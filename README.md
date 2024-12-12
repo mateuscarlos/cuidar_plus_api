@@ -14,7 +14,7 @@
 
 ### Verificação das APIs via Swagger
 Após a inicialização do servidor siga o caminho http://127.0.0.1:5000/apidocs para abrir o swagger;
-Dados fictícios para serem usados para teste da roda de cadastro de usuários:
+Dados fictícios para serem usados para teste da rota de cadastro de usuários:
 ```
 { 
       "cpf": "46161714752",
