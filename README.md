@@ -6,10 +6,10 @@
 2. Clone os repositórios e coloque os dois na mesma pasta;
 3. Abra o terminal no Visual Studio Code
 4. Navegue para a Pasta cuidar_plus_api com o comando `cd cuidar_plus_api`;
-5. Rode o comando ´python -m venv venv´ para criar o ambiente de desenvolvimento virtual;
-6. Em seguida rode o comando ´venv\Scripts\activate´ para ativar o ambiente de desenvolvimento virtual;
-7. Execute o comando ´pip install -r requirements.txt´ para instalação das dependências da aplicação;
-8. Execute o comando ´python app.py´ para inicialização do servidor da aplicação;
+5. Rode o comando `python -m venv venv` para criar o ambiente de desenvolvimento virtual;
+6. Em seguida rode o comando `venv\Scripts\activate` para ativar o ambiente de desenvolvimento virtual;
+7. Execute o comando `pip install -r requirements.txt` para instalação das dependências da aplicação;
+8. Execute o comando `python app.py` para inicialização do servidor da aplicação;
 9. Abra o navegador e acesse http://127.0.0.1:5000 para iniciar a aplicação.
 10. A qualquer momento no terminal, pressione CTRL+C para interromper a execução da aplicação.
 
