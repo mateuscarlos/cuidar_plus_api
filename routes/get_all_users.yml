@@ -1,0 +1,33 @@
+summary: Retorna todos os usuários cadastrados
+description: Esta API retorna uma lista de todos os usuários cadastrados no sistema.
+produces:
+  - application/json
+responses:
+  200:
+    description: Lista de usuários retornada com sucesso
+    schema:
+      type: array
+      items:
+        type: object
+        properties:
+          matricula:
+            type: integer
+            description: Matrícula do usuário
+          nome:
+            type: string
+            description: Nome do usuário
+          cpf:
+            type: string
+            description: CPF do usuário
+          setor:
+            type: string
+            description: Setor do usuário
+          funcao:
+            type: string
+            description: Função do usuário
+          especialidade:
+            type: string
+            description: Especialidade do usuário
+          registro_categoria:
+            type: string
+            description: Registro de categoria do usuário

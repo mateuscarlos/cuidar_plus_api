@@ -1,0 +1,17 @@
+summary: Deleta um usuário existente
+description: Deleta um usuário existente com o CPF fornecido
+consumes:
+  - application/json
+produces:
+  - application/json
+parameters:
+  - name: cpf
+    in: path
+    description: CPF do usuário
+    required: true
+    type: string
+responses:
+  200:
+    description: Usuário deletado com sucesso
+  404:
+    description: Usuário não encontrado

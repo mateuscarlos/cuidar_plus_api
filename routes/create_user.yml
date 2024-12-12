@@ -1,0 +1,38 @@
+summary: Cria um novo usuário
+description: Cria um novo usuário com os dados fornecidos
+consumes:
+  - application/json
+produces:
+  - application/json
+parameters:
+  - name: body
+    in: body
+    description: Dados do usuário
+    required: true
+    schema:
+      type: object
+      properties:
+        nome:
+          type: string
+          description: Nome do usuário
+        cpf:
+          type: string
+          description: CPF do usuário
+        endereco:
+          type: string
+          description: Endereço do usuário
+        setor:
+          type: string
+          description: Setor do usuário
+        funcao:
+          type: string
+          description: Função do usuário
+        especialidade:
+          type: string
+          description: Especialidade do usuário
+        registro_categoria:
+          type: string
+          description: Registro de categoria do usuário
+responses:
+  201:
+    description: Usuário criado com sucesso
