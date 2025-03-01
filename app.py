@@ -4,19 +4,20 @@ from db import db
 from routes.user_routes import user_routes
 from routes.routes_app import app_routes
 from flasgger import Swagger
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+from flask_talisman import Talisman
+from config import Config
 
 app = Flask(__name__, template_folder='../cuidar_plus', static_folder='../cuidar_plus/static')
-app.config["SWAGGER"] = {"title": "API Cuidar+", "uiversion": 3, "debug": True}
+app.config.from_object(Config)
 Swagger(app)
 
-CORS(app, resources={r"/api/*": {"origins": "http://127.0.0.1:5000"}})
+CORS(app, resources=Config.CORS_RESOURCES)
 
-# Configuração SQLite
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-if not app.config['SQLALCHEMY_DATABASE_URI']:
-    raise RuntimeError('No database URI provided')
+# Configurações de segurança
+talisman = Talisman(app)
+limiter = Limiter(app=app, key_func=get_remote_address)
 
 db.init_app(app)
 
