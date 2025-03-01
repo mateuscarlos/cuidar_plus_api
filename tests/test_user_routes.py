@@ -1,8 +1,11 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import pytest
 import json
 from app import app
 from db import db
-from models.user import User
+from user import User
 
 @pytest.fixture(scope='module')
 def test_client():

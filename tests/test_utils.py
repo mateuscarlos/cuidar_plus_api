@@ -1,6 +1,9 @@
-# filepath: /c:/repositorios/cuidar/cuidar_plus_api/tests/test_utils.py
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import pytest
-from routes.utils import validate_cpf, sanitize_input
+from utils import validate_cpf, sanitize_input
+
 
 def test_validate_cpf_valid():
     assert validate_cpf("12345678909")
