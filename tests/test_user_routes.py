@@ -5,14 +5,16 @@ import pytest
 import json
 from app import app
 from db import db
-from user import User
+from models.user import User
 
 @pytest.fixture(scope='module')
 def test_client():
     app.config['TESTING'] = True
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     with app.app_context():
         db.create_all()
+        print("Banco de dados de teste criado com sucesso.")
     with app.test_client() as client:
         yield client
     with app.app_context():
@@ -111,3 +113,22 @@ def test_functional_delete_user(test_client):
     response = test_client.delete('/api/excluir_usuario/12345678909')
     assert response.status_code == 200
     assert 'Usuário excluído com sucesso!' in response.get_json()['message']
+
+def test_example(test_client):
+    # Adicione um log para verificar o estado inicial do banco de dados
+    with app.app_context():
+        user = User(nome='João da Silva', cpf='12345678909', setor='TI', funcao='Desenvolvedor')
+        db.session.add(user)
+        db.session.commit()
+        users = User.query.all()
+        print(f"Usuários no banco de dados antes do teste: {users}")
+
+    # Exemplo de teste
+    response = test_client.get('/api/exibe_usuarios')
+    print(f"Response status code: {response.status_code}")
+    assert response.status_code == 200
+
+    # Adicione um log para verificar o estado final do banco de dados
+    with app.app_context():
+        users = User.query.all()
+        print(f"Usuários no banco de dados após o teste: {users}")
