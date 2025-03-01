@@ -1,0 +1,110 @@
+import pytest
+import json
+from app import app
+from db import db
+from models.user import User
+
+@pytest.fixture(scope='module')
+def test_client():
+    app.config['TESTING'] = True
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+    with app.app_context():
+        db.create_all()
+    with app.test_client() as client:
+        yield client
+    with app.app_context():
+        db.drop_all()
+
+@pytest.fixture(autouse=True)
+def clear_db():
+    with app.app_context():
+        db.session.query(User).delete()
+        db.session.commit()
+
+def test_create_user(test_client):
+    response = test_client.post('/api/criar_usuario', json={
+        'nome': 'João da Silva',
+        'cpf': '12345678909',
+        'setor': 'TI',
+        'funcao': 'Desenvolvedor'
+    })
+    assert response.status_code == 201
+    assert 'Usuário criado com sucesso!' in response.get_json()['message']
+
+def test_create_user_missing_fields(test_client):
+    response = test_client.post('/api/criar_usuario', json={
+        'nome': 'João da Silva',
+        'cpf': '12345678909'
+    })
+    assert response.status_code == 400
+    assert 'Campos obrigatórios faltando' in response.get_json()['message']
+
+def test_get_all_users(test_client):
+    with app.app_context():
+        user = User(nome='João da Silva', cpf='12345678909', setor='TI', funcao='Desenvolvedor')
+        db.session.add(user)
+        db.session.commit()
+    response = test_client.get('/api/exibe_usuarios')
+    assert response.status_code == 200
+    assert len(response.get_json()['usuarios']) == 1
+
+def test_update_user(test_client):
+    with app.app_context():
+        user = User(nome='João da Silva', cpf='12345678909', setor='TI', funcao='Desenvolvedor')
+        db.session.add(user)
+        db.session.commit()
+    response = test_client.put('/api/atualizar_usuario/12345678909', json={
+        'nome': 'João da Silva Updated'
+    })
+    assert response.status_code == 200
+    assert 'Usuário atualizado com sucesso!' in response.get_json()['message']
+
+def test_delete_user(test_client):
+    with app.app_context():
+        user = User(nome='João da Silva', cpf='12345678909', setor='TI', funcao='Desenvolvedor')
+        db.session.add(user)
+        db.session.commit()
+    response = test_client.delete('/api/excluir_usuario/12345678909')
+    assert response.status_code == 200
+    assert 'Usuário excluído com sucesso!' in response.get_json()['message']
+
+def test_functional_create_user(test_client):
+    response = test_client.post('/api/criar_usuario', json={
+        'nome': 'Maria da Silva',
+        'cpf': '98765432100',
+        'setor': 'RH',
+        'funcao': 'Analista'
+    })
+    assert response.status_code == 201
+    assert 'Usuário criado com sucesso!' in response.get_json()['message']
+
+def test_functional_get_all_users(test_client):
+    with app.app_context():
+        user1 = User(nome='João da Silva', cpf='12345678909', setor='TI', funcao='Desenvolvedor')
+        user2 = User(nome='Maria da Silva', cpf='98765432100', setor='RH', funcao='Analista')
+        db.session.add(user1)
+        db.session.add(user2)
+        db.session.commit()
+    response = test_client.get('/api/exibe_usuarios')
+    assert response.status_code == 200
+    assert len(response.get_json()['usuarios']) == 2
+
+def test_functional_update_user(test_client):
+    with app.app_context():
+        user = User(nome='João da Silva', cpf='12345678909', setor='TI', funcao='Desenvolvedor')
+        db.session.add(user)
+        db.session.commit()
+    response = test_client.put('/api/atualizar_usuario/12345678909', json={
+        'nome': 'João da Silva Updated'
+    })
+    assert response.status_code == 200
+    assert 'Usuário atualizado com sucesso!' in response.get_json()['message']
+
+def test_functional_delete_user(test_client):
+    with app.app_context():
+        user = User(nome='João da Silva', cpf='12345678909', setor='TI', funcao='Desenvolvedor')
+        db.session.add(user)
+        db.session.commit()
+    response = test_client.delete('/api/excluir_usuario/12345678909')
+    assert response.status_code == 200
+    assert 'Usuário excluído com sucesso!' in response.get_json()['message']

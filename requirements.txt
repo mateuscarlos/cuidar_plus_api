@@ -10,3 +10,5 @@ python-dotenv
 Flask-RESTx
 flask-swagger-ui
 flasgger
+unittest2
+pytest

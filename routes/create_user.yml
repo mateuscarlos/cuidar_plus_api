@@ -15,24 +15,64 @@ parameters:
         nome:
           type: string
           description: Nome do usuário
+          example: "João da Silva"
         cpf:
           type: string
           description: CPF do usuário
+          example: "12345678901"
         endereco:
           type: string
           description: Endereço do usuário
+          example: "Rua Exemplo, 123"
         setor:
           type: string
           description: Setor do usuário
+          example: "TI"
         funcao:
           type: string
           description: Função do usuário
+          example: "Desenvolvedor"
         especialidade:
           type: string
           description: Especialidade do usuário
+          example: "Backend"
         registro_categoria:
           type: string
           description: Registro de categoria do usuário
+          example: "12345"
 responses:
   201:
     description: Usuário criado com sucesso
+    schema:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Usuário criado com sucesso!"
+        matricula:
+          type: integer
+          example: 1
+  400:
+    description: Erro de validação de entrada
+    schema:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Campos obrigatórios faltando: nome, cpf, setor, funcao"
+  409:
+    description: CPF já cadastrado
+    schema:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "CPF já cadastrado"
+  500:
+    description: Erro interno no servidor
+    schema:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Erro interno no servidor"
