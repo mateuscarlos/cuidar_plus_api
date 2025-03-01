@@ -4,9 +4,6 @@ from db import db
 from routes.user_routes import user_routes
 from routes.routes_app import app_routes
 from flasgger import Swagger
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
-from flask_talisman import Talisman
 from config import Config
 
 app = Flask(__name__, template_folder='../cuidar_plus', static_folder='../cuidar_plus/static')
@@ -15,14 +12,14 @@ Swagger(app)
 
 CORS(app, resources=Config.CORS_RESOURCES)
 
-# Configurações de segurança
-talisman = Talisman(app)
-limiter = Limiter(app=app, key_func=get_remote_address)
-
 db.init_app(app)
 
 with app.app_context():
-    db.create_all()
+    try:
+        db.create_all()
+        print("Banco de dados criado com sucesso.")
+    except Exception as e:
+        print(f"Erro ao inicializar o banco de dados: {e}")
 
 # Registro de rotas
 app.register_blueprint(app_routes)

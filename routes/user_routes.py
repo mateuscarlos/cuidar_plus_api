@@ -5,17 +5,12 @@ from flasgger import Swagger, swag_from
 import re
 import bleach
 from werkzeug.exceptions import BadRequest, Conflict, NotFound
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
-from flask_talisman import Talisman
 from utils import validate_cpf, sanitize_input
 
 # Inicialização do Flask
 app = Flask(__name__)
 
-# Configurações de segurança
-talisman = Talisman(app)
-limiter = Limiter(app=app, key_func=get_remote_address)
+
 
 # Configuração do Flasgger (Swagger)
 app.config['SWAGGER'] = {
@@ -31,7 +26,7 @@ swagger = Swagger(app)
 user_routes = Blueprint('user_routes', __name__)
 
 @user_routes.route('/api/criar_usuario', methods=['POST'])
-@swag_from('swagger/create_user.yml')
+@swag_from('routes/create_user.yml')
 def create_user():
     try:
         data = request.get_json()
@@ -65,15 +60,18 @@ def create_user():
             'matricula': new_user.id
         }), 201
 
-    except ValueError as e:
+    except BadRequest as e:
         db.session.rollback()
         return jsonify({'message': str(e)}), 400
+    except Conflict as e:
+        db.session.rollback()
+        return jsonify({'message': str(e)}), 409
     except Exception as e:
         db.session.rollback()
-        return jsonify({'message': 'Erro interno no servidor'}), 500
+        return jsonify({'message': 'Erro interno no servidor', 'error': str(e)}), 500
 
 @user_routes.route('/api/exibe_usuarios', methods=['GET'])
-@swag_from('swagger/get_users.yml')
+@swag_from('routes/get_all_users.yml')
 def get_all_users():
     try:
         page = request.args.get('page', 1, type=int)
@@ -99,10 +97,10 @@ def get_all_users():
         }), 200
 
     except Exception as e:
-        return jsonify({'message': 'Erro ao recuperar usuários'}), 500
+        return jsonify({'message': 'Erro ao recuperar usuários', 'error': str(e)}), 500
 
 @user_routes.route('/api/atualizar_usuario/<cpf>', methods=['PUT'])
-@swag_from('swagger/update_user.yml')
+@swag_from('routes/update_user.yml')
 def atualizar_usuario(cpf):
     try:
         if not validate_cpf(cpf):
@@ -128,12 +126,18 @@ def atualizar_usuario(cpf):
         db.session.commit()
         return jsonify({'message': 'Usuário atualizado com sucesso!'}), 200
 
-    except Exception as e:
+    except BadRequest as e:
         db.session.rollback()
         return jsonify({'message': str(e)}), 400
+    except NotFound as e:
+        db.session.rollback()
+        return jsonify({'message': str(e)}), 404
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': 'Erro interno no servidor', 'error': str(e)}), 500
 
 @user_routes.route('/api/excluir_usuario/<cpf>', methods=['DELETE'])
-@swag_from('swagger/delete_user.yml')
+@swag_from('routes/delete_user.yml')
 def excluir_usuario(cpf):
     try:
         if not validate_cpf(cpf):
@@ -147,9 +151,15 @@ def excluir_usuario(cpf):
         db.session.commit()
         return jsonify({'message': 'Usuário excluído com sucesso!'}), 200
 
-    except Exception as e:
+    except BadRequest as e:
         db.session.rollback()
         return jsonify({'message': str(e)}), 400
+    except NotFound as e:
+        db.session.rollback()
+        return jsonify({'message': str(e)}), 404
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': 'Erro interno no servidor', 'error': str(e)}), 500
 
 # Error handlers
 @user_routes.errorhandler(BadRequest)

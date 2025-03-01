@@ -12,3 +12,5 @@ flask-swagger-ui
 flasgger
 unittest2
 pytest
+flask-limiter
+bleach
