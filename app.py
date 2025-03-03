@@ -3,12 +3,13 @@ from flask_cors import CORS
 from db import db
 from routes.user_routes import user_routes
 from routes.routes_app import app_routes
+from routes.pacientes_app import pacientes_routes
 from flasgger import Swagger
 from config import Config
 
 app = Flask(__name__, template_folder='../cuidar_plus', static_folder='../cuidar_plus/static')
 app.config.from_object(Config)
-Swagger(app)
+swagger = Swagger(app)
 
 CORS(app, resources=Config.CORS_RESOURCES)
 
@@ -24,6 +25,7 @@ with app.app_context():
 # Registro de rotas
 app.register_blueprint(app_routes)
 app.register_blueprint(user_routes)
+app.register_blueprint(pacientes_routes)  
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=8000)

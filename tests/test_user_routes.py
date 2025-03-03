@@ -10,7 +10,7 @@ from models.user import User
 @pytest.fixture(scope='module')
 def test_client():
     app.config['TESTING'] = True
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:password@localhost/test_cuidar_plus_api'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     with app.app_context():
         db.create_all()

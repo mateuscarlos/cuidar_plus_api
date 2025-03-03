@@ -1,7 +1,7 @@
 from flask import Flask, Blueprint, request, jsonify
 from models.user import User
 from db import db
-from flasgger import Swagger, swag_from
+from flasgger import Swagger
 import re
 import bleach
 from werkzeug.exceptions import BadRequest, Conflict, NotFound
@@ -9,8 +9,6 @@ from utils import validate_cpf, sanitize_input
 
 # Inicialização do Flask
 app = Flask(__name__)
-
-
 
 # Configuração do Flasgger (Swagger)
 app.config['SWAGGER'] = {
@@ -26,8 +24,54 @@ swagger = Swagger(app)
 user_routes = Blueprint('user_routes', __name__)
 
 @user_routes.route('/api/criar_usuario', methods=['POST'])
-@swag_from('routes/create_user.yml')
 def create_user():
+    """
+    Cria um novo usuário
+    ---
+    tags:
+      - Usuários
+    parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          required:
+            - nome
+            - cpf
+            - setor
+            - funcao
+          properties:
+            nome:
+              type: string
+              description: Nome do usuário
+            cpf:
+              type: string
+              description: CPF do usuário
+            setor:
+              type: string
+              description: Setor do usuário
+            funcao:
+              type: string
+              description: Função do usuário
+            endereco:
+              type: string
+              description: Endereço do usuário
+            especialidade:
+              type: string
+              description: Especialidade do usuário
+            registro_categoria:
+              type: string
+              description: Registro da categoria do usuário
+    responses:
+      201:
+        description: Usuário criado com sucesso
+      400:
+        description: Campos obrigatórios faltando ou CPF inválido
+      409:
+        description: CPF já cadastrado
+      500:
+        description: Erro interno no servidor
+    """
     try:
         data = request.get_json()
         required_fields = ['nome', 'cpf', 'setor', 'funcao']
@@ -44,11 +88,11 @@ def create_user():
         user_data = {
             'nome': sanitize_input(data['nome'], 100),
             'cpf': cpf,
-            'endereco': sanitize_input(data.get('endereco'), 200),
+            'endereco': sanitize_input(data.get('endereco'), 200) if data.get('endereco') else None,
             'setor': sanitize_input(data['setor'], 50),
             'funcao': sanitize_input(data['funcao'], 50),
-            'especialidade': sanitize_input(data.get('especialidade'), 50),
-            'registro_categoria': sanitize_input(data.get('registro_categoria'), 20)
+            'especialidade': sanitize_input(data.get('especialidade'), 50) if data.get('especialidade') else None,
+            'registro_categoria': sanitize_input(data.get('registro_categoria'), 50) if data.get('registro_categoria') else None
         }
 
         new_user = User(**user_data)
@@ -57,7 +101,7 @@ def create_user():
 
         return jsonify({
             'message': 'Usuário criado com sucesso!',
-            'matricula': new_user.id
+            'id': new_user.id
         }), 201
 
     except BadRequest as e:
@@ -71,25 +115,52 @@ def create_user():
         return jsonify({'message': 'Erro interno no servidor', 'error': str(e)}), 500
 
 @user_routes.route('/api/exibe_usuarios', methods=['GET'])
-@swag_from('routes/get_all_users.yml')
 def get_all_users():
+    """
+    Exibe todos os usuários
+    ---
+    tags:
+      - Usuários
+    parameters:
+      - in: query
+        name: page
+        type: integer
+        description: Número da página
+      - in: query
+        name: per_page
+        type: integer
+        description: Número de usuários por página
+      - in: query
+        name: setor
+        type: string
+        description: Setor dos usuários
+    responses:
+      200:
+        description: Lista de usuários
+      500:
+        description: Erro ao recuperar usuários
+    """
     try:
         page = request.args.get('page', 1, type=int)
         per_page = request.args.get('per_page', 10, type=int)
-        
+        setor = request.args.get('setor', None, type=str)
+
         query = User.query
-        if setor := request.args.get('setor'):
-            query = query.filter_by(setor=sanitize_input(setor))
-        
+        if setor:
+            query = query.filter_by(setor=setor)
+
         pagination = query.paginate(page=page, per_page=per_page, error_out=False)
-        
+
         return jsonify({
             'usuarios': [{
-                'matricula': u.id,
+                'id': u.id,
                 'nome': u.nome,
+                'cpf': u.cpf,
                 'setor': u.setor,
                 'funcao': u.funcao,
-                'cpf': u.cpf
+                'endereco': u.endereco,
+                'especialidade': u.especialidade,
+                'registro_categoria': u.registro_categoria
             } for u in pagination.items],
             'total': pagination.total,
             'paginas': pagination.pages,
@@ -100,8 +171,48 @@ def get_all_users():
         return jsonify({'message': 'Erro ao recuperar usuários', 'error': str(e)}), 500
 
 @user_routes.route('/api/atualizar_usuario/<cpf>', methods=['PUT'])
-@swag_from('routes/update_user.yml')
 def atualizar_usuario(cpf):
+    """
+    Atualiza um usuário existente
+    ---
+    tags:
+      - Usuários
+    parameters:
+      - in: path
+        name: cpf
+        type: string
+        required: true
+        description: CPF do usuário
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            nome:
+              type: string
+              description: Nome do usuário
+            setor:
+              type: string
+              description: Setor do usuário
+            funcao:
+              type: string
+              description: Função do usuário
+            especialidade:
+              type: string
+              description: Especialidade do usuário
+            registro_categoria:
+              type: string
+              description: Registro da categoria do usuário
+    responses:
+      200:
+        description: Usuário atualizado com sucesso
+      400:
+        description: CPF inválido
+      404:
+        description: Usuário não encontrado
+      500:
+        description: Erro interno no servidor
+    """
     try:
         if not validate_cpf(cpf):
             raise BadRequest("CPF inválido")
@@ -112,11 +223,12 @@ def atualizar_usuario(cpf):
 
         data = request.get_json()
         update_fields = {
-            'nome': sanitize_input(data.get('nome'), 100),
-            'setor': sanitize_input(data.get('setor'), 50),
-            'funcao': sanitize_input(data.get('funcao'), 50),
-            'especialidade': sanitize_input(data.get('especialidade'), 50),
-            'registro_categoria': sanitize_input(data.get('registro_categoria'), 20)
+            'nome': sanitize_input(data.get('nome'), 100) if data.get('nome') else None,
+            'setor': sanitize_input(data.get('setor'), 50) if data.get('setor') else None,
+            'funcao': sanitize_input(data.get('funcao'), 50) if data.get('funcao') else None,
+            'endereco': sanitize_input(data.get('endereco'), 200) if data.get('endereco') else None,
+            'especialidade': sanitize_input(data.get('especialidade'), 50) if data.get('especialidade') else None,
+            'registro_categoria': sanitize_input(data.get('registro_categoria'), 50) if data.get('registro_categoria') else None
         }
 
         for key, value in update_fields.items():
@@ -137,8 +249,28 @@ def atualizar_usuario(cpf):
         return jsonify({'message': 'Erro interno no servidor', 'error': str(e)}), 500
 
 @user_routes.route('/api/excluir_usuario/<cpf>', methods=['DELETE'])
-@swag_from('routes/delete_user.yml')
 def excluir_usuario(cpf):
+    """
+    Exclui um usuário existente
+    ---
+    tags:
+      - Usuários
+    parameters:
+      - in: path
+        name: cpf
+        type: string
+        required: true
+        description: CPF do usuário
+    responses:
+      200:
+        description: Usuário excluído com sucesso
+      400:
+        description: CPF inválido
+      404:
+        description: Usuário não encontrado
+      500:
+        description: Erro interno no servidor
+    """
     try:
         if not validate_cpf(cpf):
             raise BadRequest("CPF inválido")
