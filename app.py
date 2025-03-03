@@ -7,7 +7,7 @@ from routes.pacientes_app import pacientes_routes
 from flasgger import Swagger
 from config import Config
 
-app = Flask(__name__, template_folder='../cuidar_plus', static_folder='../cuidar_plus/static')
+app = Flask(__name__, template_folder='../cuidar-plus/cuidar-plus', static_folder='../cuidar-plus/cuidar-plus')
 app.config.from_object(Config)
 swagger = Swagger(app)
 

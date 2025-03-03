@@ -1,4 +1,18 @@
 services:
+  backend:
+    build: ../cuidar_plus_api
+    ports:
+      - "8001:8000"
+    volumes:
+      - ../cuidar_plus_api:/app
+  frontend:
+    build:
+      context: ../cuidar-plus
+      dockerfile: Dockerfile
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend
   app:
     build: .
     container_name: app_container
