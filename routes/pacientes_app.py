@@ -1,9 +1,9 @@
 from flask import Blueprint, request, jsonify
+import requests
 from models.pacientes import Paciente
 from db import db
 from flasgger import Swagger
 from utils import validate_cpf, sanitize_input
-import requests
 from werkzeug.exceptions import BadRequest, Conflict, NotFound
 
 pacientes_routes = Blueprint('pacientes_routes', __name__)
@@ -91,8 +91,8 @@ def create_paciente():
             'operadora': sanitize_input(data['operadora'], 50),
             'cid_primario': sanitize_input(data['cid_primario'], 10),
             'rua': address_data.get('logradouro', ''),
-            'numero': sanitize_input(data.get('numero'), 10),
-            'complemento': sanitize_input(data.get('complemento'), 50),
+            'numero': sanitize_input(data.get('numero'), 10) if data.get('numero') else None,
+            'complemento': sanitize_input(data.get('complemento'), 50) if data.get('complemento') else None,
             'cep': data['cep'],
             'cidade': address_data.get('localidade', ''),
             'estado': address_data.get('uf', '')
@@ -206,6 +206,12 @@ def atualizar_paciente(cpf):
             cep:
               type: string
               description: CEP do paciente
+            cidade:
+              type: string
+              description: Cidade do paciente
+            estado:
+              type: string
+              description: Estado do paciente
     responses:
       200:
         description: Paciente atualizado com sucesso
@@ -226,15 +232,15 @@ def atualizar_paciente(cpf):
 
         data = request.get_json()
         update_fields = {
-            'nome_completo': sanitize_input(data.get('nome_completo'), 100),
-            'operadora': sanitize_input(data.get('operadora'), 50),
-            'cid_primario': sanitize_input(data.get('cid_primario'), 10),
-            'rua': sanitize_input(data.get('rua'), 100),
-            'numero': sanitize_input(data.get('numero'), 10),
-            'complemento': sanitize_input(data.get('complemento'), 50),
-            'cep': sanitize_input(data.get('cep'), 8),
-            'cidade': sanitize_input(data.get('cidade'), 50),
-            'estado': sanitize_input(data.get('estado'), 2)
+            'nome_completo': sanitize_input(data.get('nome_completo'), 100) if data.get('nome_completo') else None,
+            'operadora': sanitize_input(data.get('operadora'), 50) if data.get('operadora') else None,
+            'cid_primario': sanitize_input(data.get('cid_primario'), 10) if data.get('cid_primario') else None,
+            'rua': sanitize_input(data.get('rua'), 100) if data.get('rua') else None,
+            'numero': sanitize_input(data.get('numero'), 10) if data.get('numero') else None,
+            'complemento': sanitize_input(data.get('complemento'), 50) if data.get('complemento') else None,
+            'cep': sanitize_input(data.get('cep'), 8) if data.get('cep') else None,
+            'cidade': sanitize_input(data.get('cidade'), 50) if data.get('cidade') else None,
+            'estado': sanitize_input(data.get('estado'), 2) if data.get('estado') else None
         }
 
         for key, value in update_fields.items():
@@ -283,7 +289,9 @@ def excluir_paciente(cpf):
             
         paciente = Paciente.query.filter_by(cpf=cpf).first()
         if not paciente:
-            raise NotFound("Paciente não encontrado")
+        
+            if not paciente:
+                raise NotFound("Paciente não encontrado")
         
         db.session.delete(paciente)
         db.session.commit()

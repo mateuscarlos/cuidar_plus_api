@@ -2,7 +2,10 @@ import os
 
 class Config:
     BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-    SQLALCHEMY_DATABASE_URI = f'sqlite:///{os.path.join(BASE_DIR, "users.db")}'
+    SQLALCHEMY_DATABASE_URI = (
+        f"mysql+pymysql://{os.getenv('DB_USER', 'root')}:{os.getenv('DB_PASSWORD', 'password')}"
+        f"@mysql/{os.getenv('DB_NAME', 'cuidar_plus_api')}"
+    )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SWAGGER = {
         'title': 'API Cuidar+',

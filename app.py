@@ -25,7 +25,7 @@ with app.app_context():
 # Registro de rotas
 app.register_blueprint(app_routes)
 app.register_blueprint(user_routes)
-app.register_blueprint(pacientes_routes)  # Registrar o novo blueprint
+app.register_blueprint(pacientes_routes)  
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=8000)

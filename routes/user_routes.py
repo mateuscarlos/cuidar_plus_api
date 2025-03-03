@@ -88,11 +88,11 @@ def create_user():
         user_data = {
             'nome': sanitize_input(data['nome'], 100),
             'cpf': cpf,
-            'endereco': sanitize_input(data.get('endereco'), 200),
+            'endereco': sanitize_input(data.get('endereco'), 200) if data.get('endereco') else None,
             'setor': sanitize_input(data['setor'], 50),
             'funcao': sanitize_input(data['funcao'], 50),
-            'especialidade': sanitize_input(data.get('especialidade'), 50),
-            'registro_categoria': sanitize_input(data.get('registro_categoria'), 20)
+            'especialidade': sanitize_input(data.get('especialidade'), 50) if data.get('especialidade') else None,
+            'registro_categoria': sanitize_input(data.get('registro_categoria'), 50) if data.get('registro_categoria') else None
         }
 
         new_user = User(**user_data)
@@ -101,7 +101,7 @@ def create_user():
 
         return jsonify({
             'message': 'Usuário criado com sucesso!',
-            'matricula': new_user.id
+            'id': new_user.id
         }), 201
 
     except BadRequest as e:
@@ -143,20 +143,24 @@ def get_all_users():
     try:
         page = request.args.get('page', 1, type=int)
         per_page = request.args.get('per_page', 10, type=int)
-        
+        setor = request.args.get('setor', None, type=str)
+
         query = User.query
-        if setor := request.args.get('setor'):
-            query = query.filter_by(setor=sanitize_input(setor))
-        
+        if setor:
+            query = query.filter_by(setor=setor)
+
         pagination = query.paginate(page=page, per_page=per_page, error_out=False)
-        
+
         return jsonify({
             'usuarios': [{
-                'matricula': u.id,
+                'id': u.id,
                 'nome': u.nome,
+                'cpf': u.cpf,
                 'setor': u.setor,
                 'funcao': u.funcao,
-                'cpf': u.cpf
+                'endereco': u.endereco,
+                'especialidade': u.especialidade,
+                'registro_categoria': u.registro_categoria
             } for u in pagination.items],
             'total': pagination.total,
             'paginas': pagination.pages,
@@ -219,11 +223,12 @@ def atualizar_usuario(cpf):
 
         data = request.get_json()
         update_fields = {
-            'nome': sanitize_input(data.get('nome'), 100),
-            'setor': sanitize_input(data.get('setor'), 50),
-            'funcao': sanitize_input(data.get('funcao'), 50),
-            'especialidade': sanitize_input(data.get('especialidade'), 50),
-            'registro_categoria': sanitize_input(data.get('registro_categoria'), 20)
+            'nome': sanitize_input(data.get('nome'), 100) if data.get('nome') else None,
+            'setor': sanitize_input(data.get('setor'), 50) if data.get('setor') else None,
+            'funcao': sanitize_input(data.get('funcao'), 50) if data.get('funcao') else None,
+            'endereco': sanitize_input(data.get('endereco'), 200) if data.get('endereco') else None,
+            'especialidade': sanitize_input(data.get('especialidade'), 50) if data.get('especialidade') else None,
+            'registro_categoria': sanitize_input(data.get('registro_categoria'), 50) if data.get('registro_categoria') else None
         }
 
         for key, value in update_fields.items():
