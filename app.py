@@ -6,6 +6,7 @@ from routes.routes_app import app_routes
 from routes.pacientes_app import pacientes_routes
 from flasgger import Swagger
 from config import Config
+from models.pacientes import Paciente
 
 app = Flask(__name__, template_folder='../cuidar-plus/cuidar-plus', static_folder='../cuidar-plus/cuidar-plus')
 app.config.from_object(Config)
@@ -28,4 +29,4 @@ app.register_blueprint(user_routes)
 app.register_blueprint(pacientes_routes)  
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8000)
+    app.run(host='0.0.0.0', port=5000)

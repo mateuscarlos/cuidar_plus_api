@@ -5,6 +5,7 @@ from db import db
 from flasgger import Swagger
 from utils import validate_cpf, sanitize_input
 from werkzeug.exceptions import BadRequest, Conflict, NotFound
+import re
 
 pacientes_routes = Blueprint('pacientes_routes', __name__)
 
