@@ -88,13 +88,13 @@ def create_paciente():
         address_data = get_address_from_cep(data['cep'])
 
         paciente_data = {
-            'nome_completo': sanitize_input(data['nome_completo'], 100),
+            'nome_completo': sanitize_input(str(data['nome_completo']), 100),
             'cpf': cpf,
-            'operadora': sanitize_input(data['operadora'], 50),
-            'cid_primario': sanitize_input(data['cid_primario'], 10),
+            'operadora': sanitize_input(str(data['operadora']), 50),
+            'cid_primario': sanitize_input(str(data['cid_primario']), 10),
             'rua': address_data.get('logradouro', ''),
-            'numero': sanitize_input(data.get('numero'), 10) if data.get('numero') else None,
-            'complemento': sanitize_input(data.get('complemento'), 50) if data.get('complemento') else None,
+            'numero': sanitize_input(str(data.get('numero')), 10) if data.get('numero') else None,
+            'complemento': sanitize_input(str(data.get('complemento')), 50) if data.get('complemento') else None,
             'cep': data['cep'],
             'cidade': address_data.get('localidade', ''),
             'estado': address_data.get('uf', ''),
@@ -257,7 +257,6 @@ def atualizar_paciente(cpf):
     except Exception as e:
         db.session.rollback()
         return jsonify({'message': 'Erro interno no servidor', 'error': str(e)}), 500
-
 @pacientes_routes.route('/api/excluir_paciente/<cpf>', methods=['DELETE'])
 def excluir_paciente(cpf):
     """
