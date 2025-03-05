@@ -121,19 +121,6 @@ def get_all_users():
     ---
     tags:
       - Usuários
-    parameters:
-      - in: query
-        name: page
-        type: integer
-        description: Número da página
-      - in: query
-        name: per_page
-        type: integer
-        description: Número de usuários por página
-      - in: query
-        name: setor
-        type: string
-        description: Setor dos usuários
     responses:
       200:
         description: Lista de usuários
@@ -141,16 +128,10 @@ def get_all_users():
         description: Erro ao recuperar usuários
     """
     try:
-        page = request.args.get('page', 1, type=int)
-        per_page = request.args.get('per_page', 10, type=int)
-        setor = request.args.get('setor', None, type=str)
+        # Busca todos os usuários sem paginação
+        usuarios = User.query.all()
 
-        query = User.query
-        if setor:
-            query = query.filter_by(setor=setor)
-
-        pagination = query.paginate(page=page, per_page=per_page, error_out=False)
-
+        # Retorna a lista de usuários
         return jsonify({
             'usuarios': [{
                 'id': u.id,
@@ -161,10 +142,7 @@ def get_all_users():
                 'endereco': u.endereco,
                 'especialidade': u.especialidade,
                 'registro_categoria': u.registro_categoria
-            } for u in pagination.items],
-            'total': pagination.total,
-            'paginas': pagination.pages,
-            'pagina_atual': page
+            } for u in usuarios]
         }), 200
 
     except Exception as e:
