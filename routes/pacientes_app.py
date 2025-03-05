@@ -3,9 +3,10 @@ import requests
 from models.pacientes import Paciente
 from db import db
 from flasgger import Swagger
-from utils import validate_cpf, sanitize_input
+from utils import validate_cpf, sanitize_input, get_local_time, get_user_timezone
 from werkzeug.exceptions import BadRequest, Conflict, NotFound
 import re
+from datetime import datetime, timezone
 
 pacientes_routes = Blueprint('pacientes_routes', __name__)
 
@@ -87,25 +88,30 @@ def create_paciente():
         address_data = get_address_from_cep(data['cep'])
 
         paciente_data = {
-            'nome_completo': sanitize_input(data['nome_completo'], 100),
+            'nome_completo': sanitize_input(str(data['nome_completo']), 100),
             'cpf': cpf,
-            'operadora': sanitize_input(data['operadora'], 50),
-            'cid_primario': sanitize_input(data['cid_primario'], 10),
+            'operadora': sanitize_input(str(data['operadora']), 50),
+            'cid_primario': sanitize_input(str(data['cid_primario']), 10),
             'rua': address_data.get('logradouro', ''),
-            'numero': sanitize_input(data.get('numero'), 10) if data.get('numero') else None,
-            'complemento': sanitize_input(data.get('complemento'), 50) if data.get('complemento') else None,
+            'numero': sanitize_input(str(data.get('numero')), 10) if data.get('numero') else None,
+            'complemento': sanitize_input(str(data.get('complemento')), 50) if data.get('complemento') else None,
             'cep': data['cep'],
             'cidade': address_data.get('localidade', ''),
-            'estado': address_data.get('uf', '')
+            'estado': address_data.get('uf', ''),
+            'updated_at': datetime.now(timezone.utc)
         }
 
         new_paciente = Paciente(**paciente_data)
         db.session.add(new_paciente)
         db.session.commit()
 
+        user_ip = request.remote_addr
+        user_timezone = get_user_timezone(user_ip)
+
         return jsonify({
             'message': 'Paciente criado com sucesso!',
-            'id': new_paciente.id
+            'id': new_paciente.id,
+            'updated_at': get_local_time(new_paciente.updated_at, user_timezone).isoformat()
         }), 201
 
     except BadRequest as e:
@@ -125,15 +131,6 @@ def get_all_pacientes():
     ---
     tags:
       - Pacientes
-    parameters:
-      - in: query
-        name: page
-        type: integer
-        description: Número da página
-      - in: query
-        name: per_page
-        type: integer
-        description: Número de pacientes por página
     responses:
       200:
         description: Lista de pacientes
@@ -141,10 +138,9 @@ def get_all_pacientes():
         description: Erro ao recuperar pacientes
     """
     try:
-        page = request.args.get('page', 1, type=int)
-        per_page = request.args.get('per_page', 10, type=int)
-        
-        pagination = Paciente.query.paginate(page=page, per_page=per_page, error_out=False)
+        pacientes = Paciente.query.all()
+        user_ip = request.remote_addr
+        user_timezone = get_user_timezone(user_ip)
         
         return jsonify({
             'pacientes': [{
@@ -158,11 +154,9 @@ def get_all_pacientes():
                 'complemento': p.complemento,
                 'cep': p.cep,
                 'cidade': p.cidade,
-                'estado': p.estado
-            } for p in pagination.items],
-            'total': pagination.total,
-            'paginas': pagination.pages,
-            'pagina_atual': page
+                'estado': p.estado,
+                'updated_at': get_local_time(p.updated_at, user_timezone).isoformat()
+            } for p in pacientes]
         }), 200
 
     except Exception as e:
@@ -241,7 +235,8 @@ def atualizar_paciente(cpf):
             'complemento': sanitize_input(data.get('complemento'), 50) if data.get('complemento') else None,
             'cep': sanitize_input(data.get('cep'), 8) if data.get('cep') else None,
             'cidade': sanitize_input(data.get('cidade'), 50) if data.get('cidade') else None,
-            'estado': sanitize_input(data.get('estado'), 2) if data.get('estado') else None
+            'estado': sanitize_input(data.get('estado'), 2) if data.get('estado') else None,
+            'updated_at': datetime.now(timezone.utc)
         }
 
         for key, value in update_fields.items():
@@ -249,7 +244,9 @@ def atualizar_paciente(cpf):
                 setattr(paciente, key, value)
         
         db.session.commit()
-        return jsonify({'message': 'Paciente atualizado com sucesso!'}), 200
+        user_ip = request.remote_addr
+        user_timezone = get_user_timezone(user_ip)
+        return jsonify({'message': 'Paciente atualizado com sucesso!', 'updated_at': get_local_time(paciente.updated_at, user_timezone).isoformat()}), 200
 
     except BadRequest as e:
         db.session.rollback()
@@ -260,7 +257,6 @@ def atualizar_paciente(cpf):
     except Exception as e:
         db.session.rollback()
         return jsonify({'message': 'Erro interno no servidor', 'error': str(e)}), 500
-
 @pacientes_routes.route('/api/excluir_paciente/<cpf>', methods=['DELETE'])
 def excluir_paciente(cpf):
     """
@@ -290,9 +286,7 @@ def excluir_paciente(cpf):
             
         paciente = Paciente.query.filter_by(cpf=cpf).first()
         if not paciente:
-        
-            if not paciente:
-                raise NotFound("Paciente não encontrado")
+            raise NotFound("Paciente não encontrado")
         
         db.session.delete(paciente)
         db.session.commit()
