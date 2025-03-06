@@ -301,3 +301,76 @@ def excluir_paciente(cpf):
     except Exception as e:
         db.session.rollback()
         return jsonify({'message': 'Erro interno no servidor', 'error': str(e)}), 500
+
+@pacientes_routes.route('/api/buscar_paciente', methods=['GET'])
+def buscar_paciente():
+    """
+    Busca um paciente por ID, Nome Completo ou CPF
+    ---
+    tags:
+      - Pacientes
+    parameters:
+      - in: query
+        name: campo
+        type: string
+        required: true
+        description: Campo de busca (id, nome_completo, cpf)
+      - in: query
+        name: valor
+        type: string
+        required: true
+        description: Valor de busca
+    responses:
+      200:
+        description: Paciente encontrado
+      400:
+        description: Campo ou valor de busca inválido
+      404:
+        description: Paciente não encontrado
+      500:
+        description: Erro interno no servidor
+    """
+    try:
+        campo = request.args.get('campo')
+        valor = request.args.get('valor')
+
+        if not campo or not valor:
+            raise BadRequest("Campo e valor de busca são obrigatórios")
+
+        if campo not in ['id', 'nome_completo', 'cpf']:
+            raise BadRequest("Campo de busca inválido")
+
+        if campo == 'id':
+            paciente = Paciente.query.filter_by(id=valor).first()
+        elif campo == 'nome_completo':
+            paciente = Paciente.query.filter(Paciente.nome_completo.ilike(f'%{valor}%')).first()
+        elif campo == 'cpf':
+            paciente = Paciente.query.filter_by(cpf=valor).first()
+
+        if not paciente:
+            raise NotFound("Paciente não encontrado")
+
+        user_ip = request.remote_addr
+        user_timezone = get_user_timezone(user_ip)
+
+        return jsonify({
+            'id': paciente.id,
+            'nome_completo': paciente.nome_completo,
+            'cpf': paciente.cpf,
+            'operadora': paciente.operadora,
+            'cid_primario': paciente.cid_primario,
+            'rua': paciente.rua,
+            'numero': paciente.numero,
+            'complemento': paciente.complemento,
+            'cep': paciente.cep,
+            'cidade': paciente.cidade,
+            'estado': paciente.estado,
+            'updated_at': get_local_time(paciente.updated_at, user_timezone).isoformat()
+        }), 200
+
+    except BadRequest as e:
+        return jsonify({'message': str(e)}), 400
+    except NotFound as e:
+        return jsonify({'message': str(e)}), 404
+    except Exception as e:
+        return jsonify({'message': 'Erro interno no servidor', 'error': str(e)}), 500
