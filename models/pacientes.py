@@ -21,5 +21,6 @@ class Paciente(db.Model):
     bairro = db.Column(db.String(50), nullable=False)
     cidade = db.Column(db.String(50), nullable=False)
     estado = db.Column(db.String(2), nullable=False)
+    status = db.Column(db.String(20), nullable=False, default='em-avaliacao')  # Adiciona o campo de status
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

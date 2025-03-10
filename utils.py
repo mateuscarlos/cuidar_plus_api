@@ -2,6 +2,8 @@ import re
 import bleach
 from datetime import datetime
 import pytz
+import requests
+from werkzeug.exceptions import BadRequest
 
 def validate_cpf(cpf: str) -> bool:
     """Valida o formato e dígitos verificadores do CPF"""
@@ -43,9 +45,6 @@ def get_local_time(utc_dt, timezone_str):
     local_dt = utc_dt.astimezone(local_tz)
     return local_dt
 
-
-import requests
-
 def get_user_timezone(ip_address):
     """
     Obtém o fuso horário do usuário com base no endereço IP.
@@ -60,3 +59,18 @@ def get_user_timezone(ip_address):
         return data.get('timezone', 'UTC')
     except requests.RequestException:
         return 'UTC'
+
+def get_address_from_cep(cep):
+    """
+    Obtém o endereço a partir do CEP usando a API ViaCEP.
+    
+    :param cep: CEP do usuário
+    :return: dados do endereço
+    """
+    response = requests.get(f'https://viacep.com.br/ws/{cep}/json/')
+    if response.status_code != 200:
+        raise BadRequest("CEP inválido")
+    data = response.json()
+    if 'erro' in data:
+        raise BadRequest("CEP inválido")
+    return data
