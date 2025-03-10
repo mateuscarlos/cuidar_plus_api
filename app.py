@@ -3,7 +3,7 @@ from flask_cors import CORS
 from db import db
 from routes.user_routes import user_routes
 from routes.routes_app import app_routes
-from routes.pacientes_app import pacientes_routes
+from routes.pacientes.pacientes_app import pacientes_routes
 from flasgger import Swagger
 from config import Config
 from models.pacientes import Paciente
@@ -31,4 +31,4 @@ app.register_blueprint(user_routes)
 app.register_blueprint(pacientes_routes)  
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5000, debug=True)
