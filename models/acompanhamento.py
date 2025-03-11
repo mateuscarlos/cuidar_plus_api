@@ -7,7 +7,7 @@ class Acompanhamento(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     descricao = db.Column(db.Text, nullable=False)
     data_criacao = db.Column(db.DateTime, default=datetime.utcnow)
-    paciente_id = db.Column(db.Integer, db.ForeignKey('pacientes.id'), nullable=False)
+    paciente_id = db.Column(db.Integer, db.ForeignKey('paciente.id'), nullable=False)
     usuario_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
     paciente = db.relationship('Paciente', backref=db.backref('acompanhamentos', lazy=True))
