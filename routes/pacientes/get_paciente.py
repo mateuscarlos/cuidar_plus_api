@@ -17,7 +17,7 @@ def buscar_paciente():
         if campo == 'id':
             paciente = Paciente.query.filter_by(id=valor).first()
         elif campo == 'nome_completo':
-            paciente = Paciente.query.filter(Paciente.nome_completo.ilike(f'%{valor}%')).first()
+            paciente = Paciente.query.filter(Paciente.nome_completo.ilike(f'%{valor}%')).all()
         elif campo == 'cpf':
             paciente = Paciente.query.filter_by(cpf=valor).first()
 
@@ -27,28 +27,13 @@ def buscar_paciente():
         user_ip = request.remote_addr
         user_timezone = get_user_timezone(user_ip)
 
+        if isinstance(paciente, list):
+            pacientes = [p.to_dict() for p in paciente]
+        else:
+            pacientes = [paciente.to_dict()]
+
         return jsonify({
-            'id': paciente.id,
-            'nome_completo': paciente.nome_completo,
-            'cpf': paciente.cpf,
-            'operadora': paciente.operadora,
-            'identificador_prestadora': paciente.identificador_prestadora,
-            'acomodacao': paciente.acomodacao,
-            'telefone': paciente.telefone,
-            'alergias': paciente.alergias,
-            'cid_primario': paciente.cid_primario,
-            'cid_secundario': paciente.cid_secundario,
-            'data_nascimento': paciente.data_nascimento,
-            'rua': paciente.rua,
-            'numero': paciente.numero,
-            'complemento': paciente.complemento,
-            'cep': paciente.cep,
-            'bairro': paciente.bairro,
-            'cidade': paciente.cidade,
-            'estado': paciente.estado,
-            'status': paciente.status,
-            'created_at': paciente.created_at.isoformat(),
-            'updated_at': get_local_time(paciente.updated_at, user_timezone).isoformat()
+            'pacientes': pacientes
         }), 200
 
     except BadRequest as e:
