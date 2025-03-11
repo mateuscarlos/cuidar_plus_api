@@ -24,6 +24,11 @@ class Paciente(db.Model):
     status = db.Column(db.String(20), nullable=False, default='em-avaliacao')  # Adiciona o campo de status
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    email = db.Column(db.String(100), nullable=True)
+    telefone_emergencia = db.Column(db.String(15), nullable=True)
+    contato_emergencia = db.Column(db.String(100), nullable=True)
+    case_responsavel = db.Column(db.String(100), nullable=True)
+    medico_responsavel = db.Column(db.String(100), nullable=True)
 
     def to_dict(self):
         return {
