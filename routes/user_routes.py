@@ -47,21 +47,55 @@ def create_user():
             cpf:
               type: string
               description: CPF do usuário
+            rua:
+              type: string
+              description: Rua do usuário
+            numero:
+              type: string
+              description: Número do endereço do usuário
+            complemento:
+              type: string
+              description: Complemento do endereço do usuário
+            cep:
+              type: string
+              description: CEP do usuário
+            bairro:
+              type: string
+              description: Bairro do usuário
+            cidade:
+              type: string
+              description: Cidade do usuário
+            estado:
+              type: string
+              description: Estado do usuário
             setor:
               type: string
               description: Setor do usuário
             funcao:
               type: string
               description: Função do usuário
-            endereco:
-              type: string
-              description: Endereço do usuário
             especialidade:
               type: string
               description: Especialidade do usuário
             registro_categoria:
               type: string
               description: Registro da categoria do usuário
+            email:
+              type: string
+              description: Email do usuário
+            telefone:
+              type: string
+              description: Telefone do usuário
+            data_admissao:
+              type: string
+              format: date
+              description: Data de admissão do usuário
+            status:
+              type: string
+              description: Status do usuário
+            tipo_acesso:
+              type: string
+              description: Tipo de acesso do usuário
     responses:
       201:
         description: Usuário criado com sucesso
@@ -88,11 +122,22 @@ def create_user():
         user_data = {
             'nome': sanitize_input(data['nome'], 100),
             'cpf': cpf,
-            'endereco': sanitize_input(data.get('endereco'), 200) if data.get('endereco') else None,
+            'rua': sanitize_input(data.get('rua'), 100) if data.get('rua') else None,
+            'numero': sanitize_input(data.get('numero'), 10) if data.get('numero') else None,
+            'complemento': sanitize_input(data.get('complemento'), 50) if data.get('complemento') else None,
+            'cep': sanitize_input(data.get('cep'), 8) if data.get('cep') else None,
+            'bairro': sanitize_input(data.get('bairro'), 50) if data.get('bairro') else None,
+            'cidade': sanitize_input(data.get('cidade'), 50) if data.get('cidade') else None,
+            'estado': sanitize_input(data.get('estado'), 2) if data.get('estado') else None,
             'setor': sanitize_input(data['setor'], 50),
             'funcao': sanitize_input(data['funcao'], 50),
             'especialidade': sanitize_input(data.get('especialidade'), 50) if data.get('especialidade') else None,
-            'registro_categoria': sanitize_input(data.get('registro_categoria'), 50) if data.get('registro_categoria') else None
+            'registro_categoria': sanitize_input(data.get('registro_categoria'), 50) if data.get('registro_categoria') else None,
+            'email': sanitize_input(data.get('email'), 100) if data.get('email') else None,
+            'telefone': sanitize_input(data.get('telefone'), 15) if data.get('telefone') else None,
+            'data_admissao': data.get('data_admissao'),
+            'status': sanitize_input(data.get('status'), 20) if data.get('status') else None,
+            'tipo_acesso': sanitize_input(data.get('tipo_acesso'), 20) if data.get('tipo_acesso') else None
         }
 
         new_user = User(**user_data)
@@ -137,11 +182,22 @@ def get_all_users():
                 'id': u.id,
                 'nome': u.nome,
                 'cpf': u.cpf,
+                'rua': u.rua,
+                'numero': u.numero,
+                'complemento': u.complemento,
+                'cep': u.cep,
+                'bairro': u.bairro,
+                'cidade': u.cidade,
+                'estado': u.estado,
                 'setor': u.setor,
                 'funcao': u.funcao,
-                'endereco': u.endereco,
                 'especialidade': u.especialidade,
-                'registro_categoria': u.registro_categoria
+                'registro_categoria': u.registro_categoria,
+                'email': u.email,
+                'telefone': u.telefone,
+                'data_admissao': u.data_admissao,
+                'status': u.status,
+                'tipo_acesso': u.tipo_acesso
             } for u in usuarios]
         }), 200
 
@@ -169,6 +225,27 @@ def atualizar_usuario(cpf):
             nome:
               type: string
               description: Nome do usuário
+            rua:
+              type: string
+              description: Rua do usuário
+            numero:
+              type: string
+              description: Número do endereço do usuário
+            complemento:
+              type: string
+              description: Complemento do endereço do usuário
+            cep:
+              type: string
+              description: CEP do usuário
+            bairro:
+              type: string
+              description: Bairro do usuário
+            cidade:
+              type: string
+              description: Cidade do usuário
+            estado:
+              type: string
+              description: Estado do usuário
             setor:
               type: string
               description: Setor do usuário
@@ -181,6 +258,22 @@ def atualizar_usuario(cpf):
             registro_categoria:
               type: string
               description: Registro da categoria do usuário
+            email:
+              type: string
+              description: Email do usuário
+            telefone:
+              type: string
+              description: Telefone do usuário
+            data_admissao:
+              type: string
+              format: date
+              description: Data de admissão do usuário
+            status:
+              type: string
+              description: Status do usuário
+            tipo_acesso:
+              type: string
+              description: Tipo de acesso do usuário
     responses:
       200:
         description: Usuário atualizado com sucesso
@@ -202,11 +295,22 @@ def atualizar_usuario(cpf):
         data = request.get_json()
         update_fields = {
             'nome': sanitize_input(data.get('nome'), 100) if data.get('nome') else None,
+            'rua': sanitize_input(data.get('rua'), 100) if data.get('rua') else None,
+            'numero': sanitize_input(data.get('numero'), 10) if data.get('numero') else None,
+            'complemento': sanitize_input(data.get('complemento'), 50) if data.get('complemento') else None,
+            'cep': sanitize_input(data.get('cep'), 8) if data.get('cep') else None,
+            'bairro': sanitize_input(data.get('bairro'), 50) if data.get('bairro') else None,
+            'cidade': sanitize_input(data.get('cidade'), 50) if data.get('cidade') else None,
+            'estado': sanitize_input(data.get('estado'), 2) if data.get('estado') else None,
             'setor': sanitize_input(data.get('setor'), 50) if data.get('setor') else None,
             'funcao': sanitize_input(data.get('funcao'), 50) if data.get('funcao') else None,
-            'endereco': sanitize_input(data.get('endereco'), 200) if data.get('endereco') else None,
             'especialidade': sanitize_input(data.get('especialidade'), 50) if data.get('especialidade') else None,
-            'registro_categoria': sanitize_input(data.get('registro_categoria'), 50) if data.get('registro_categoria') else None
+            'registro_categoria': sanitize_input(data.get('registro_categoria'), 50) if data.get('registro_categoria') else None,
+            'email': sanitize_input(data.get('email'), 100) if data.get('email') else None,
+            'telefone': sanitize_input(data.get('telefone'), 15) if data.get('telefone') else None,
+            'data_admissao': data.get('data_admissao'),
+            'status': sanitize_input(data.get('status'), 20) if data.get('status') else None,
+            'tipo_acesso': sanitize_input(data.get('tipo_acesso'), 20) if data.get('tipo_acesso') else None
         }
 
         for key, value in update_fields.items():
