@@ -204,8 +204,8 @@ def get_all_users():
     except Exception as e:
         return jsonify({'message': 'Erro ao recuperar usuários', 'error': str(e)}), 500
 
-@user_routes.route('/api/atualizar_usuario/<cpf>', methods=['PUT'])
-def atualizar_usuario(cpf):
+@user_routes.route('/api/atualizar_usuario/<id>', methods=['PUT'])
+def atualizar_usuario(id):
     """
     Atualiza um usuário existente
     ---
@@ -213,10 +213,10 @@ def atualizar_usuario(cpf):
       - Usuários
     parameters:
       - in: path
-        name: cpf
-        type: string
+        name: id
+        type: integer
         required: true
-        description: CPF do usuário
+        description: ID do usuário
       - in: body
         name: body
         schema:
@@ -278,17 +278,17 @@ def atualizar_usuario(cpf):
       200:
         description: Usuário atualizado com sucesso
       400:
-        description: CPF inválido
+        description: ID inválido
       404:
         description: Usuário não encontrado
       500:
         description: Erro interno no servidor
     """
     try:
-        if not validate_cpf(cpf):
-            raise BadRequest("CPF inválido")
+        if not id.isdigit():
+            raise BadRequest("ID inválido")
             
-        usuario = User.query.filter_by(cpf=cpf).first()
+        usuario = User.query.filter_by(id=id).first()
         if not usuario:
             raise NotFound("Usuário não encontrado")
 
@@ -330,8 +330,8 @@ def atualizar_usuario(cpf):
         db.session.rollback()
         return jsonify({'message': 'Erro interno no servidor', 'error': str(e)}), 500
 
-@user_routes.route('/api/excluir_usuario/<cpf>', methods=['DELETE'])
-def excluir_usuario(cpf):
+@user_routes.route('/api/excluir_usuario/<id>', methods=['DELETE'])
+def excluir_usuario(id):
     """
     Exclui um usuário existente
     ---
@@ -339,25 +339,25 @@ def excluir_usuario(cpf):
       - Usuários
     parameters:
       - in: path
-        name: cpf
-        type: string
+        name: id
+        type: integer
         required: true
-        description: CPF do usuário
+        description: ID do usuário
     responses:
       200:
         description: Usuário excluído com sucesso
       400:
-        description: CPF inválido
+        description: ID inválido
       404:
         description: Usuário não encontrado
       500:
         description: Erro interno no servidor
     """
     try:
-        if not validate_cpf(cpf):
-            raise BadRequest("CPF inválido")
+        if not id.isdigit():
+            raise BadRequest("ID inválido")
             
-        usuario = User.query.filter_by(cpf=cpf).first()
+        usuario = User.query.filter_by(id=id).first()
         if not usuario:
             raise NotFound("Usuário não encontrado")
         
@@ -373,6 +373,68 @@ def excluir_usuario(cpf):
         return jsonify({'message': str(e)}), 404
     except Exception as e:
         db.session.rollback()
+        return jsonify({'message': 'Erro interno no servidor', 'error': str(e)}), 500
+    
+@user_routes.route('/api/usuario/<id>', methods=['GET'])
+def get_usuario_by_id(id):
+    """
+    Obtém os dados de um usuário pelo ID
+    ---
+    tags:
+      - Usuários
+    parameters:
+      - in: path
+        name: id
+        type: integer
+        required: true
+        description: ID do usuário
+    responses:
+      200:
+        description: Dados do usuário
+      400:
+        description: ID inválido
+      404:
+        description: Usuário não encontrado
+      500:
+        description: Erro interno no servidor
+    """
+    try:
+        if not id.isdigit():
+            raise BadRequest("ID inválido")
+            
+        usuario = User.query.filter_by(id=id).first()
+        if not usuario:
+            raise NotFound("Usuário não encontrado")
+
+        return jsonify({
+            'usuario': {
+                'id': usuario.id,
+                'nome': usuario.nome,
+                'cpf': usuario.cpf,
+                'rua': usuario.rua,
+                'numero': usuario.numero,
+                'complemento': usuario.complemento,
+                'cep': usuario.cep,
+                'bairro': usuario.bairro,
+                'cidade': usuario.cidade,
+                'estado': usuario.estado,
+                'setor': usuario.setor,
+                'funcao': usuario.funcao,
+                'especialidade': usuario.especialidade,
+                'registro_categoria': usuario.registro_categoria,
+                'email': usuario.email,
+                'telefone': usuario.telefone,
+                'data_admissao': usuario.data_admissao,
+                'status': usuario.status,
+                'tipo_acesso': usuario.tipo_acesso
+            }
+        }), 200
+
+    except BadRequest as e:
+        return jsonify({'message': str(e)}), 400
+    except NotFound as e:
+        return jsonify({'message': str(e)}), 404
+    except Exception as e:
         return jsonify({'message': 'Erro interno no servidor', 'error': str(e)}), 500
 
 # Error handlers
