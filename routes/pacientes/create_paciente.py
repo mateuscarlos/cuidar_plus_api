@@ -42,7 +42,7 @@ def create_paciente():
             'estado': address_data.get('uf', ''),
             'created_at': datetime.now(timezone.utc),
             'updated_at': datetime.now(timezone.utc),
-            'status': 'em-avaliacao'
+            'status': sanitize_input(str(data.get('status', '')), 50)
         }
 
         new_paciente = Paciente(**paciente_data)
