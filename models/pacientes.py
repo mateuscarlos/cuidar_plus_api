@@ -1,5 +1,6 @@
 from datetime import datetime
 from db import db
+from utils import convert_utc_to_db_format, convert_ddmmyyyy_to_db_format
 
 class Paciente(db.Model):
     __tablename__ = 'paciente'
@@ -42,7 +43,7 @@ class Paciente(db.Model):
             'alergias': self.alergias,
             'cid_primario': self.cid_primario,
             'cid_secundario': self.cid_secundario,
-            'data_nascimento': self.data_nascimento.strftime('%Y-%m-%d') if self.data_nascimento else None,
+            'data_nascimento': self.data_nascimento.strftime('%d/%m/%Y') if self.data_nascimento else None,
             'rua': self.rua,
             'numero': self.numero,
             'complemento': self.complemento,
@@ -51,8 +52,8 @@ class Paciente(db.Model):
             'cidade': self.cidade,
             'estado': self.estado,
             'status': self.status,
-            'created_at': self.created_at.isoformat() if self.created_at else None,
-            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
+            'created_at': self.created_at.strftime('%d/%m/%Y %H:%M:%S') if self.created_at else None,
+            'updated_at': self.updated_at.strftime('%d/%m/%Y %H:%M:%S') if self.updated_at else None,
             'email': self.email,
             'telefone_emergencia': self.telefone_emergencia,
             'contato_emergencia': self.contato_emergencia,

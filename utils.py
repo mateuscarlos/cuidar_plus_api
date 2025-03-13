@@ -74,3 +74,23 @@ def get_address_from_cep(cep):
     if 'erro' in data:
         raise BadRequest("CEP inválido")
     return data
+
+def convert_utc_to_db_format(utc_date_str):
+    """
+    Converte uma string de data UTC para o formato do banco de dados.
+    
+    :param utc_date_str: string de data em UTC (ex: '2025-03-13T12:00:00Z')
+    :return: string de data no formato do banco de dados (ex: '2025-03-13 12:00:00')
+    """
+    utc_date = datetime.strptime(utc_date_str, '%Y-%m-%dT%H:%M:%SZ')
+    return utc_date.strftime('%Y-%m-%d %H:%M:%S')
+
+def convert_ddmmyyyy_to_db_format(date_str):
+    """
+    Converte uma string de data no formato dd/mm/yyyy para o formato do banco de dados.
+    
+    :param date_str: string de data no formato dd/mm/yyyy (ex: '13/03/2025')
+    :return: string de data no formato do banco de dados (ex: '2025-03-13')
+    """
+    date = datetime.strptime(date_str, '%d/%m/%Y')
+    return date.strftime('%Y-%m-%d')

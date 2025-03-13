@@ -1,7 +1,7 @@
 from flask import request, jsonify
 from models.pacientes import Paciente
 from db import db
-from utils import validate_cpf, sanitize_input, get_local_time, get_user_timezone, get_address_from_cep
+from utils import validate_cpf, sanitize_input, get_local_time, get_user_timezone, get_address_from_cep, convert_utc_to_db_format, convert_ddmmyyyy_to_db_format
 from werkzeug.exceptions import BadRequest, Conflict
 import re
 from datetime import datetime, timezone
@@ -32,7 +32,7 @@ def create_paciente():
             'telefone': sanitize_input(str(data.get('telefone')), 20) if data.get('telefone') else None,
             'alergias': sanitize_input(str(data.get('alergias', '')), 200) if data.get('alergias') else None,
             'cid_secundario': sanitize_input(str(data.get('cid_secundario', '')), 10) if data.get('cid_secundario') else None,
-            'data_nascimento': datetime.strptime(data.get('data_nascimento'), '%Y-%m-%d') if data.get('data_nascimento') else None,
+            'data_nascimento': convert_ddmmyyyy_to_db_format(data.get('data_nascimento')) if data.get('data_nascimento') else None,
             'rua': address_data.get('logradouro', ''),
             'numero': sanitize_input(str(data.get('numero')), 10) if data.get('numero') else None,
             'complemento': sanitize_input(str(data.get('complemento')), 50) if data.get('complemento') else None,
@@ -40,8 +40,8 @@ def create_paciente():
             'bairro': address_data.get('bairro', ''),
             'cidade': address_data.get('localidade', ''),
             'estado': address_data.get('uf', ''),
-            'created_at': datetime.now(timezone.utc),
-            'updated_at': datetime.now(timezone.utc),
+            'created_at': datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S'),
+            'updated_at': datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S'),
             'status': sanitize_input(str(data.get('status', '')), 50)
         }
 

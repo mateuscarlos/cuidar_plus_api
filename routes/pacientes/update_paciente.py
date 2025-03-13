@@ -1,7 +1,7 @@
 from flask import request, jsonify
 from models.pacientes import Paciente
 from db import db
-from utils import validate_cpf, sanitize_input, get_local_time, get_user_timezone
+from utils import validate_cpf, sanitize_input, get_local_time, get_user_timezone, convert_utc_to_db_format, convert_ddmmyyyy_to_db_format
 from werkzeug.exceptions import BadRequest, NotFound
 from datetime import datetime, timezone
 
@@ -24,7 +24,7 @@ def atualizar_paciente(cpf):
             'telefone': sanitize_input(data.get('telefone'), 20) if data.get('telefone') else None,
             'alergias': sanitize_input(data.get('alergias'), 200) if data.get('alergias') else None,
             'cid_secundario': sanitize_input(data.get('cid_secundario'), 10) if data.get('cid_secundario') else None,
-            'data_nascimento': sanitize_input(data.get('data_nascimento'), 10) if data.get('data_nascimento') else None,
+            'data_nascimento': convert_ddmmyyyy_to_db_format(data.get('data_nascimento')) if data.get('data_nascimento') else None,
             'rua': sanitize_input(data.get('rua'), 100) if data.get('rua') else None,
             'numero': sanitize_input(data.get('numero'), 10) if data.get('numero') else None,
             'complemento': sanitize_input(data.get('complemento'), 50) if data.get('complemento') else None,
@@ -33,7 +33,7 @@ def atualizar_paciente(cpf):
             'cidade': sanitize_input(data.get('cidade'), 50) if data.get('cidade') else None,
             'estado': sanitize_input(data.get('estado'), 2) if data.get('estado') else None,
             'status': sanitize_input(data.get('status'), 20) if data.get('status') else None,
-            'updated_at': datetime.now(timezone.utc)
+            'updated_at': datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
         }
 
         for key, value in update_fields.items():
