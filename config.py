@@ -7,6 +7,7 @@ class Config:
         f"@mysql:3306/{os.getenv('DB_NAME', 'cuidar_plus_bd')}"
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SECRET_KEY = os.getenv('SECRET_KEY', 'your_secret_key')
     SWAGGER = {
         'title': 'API Cuidar+',
         'uiversion': 3,
@@ -14,8 +15,8 @@ class Config:
             {
                 'endpoint': 'apispec_1',
                 'route': '/apispec_1.json',
-                'rule_filter': lambda rule: True,  # all in
-                'model_filter': lambda tag: True,  # all in
+                'rule_filter': lambda rule: True, 
+                'model_filter': lambda tag: True, 
             }
         ],
         'static_url_path': '/flasgger_static',
@@ -33,4 +34,4 @@ class Config:
         "methods": ["PUT"],
         "allow_headers": ["Authorization", "Content-Type"],
     }
-        }
+}

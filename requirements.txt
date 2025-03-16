@@ -11,3 +11,4 @@ Werkzeug
 SQLAlchemy
 cryptography
 pytz
+PyJWT

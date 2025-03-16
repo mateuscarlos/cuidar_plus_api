@@ -10,6 +10,7 @@ from models.pacientes import Paciente
 from models.acompanhamento import Acompanhamento
 from models.user import User
 from flask_migrate import Migrate
+from routes.auth_routes import auth_bp
 
 app = Flask(__name__, template_folder='../cuidar-plus/cuidar-plus', static_folder='../cuidar-plus/cuidar-plus')
 app.config.from_object(Config)
@@ -39,6 +40,7 @@ with app.app_context():
 app.register_blueprint(app_routes)
 register_user_routes(app)
 app.register_blueprint(pacientes_routes)
+app.register_blueprint(auth_bp)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

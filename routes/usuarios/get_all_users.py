@@ -5,7 +5,7 @@ from werkzeug.exceptions import InternalServerError
 get_all_users_bp = Blueprint('get_all_users', __name__)
 
 @get_all_users_bp.route('/api/exibe_usuarios', methods=['GET'])
-def get_all_users():
+def exibe_usuarios():
     """
     Exibe todos os usuários
     ---
@@ -21,30 +21,32 @@ def get_all_users():
         # Busca todos os usuários sem paginação
         usuarios = User.query.all()
 
-        # Retorna a lista de usuários
-        return jsonify({
-            'usuarios': [{
-                'id': u.id,
-                'nome': u.nome,
-                'cpf': u.cpf,
-                'rua': u.rua,
-                'numero': u.numero,
-                'complemento': u.complemento,
-                'cep': u.cep,
-                'bairro': u.bairro,
-                'cidade': u.cidade,
-                'estado': u.estado,
-                'setor': u.setor,
-                'funcao': u.funcao,
-                'especialidade': u.especialidade,
-                'registro_categoria': u.registro_categoria,
-                'email': u.email,
-                'telefone': u.telefone,
-                'data_admissao': u.data_admissao,
-                'status': u.status,
-                'tipo_acesso': u.tipo_acesso
-            } for u in usuarios]
-        }), 200
+        # Retorna a lista de usuários sem senha
+        usuarios_sem_senha = [
+            {
+                'id': usuario.id,
+                'email': usuario.email,
+                'nome': usuario.nome,
+                'cpf': usuario.cpf,
+                'rua': usuario.rua,
+                'numero': usuario.numero,
+                'complemento': usuario.complemento,
+                'cep': usuario.cep,
+                'bairro': usuario.bairro,
+                'cidade': usuario.cidade,
+                'estado': usuario.estado,
+                'setor': usuario.setor,
+                'funcao': usuario.funcao,
+                'especialidade': usuario.especialidade,
+                'registro_categoria': usuario.registro_categoria,
+                'telefone': usuario.telefone,
+                'data_admissao': usuario.data_admissao,
+                'status': usuario.status,
+                'tipo_acesso': usuario.tipo_acesso
+            }
+            for usuario in usuarios
+        ]
+        return jsonify({'usuarios': usuarios_sem_senha}), 200
 
     except Exception as e:
         return jsonify({'message': 'Erro ao recuperar usuários', 'error': str(e)}), 500

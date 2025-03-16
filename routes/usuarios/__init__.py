@@ -10,3 +10,4 @@ def register_user_routes(app):
     app.register_blueprint(get_all_users_bp)
     app.register_blueprint(get_user_by_id_bp)
     app.register_blueprint(update_user_bp)
+
