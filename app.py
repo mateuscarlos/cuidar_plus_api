@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_cors import CORS
 from db import db
-from routes.user_routes import user_routes
+from routes.usuarios import register_user_routes
 from routes.routes_app import app_routes
 from routes.pacientes.pacientes_app import pacientes_routes
 from flasgger import Swagger
@@ -37,7 +37,7 @@ with app.app_context():
 
 # Registro de rotas
 app.register_blueprint(app_routes)
-app.register_blueprint(user_routes)
+register_user_routes(app)
 app.register_blueprint(pacientes_routes)
 
 if __name__ == '__main__':
