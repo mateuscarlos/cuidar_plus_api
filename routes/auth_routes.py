@@ -10,41 +10,48 @@ auth_bp = Blueprint('auth_bp', __name__)
 
 @auth_bp.route('/api/register', methods=['POST'])
 def register():
-    data = request.get_json()
-    password = data.get('password')
-    email = data.get('email')
-    nome = data.get('nome')
-    cpf = data.get('cpf')
-    rua = data.get('rua')
-    numero = data.get('numero')
-    complemento = data.get('complemento')
-    cep = data.get('cep')
-    bairro = data.get('bairro')
-    cidade = data.get('cidade')
-    estado = data.get('estado')
-    setor = data.get('setor')
-    funcao = data.get('funcao')
-    especialidade = data.get('especialidade')
-    registro_categoria = data.get('registro_categoria')
-    telefone = data.get('telefone')
-    data_admissao = data.get('data_admissao')
-    status = data.get('status')
-    tipo_acesso = data.get('tipo_acesso')
+    try:
+        data = request.get_json()
+        password = data.get('password')
+        email = data.get('email')
+        nome = data.get('nome')
+        cpf = data.get('cpf')
+        rua = data.get('rua')
+        numero = data.get('numero')
+        complemento = data.get('complemento')
+        cep = data.get('cep')
+        bairro = data.get('bairro')
+        cidade = data.get('cidade')
+        estado = data.get('estado')
+        setor = data.get('setor')
+        funcao = data.get('funcao')
+        especialidade = data.get('especialidade')
+        registro_categoria = data.get('registro_categoria')
+        telefone = data.get('telefone')
+        data_admissao = data.get('data_admissao')
+        status = data.get('status')
+        tipo_acesso = data.get('tipo_acesso')
 
-    if User.query.filter_by(email=email).first() or User.query.filter_by(cpf=cpf).first():
-        return jsonify({'message': 'Email or CPF already exists'}), 409
+        # Convertendo a data_admissao para o formato YYYY-MM-DD
+        data_admissao = datetime.datetime.strptime(data_admissao, '%d%m%Y').strftime('%Y-%m-%d')
 
-    new_user = User(
-        email=email, nome=nome, cpf=cpf, rua=rua, numero=numero, complemento=complemento,
-        cep=cep, bairro=bairro, cidade=cidade, estado=estado, setor=setor, funcao=funcao,
-        especialidade=especialidade, registro_categoria=registro_categoria, telefone=telefone,
-        data_admissao=data_admissao, status=status, tipo_acesso=tipo_acesso
-    )
-    new_user.set_password(password)
-    db.session.add(new_user)
-    db.session.commit()
+        if User.query.filter_by(email=email).first() or User.query.filter_by(cpf=cpf).first():
+            return jsonify({'message': 'Email or CPF already exists'}), 409
 
-    return jsonify({'message': 'User registered successfully'}), 201
+        new_user = User(
+            email=email, nome=nome, cpf=cpf, rua=rua, numero=numero, complemento=complemento,
+            cep=cep, bairro=bairro, cidade=cidade, estado=estado, setor=setor, funcao=funcao,
+            especialidade=especialidade, registro_categoria=registro_categoria, telefone=telefone,
+            data_admissao=data_admissao, status=status, tipo_acesso=tipo_acesso
+        )
+        new_user.set_password(password)
+        db.session.add(new_user)
+        db.session.commit()
+
+        return jsonify({'message': 'User registered successfully'}), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': 'An error occurred', 'error': str(e)}), 500
 
 @auth_bp.route('/api/login', methods=['POST'])
 def login():

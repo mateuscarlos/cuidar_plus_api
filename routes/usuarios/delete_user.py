@@ -9,7 +9,7 @@ from utils import validate_cpf, sanitize_input
 
 delete_user_bp = Blueprint('delete_user', __name__)
 
-@delete_user_bp.route('/delete_user/<int:user_id>', methods=['DELETE'])
+@delete_user_bp.route('/api/delete_user/<int:user_id>', methods=['DELETE'])
 def delete_user(user_id):
     """
     Exclui um usuário existente
@@ -18,7 +18,7 @@ def delete_user(user_id):
       - Usuários
     parameters:
       - in: path
-        name: id
+        name: user_id
         type: integer
         required: true
         description: ID do usuário
@@ -33,10 +33,7 @@ def delete_user(user_id):
         description: Erro interno no servidor
     """
     try:
-        if not id.isdigit():
-            raise BadRequest("ID inválido")
-            
-        usuario = User.query.filter_by(id=id).first()
+        usuario = User.query.filter_by(id=user_id).first()
         if not usuario:
             raise NotFound("Usuário não encontrado")
         
@@ -53,6 +50,5 @@ def delete_user(user_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'message': 'Erro interno no servidor', 'error': str(e)}), 500
-    
 
-   
+

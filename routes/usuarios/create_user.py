@@ -98,7 +98,8 @@ def create_user():
         if not all(field in data for field in required_fields):
             raise BadRequest("Campos obrigatórios faltando: nome, cpf, setor, funcao")
         
-        cpf = re.sub(r'[^\d]', '', data['cpf'])
+        cpf = sanitize_input(data['cpf'], 11)
+        cpf = re.sub(r'[^\d]', '', cpf)
         if not validate_cpf(cpf):
             raise BadRequest("CPF inválido")
             
