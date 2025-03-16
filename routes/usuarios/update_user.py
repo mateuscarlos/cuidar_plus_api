@@ -9,7 +9,7 @@ from utils import validate_cpf, sanitize_input
 
 update_user_bp = Blueprint('update_user', __name__)
 
-@update_user_bp.route('/update_user/<int:user_id>', methods=['PUT'])
+@update_user_bp.route('/api/update_user/<int:user_id>', methods=['PUT'])
 def update_user(user_id):
     """
     Atualiza um usuário existente
@@ -90,10 +90,7 @@ def update_user(user_id):
         description: Erro interno no servidor
     """
     try:
-        if not id.isdigit():
-            raise BadRequest("ID inválido")
-            
-        usuario = User.query.filter_by(id=id).first()
+        usuario = User.query.filter_by(id=user_id).first()
         if not usuario:
             raise NotFound("Usuário não encontrado")
 

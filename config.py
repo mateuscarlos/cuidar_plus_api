@@ -27,5 +27,10 @@ class Config:
             "origins": ["http://localhost:4200","http://127.0.0.1:5000", "http://127.0.0.1:80", "http://localhost"],
             "methods": ["GET", "POST", "PUT", "DELETE"],
             "allow_headers": ["Authorization", "Content-Type"],
-            }
+            },
+        r"/api/update_user/*": {
+        "origins": ["http://localhost:4200","http://127.0.0.1:5000", "http://127.0.0.1:80", "http://localhost"],
+        "methods": ["PUT"],
+        "allow_headers": ["Authorization", "Content-Type"],
+    }
         }
