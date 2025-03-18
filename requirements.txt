@@ -12,3 +12,4 @@ SQLAlchemy
 cryptography
 pytz
 PyJWT
+argon2-cffi

@@ -3,11 +3,12 @@ from models.user import User
 from db import db
 from flasgger import Swagger
 import re
-import bleach
 from werkzeug.exceptions import BadRequest, Conflict, NotFound
 from utils import validate_cpf, sanitize_input
+from argon2 import PasswordHasher
 
 create_user_bp = Blueprint('create_user', __name__)
+ph = PasswordHasher()  # Inicializa o objeto PasswordHasher
 
 @create_user_bp.route('/api/criar_usuario', methods=['POST'])
 def create_user():
@@ -106,6 +107,10 @@ def create_user():
         if User.query.filter_by(cpf=cpf).first():
             raise Conflict("CPF já cadastrado")
 
+        # Se uma senha for fornecida, faça o hash usando Argon2
+        password = data.get('password')
+        password_hash = ph.hash(password) if password else None
+
         user_data = {
             'nome': sanitize_input(data['nome'], 100),
             'cpf': cpf,
@@ -118,23 +123,24 @@ def create_user():
             'estado': sanitize_input(data.get('estado'), 2) if data.get('estado') else None,
             'setor': sanitize_input(data['setor'], 50),
             'funcao': sanitize_input(data['funcao'], 50),
-            'especialidade': sanitize_input(data.get('especialidade'), 50) if data.get('especialidade') else None,
-            'registro_categoria': sanitize_input(data.get('registro_categoria'), 50) if data.get('registro_categoria') else None,
             'email': sanitize_input(data.get('email'), 100) if data.get('email') else None,
-            'telefone': sanitize_input(data.get('telefone'), 15) if data.get('telefone') else None,
+            'telefone': sanitize_input(data.get('telefone'), 20) if data.get('telefone') else None,
             'data_admissao': data.get('data_admissao'),
-            'status': sanitize_input(data.get('status'), 20) if data.get('status') else None,
-            'tipo_acesso': sanitize_input(data.get('tipo_acesso'), 20) if data.get('tipo_acesso') else None
+            'status': sanitize_input(data.get('status'), 20) if data.get('status') else 'Ativo',
+            'tipo_acesso': sanitize_input(data.get('tipo_acesso'), 20) if data.get('tipo_acesso') else None,
+            'especialidade': sanitize_input(data.get('especialidade'), 50) if data.get('especialidade') else None,
+            'registro_categoria': sanitize_input(data.get('registro_categoria'), 20) if data.get('registro_categoria') else None
         }
+        
+        # Adicionar o hash da senha apenas se uma senha foi fornecida
+        if password_hash:
+            user_data['password_hash'] = password_hash
 
         new_user = User(**user_data)
         db.session.add(new_user)
         db.session.commit()
 
-        return jsonify({
-            'message': 'Usuário criado com sucesso!',
-            'id': new_user.id
-        }), 201
+        return jsonify({'message': 'Usuário criado com sucesso', 'id': new_user.id}), 201
 
     except BadRequest as e:
         db.session.rollback()
@@ -144,4 +150,4 @@ def create_user():
         return jsonify({'message': str(e)}), 409
     except Exception as e:
         db.session.rollback()
-        return jsonify({'message': 'Erro interno no servidor', 'error': str(e)}), 500
+        return jsonify({'message': f'Erro interno no servidor: {str(e)}'}), 500

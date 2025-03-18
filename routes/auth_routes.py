@@ -1,12 +1,14 @@
 from flask import Blueprint, request, jsonify
+from werkzeug.security import check_password_hash
 from models.user import User
 from db import db
-from werkzeug.security import generate_password_hash, check_password_hash
-import jwt
 import datetime
-from config import Config
+import re
+from argon2 import PasswordHasher
+from argon2.exceptions import VerifyMismatchError
 
-auth_bp = Blueprint('auth_bp', __name__)
+auth_bp = Blueprint('auth', __name__)
+ph = PasswordHasher()  # Inicializa o objeto PasswordHasher da biblioteca argon2-cffi
 
 @auth_bp.route('/api/register', methods=['POST'])
 def register():
@@ -38,34 +40,52 @@ def register():
         if User.query.filter_by(email=email).first() or User.query.filter_by(cpf=cpf).first():
             return jsonify({'message': 'Email or CPF already exists'}), 409
 
-        hashed_password = generate_password_hash(password, method='sha256')
+        # Usando Argon2 para criar hash da senha de maneira mais segura
+        hashed_password = ph.hash(password)
 
         new_user = User(
             email=email, nome=nome, cpf=cpf, rua=rua, numero=numero, complemento=complemento,
             cep=cep, bairro=bairro, cidade=cidade, estado=estado, setor=setor, funcao=funcao,
             especialidade=especialidade, registro_categoria=registro_categoria, telefone=telefone,
-            data_admissao=data_admissao, status=status, tipo_acesso=tipo_acesso, password=hashed_password
+            data_admissao=data_admissao, status=status, tipo_acesso=tipo_acesso, password_hash=hashed_password
         )
+
         db.session.add(new_user)
         db.session.commit()
 
         return jsonify({'message': 'User registered successfully'}), 201
+
     except Exception as e:
         db.session.rollback()
-        return jsonify({'message': 'An error occurred', 'error': str(e)}), 500
+        return jsonify({'message': str(e)}), 500
 
 @auth_bp.route('/api/login', methods=['POST'])
 def login():
-    data = request.get_json()
-    email = data.get('email')
-    password = data.get('password')
-
-    user = User.query.filter_by(email=email).first()
-    if user and user.check_password(password):
-        token = jwt.encode({
-            'user_id': user.id,
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)
-        }, Config.SECRET_KEY, algorithm='HS256')
-        return jsonify({'token': token}), 200
-
-    return jsonify({'message': 'Invalid email or password'}), 401
+    try:
+        data = request.get_json()
+        user = User.query.filter_by(email=data.get('email')).first()
+        
+        if not user:
+            return jsonify({'message': 'Invalid email or password'}), 401
+            
+        try:
+            # Verifica a senha usando Argon2
+            ph.verify(user.password_hash, data.get('password'))
+            
+            # Se a senha precisa ser rehashed (devido a mudanças nos parâmetros de segurança)
+            if ph.check_needs_rehash(user.password_hash):
+                user.password_hash = ph.hash(data.get('password'))
+                db.session.commit()
+                
+            return jsonify({
+                'message': 'Login successful',
+                'user_id': user.id,
+                'nome': user.nome,
+                'email': user.email
+            }), 200
+            
+        except VerifyMismatchError:
+            return jsonify({'message': 'Invalid email or password'}), 401
+            
+    except Exception as e:
+        return jsonify({'message': str(e)}), 500

@@ -46,7 +46,9 @@ def exibe_usuarios():
             }
             for usuario in usuarios
         ]
+        print("Resposta da API:", {'usuarios': usuarios_sem_senha})  # Log para depuração
         return jsonify({'usuarios': usuarios_sem_senha}), 200
 
     except Exception as e:
+        print("Erro na API:", str(e))  # Log para depuração
         return jsonify({'message': 'Erro ao recuperar usuários', 'error': str(e)}), 500

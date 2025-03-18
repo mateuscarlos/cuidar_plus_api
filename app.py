@@ -42,5 +42,6 @@ register_user_routes(app)
 app.register_blueprint(pacientes_routes)
 app.register_blueprint(auth_bp)
 
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

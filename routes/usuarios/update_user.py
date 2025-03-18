@@ -6,8 +6,10 @@ import re
 import bleach
 from werkzeug.exceptions import BadRequest, Conflict, NotFound
 from utils import validate_cpf, sanitize_input
+from argon2 import PasswordHasher
 
 update_user_bp = Blueprint('update_user', __name__)
+ph = PasswordHasher()
 
 @update_user_bp.route('/api/update_user/<int:user_id>', methods=['PUT'])
 def update_user(user_id):
@@ -131,3 +133,76 @@ def update_user(user_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'message': 'Erro interno no servidor', 'error': str(e)}), 500
+
+@update_user_bp.route('/api/atualizar_senha/<int:user_id>', methods=['POST'])
+def update_password(user_id):
+    """
+    Atualiza a senha de um usuário
+    ---
+    parameters:
+      - name: user_id
+        in: path
+        type: integer
+        required: true
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          required:
+            - password
+          properties:
+            password:
+              type: string
+    responses:
+      200:
+        description: Senha atualizada com sucesso
+      404:
+        description: Usuário não encontrado
+      400:
+        description: Senha inválida ou dados ausentes
+      500:
+        description: Erro interno no servidor
+    """
+    try:
+        data = request.get_json()
+        if not data or 'password' not in data:
+            raise BadRequest("Senha não fornecida")
+            
+        password = data['password']
+        
+        # Validações básicas da senha
+        if len(password) < 8:
+            raise BadRequest("A senha deve ter pelo menos 8 caracteres")
+        
+        if not any(c.isupper() for c in password):
+            raise BadRequest("A senha deve conter pelo menos uma letra maiúscula")
+            
+        if not any(c.islower() for c in password):
+            raise BadRequest("A senha deve conter pelo menos uma letra minúscula")
+            
+        if not any(c.isdigit() for c in password):
+            raise BadRequest("A senha deve conter pelo menos um número")
+            
+        if not any(c in '!@#$%^&*()_-+=<>?/[]{}|\\' for c in password):
+            raise BadRequest("A senha deve conter pelo menos um caractere especial")
+        
+        user = User.query.get(user_id)
+        if not user:
+            raise NotFound("Usuário não encontrado")
+        
+        # Hash da senha usando Argon2
+        hashed_password = ph.hash(password)
+        user.password_hash = hashed_password
+        
+        db.session.commit()
+        
+        return jsonify({'message': 'Senha atualizada com sucesso'}), 200
+        
+    except BadRequest as e:
+        return jsonify({'message': str(e)}), 400
+    except NotFound as e:
+        return jsonify({'message': str(e)}), 404
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': f'Erro interno no servidor: {str(e)}'}), 500
