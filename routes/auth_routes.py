@@ -38,13 +38,14 @@ def register():
         if User.query.filter_by(email=email).first() or User.query.filter_by(cpf=cpf).first():
             return jsonify({'message': 'Email or CPF already exists'}), 409
 
+        hashed_password = generate_password_hash(password, method='sha256')
+
         new_user = User(
             email=email, nome=nome, cpf=cpf, rua=rua, numero=numero, complemento=complemento,
             cep=cep, bairro=bairro, cidade=cidade, estado=estado, setor=setor, funcao=funcao,
             especialidade=especialidade, registro_categoria=registro_categoria, telefone=telefone,
-            data_admissao=data_admissao, status=status, tipo_acesso=tipo_acesso
+            data_admissao=data_admissao, status=status, tipo_acesso=tipo_acesso, password=hashed_password
         )
-        new_user.set_password(password)
         db.session.add(new_user)
         db.session.commit()
 
