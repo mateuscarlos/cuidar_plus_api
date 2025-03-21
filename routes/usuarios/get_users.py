@@ -287,3 +287,102 @@ def get_usuario_by_name():
         return jsonify({'message': str(e)}), 400
     except Exception as e:
         return jsonify({'message': 'Erro interno no servidor', 'error': str(e)}), 500
+
+
+@get_users_bp.route('/api/usuarios/buscar', methods=['GET'])
+def buscar_usuarios():
+    """
+    Busca genérica de usuários por campo específico
+    ---
+    tags:
+      - Usuários
+    parameters:
+      - in: query
+        name: campo
+        type: string
+        required: true
+        description: Campo para busca (id, nome, cpf)
+      - in: query
+        name: valor
+        type: string
+        required: true
+        description: Valor a ser buscado
+    responses:
+      200:
+        description: Lista de usuários encontrados
+      400:
+        description: Parâmetros de busca inválidos
+      404:
+        description: Nenhum usuário encontrado
+      500:
+        description: Erro interno no servidor
+    """
+    try:
+        # Obtém os parâmetros da busca
+        campo = request.args.get('campo')
+        valor = request.args.get('valor')
+
+        # Valida os parâmetros
+        if not campo or not valor:
+            raise BadRequest("Campo e valor são obrigatórios")
+
+        if len(valor) < 2:
+            raise BadRequest("É necessário informar pelo menos 3 caracteres para a busca")
+
+        # Define os campos permitidos para busca
+        campos_permitidos = {
+            'id': User.id,
+            'nome': User.nome,
+            'cpf': User.cpf,
+            'email': User.email
+        }
+
+        if campo not in campos_permitidos:
+            raise BadRequest(f"Campo de busca inválido. Campos permitidos: {', '.join(campos_permitidos.keys())}")
+
+        # Prepara a query base
+        query = User.query
+
+        # Aplica o filtro adequado conforme o campo
+        if campo == 'id':
+            if not valor.isdigit():
+                raise BadRequest("O valor deve ser numérico para busca por ID")
+            query = query.filter(User.id == int(valor))
+        elif campo == 'cpf':
+            query = query.filter(User.cpf.like(f"%{valor}%"))
+        else:
+            # Para outros campos, usa busca case-insensitive com LIKE
+            query = query.filter(campos_permitidos[campo].ilike(f"%{valor}%"))
+
+        # Executa a busca
+        usuarios = query.all()
+
+        if not usuarios:
+            return jsonify({
+                'message': 'Nenhum usuário encontrado',
+                'usuarios': []
+            }), 404
+
+        # Prepara o resultado
+        resultado = []
+        for usuario in usuarios:
+            resultado.append({
+                'id': usuario.id,
+                'nome_completo': usuario.nome,
+                'cpf': usuario.cpf,
+                'email': usuario.email,
+                'telefone': usuario.telefone,
+                'cargo': usuario.funcao,
+                'setor': usuario.setor,
+                'status': usuario.status
+            })
+
+        return jsonify({
+            'total': len(resultado),
+            'usuarios': resultado
+        }), 200
+
+    except BadRequest as e:
+        return jsonify({'message': str(e)}), 400
+    except Exception as e:
+        return jsonify({'message': 'Erro interno no servidor', 'error': str(e)}), 500
