@@ -1,18 +1,22 @@
 from flask import request, jsonify
 from models.pacientes import Paciente
 from db import db
-from utils import validate_cpf
 from werkzeug.exceptions import BadRequest, NotFound
 
-def excluir_paciente(cpf):
+def excluir_paciente(paciente_id):
     try:
-        if not validate_cpf(cpf):
-            raise BadRequest("CPF inválido")
+        # Validar se o ID é um número inteiro válido
+        try:
+            paciente_id = int(paciente_id)
+        except ValueError:
+            raise BadRequest("ID de paciente inválido")
             
-        paciente = Paciente.query.filter_by(cpf=cpf).first()
+        # Buscar paciente pelo ID
+        paciente = Paciente.query.get(paciente_id)
         if not paciente:
             raise NotFound("Paciente não encontrado")
         
+        # Excluir o paciente
         db.session.delete(paciente)
         db.session.commit()
         return jsonify({'message': 'Paciente excluído com sucesso!'}), 200

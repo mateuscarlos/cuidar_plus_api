@@ -42,7 +42,13 @@ def create_paciente():
             'estado': address_data.get('uf', ''),
             'created_at': datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S'),
             'updated_at': datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S'),
-            'status': sanitize_input(str(data.get('status', '')), 50)
+            'status': sanitize_input(str(data.get('status', '')), 50),
+            # Adicionando os campos que faltavam
+            'email': sanitize_input(str(data.get('email', '')), 100) if data.get('email') else None,
+            'telefone_emergencia': sanitize_input(str(data.get('telefone_emergencia', '')), 15) if data.get('telefone_emergencia') else None,
+            'contato_emergencia': sanitize_input(str(data.get('contato_emergencia', '')), 100) if data.get('contato_emergencia') else None,
+            'case_responsavel': sanitize_input(str(data.get('case_responsavel', '')), 100) if data.get('case_responsavel') else None,
+            'medico_responsavel': sanitize_input(str(data.get('medico_responsavel', '')), 100) if data.get('medico_responsavel') else None
         }
 
         new_paciente = Paciente(**paciente_data)
