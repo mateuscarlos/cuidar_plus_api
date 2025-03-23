@@ -4,11 +4,13 @@ from db import db
 from routes.usuarios import register_user_routes
 from routes.routes_app import app_routes
 from routes.pacientes.pacientes_app import pacientes_routes
+from routes.tratamento.tratamentos_routes import tratamentos_routes  # Fix: correct import path
 from flasgger import Swagger
 from config import Config
 from models.pacientes import Paciente
 from models.acompanhamento import Acompanhamento
 from models.user import User
+from models.tratamento import Tratamento
 from flask_migrate import Migrate
 from routes.auth_routes import auth_bp
 
@@ -33,6 +35,10 @@ with app.app_context():
             print("Tabela 'acompanhamentos' criada com sucesso.")
         else:
             print("Tabela 'acompanhamentos' não foi criada.")
+        if 'tratamento' in db.metadata.tables:
+            print("Tabela 'tratamento' criada com sucesso.")
+        else:
+            print("Tabela 'tratamento' não foi criada.")
     except Exception as e:
         print(f"Erro ao inicializar o banco de dados: {e}")
 
@@ -40,6 +46,7 @@ with app.app_context():
 app.register_blueprint(app_routes)
 register_user_routes(app)
 app.register_blueprint(pacientes_routes)
+app.register_blueprint(tratamentos_routes)
 app.register_blueprint(auth_bp)
 
 
