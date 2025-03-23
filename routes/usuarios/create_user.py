@@ -6,6 +6,7 @@ import re
 from werkzeug.exceptions import BadRequest, Conflict, NotFound
 from utils import validate_cpf, sanitize_input
 from argon2 import PasswordHasher
+from datetime import datetime
 
 create_user_bp = Blueprint('create_user', __name__)
 ph = PasswordHasher()  # Inicializa o objeto PasswordHasher
@@ -111,6 +112,14 @@ def create_user():
         password = data.get('password')
         password_hash = ph.hash(password) if password else None
 
+        # Format the data_admissao to 'YYYY-MM-DD'
+        data_admissao = data.get('data_admissao')
+        if data_admissao:
+            try:
+                data_admissao = datetime.strptime(data_admissao, '%d/%m/%Y').strftime('%Y-%m-%d')
+            except ValueError:
+                raise BadRequest("Formato de data inválido. Por favor, utilize o formato DD/MM/YYYY.")
+
         user_data = {
             'nome': sanitize_input(data['nome'], 100),
             'cpf': cpf,
@@ -125,7 +134,7 @@ def create_user():
             'funcao': sanitize_input(data['funcao'], 50),
             'email': sanitize_input(data.get('email'), 100) if data.get('email') else None,
             'telefone': sanitize_input(data.get('telefone'), 20) if data.get('telefone') else None,
-            'data_admissao': data.get('data_admissao'),
+            'data_admissao': data_admissao,
             'status': sanitize_input(data.get('status'), 20) if data.get('status') else 'Ativo',
             'tipo_acesso': sanitize_input(data.get('tipo_acesso'), 20) if data.get('tipo_acesso') else None,
             'especialidade': sanitize_input(data.get('especialidade'), 50) if data.get('especialidade') else None,
