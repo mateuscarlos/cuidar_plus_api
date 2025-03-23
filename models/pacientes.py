@@ -7,8 +7,10 @@ class Paciente(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nome_completo = db.Column(db.String(100), nullable=False)
     cpf = db.Column(db.String(11), unique=True, nullable=False)
-    operadora = db.Column(db.String(50), nullable=False)
-    identificador_prestadora = db.Column(db.String(50), nullable=False)
+    # Substituição de operadora por convenio_id
+    convenio_id = db.Column(db.Integer, nullable=True)
+    # Substituição de identificador_prestadora por numero_carteirinha
+    numero_carteirinha = db.Column(db.String(50), nullable=True)
     acomodacao = db.Column(db.String(50), nullable=False)
     telefone = db.Column(db.String(15), nullable=False)
     alergias = db.Column(db.Text, nullable=True)
@@ -30,14 +32,22 @@ class Paciente(db.Model):
     contato_emergencia = db.Column(db.String(100), nullable=True)
     case_responsavel = db.Column(db.String(100), nullable=True)
     medico_responsavel = db.Column(db.String(100), nullable=True)
+    # Novos campos do frontend
+    telefone_secundario = db.Column(db.String(15), nullable=True)
+    genero = db.Column(db.String(20), nullable=True)
+    estado_civil = db.Column(db.String(20), nullable=True)
+    profissao = db.Column(db.String(50), nullable=True)
+    nacionalidade = db.Column(db.String(50), nullable=True, default='Brasileiro(a)')
+    plano_id = db.Column(db.Integer, nullable=True)
+    data_validade = db.Column(db.Date, nullable=True)
     
     def to_dict(self):
         return {
             'id': self.id,
             'nome_completo': self.nome_completo,
             'cpf': self.cpf,
-            'operadora': self.operadora,
-            'identificador_prestadora': self.identificador_prestadora,
+            'convenio_id': self.convenio_id,
+            'numero_carteirinha': self.numero_carteirinha,
             'acomodacao': self.acomodacao,
             'telefone': self.telefone,
             'alergias': self.alergias,
@@ -58,5 +68,12 @@ class Paciente(db.Model):
             'telefone_emergencia': self.telefone_emergencia,
             'contato_emergencia': self.contato_emergencia,
             'case_responsavel': self.case_responsavel,
-            'medico_responsavel': self.medico_responsavel
+            'medico_responsavel': self.medico_responsavel,
+            'telefone_secundario': self.telefone_secundario,
+            'genero': self.genero,
+            'estado_civil': self.estado_civil,
+            'profissao': self.profissao,
+            'nacionalidade': self.nacionalidade,
+            'plano_id': self.plano_id,
+            'data_validade': self.data_validade.strftime('%Y-%m-%d') if self.data_validade else None
         }
