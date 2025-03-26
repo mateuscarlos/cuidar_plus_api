@@ -2,15 +2,19 @@ from flask import Flask
 from flask_cors import CORS
 from db import db
 from routes.usuarios import register_user_routes
-from routes.routes_app import app_routes
+from routes.routes_app import register_routes
 from routes.pacientes.pacientes_app import pacientes_routes
-from routes.tratamento.tratamentos_routes import tratamentos_routes  # Fix: correct import path
+from routes.tratamento.tratamentos_routes import tratamentos_routes
+from routes.convenios.convenios_routes import convenios_routes
+#from routes.acompanhamentos.acompanhamentos_routes import acompanhamentos_routes
 from flasgger import Swagger
 from config import Config
 from models.pacientes import Paciente
 from models.acompanhamento import Acompanhamento
 from models.user import User
 from models.tratamento import Tratamento
+from models.convenio import Convenio
+from models.plano import Plano
 from flask_migrate import Migrate
 from routes.auth_routes import auth_bp
 
@@ -27,28 +31,24 @@ with app.app_context():
     try:
         db.create_all()
         print("Banco de dados criado com sucesso.")
-        if 'paciente' in db.metadata.tables:  # Use o nome correto da tabela
-            print("Tabela 'paciente' criada com sucesso.")
-        else:
-            print("Tabela 'paciente' não foi criada.")
-        if 'acompanhamentos' in db.metadata.tables:
-            print("Tabela 'acompanhamentos' criada com sucesso.")
-        else:
-            print("Tabela 'acompanhamentos' não foi criada.")
-        if 'tratamento' in db.metadata.tables:
-            print("Tabela 'tratamento' criada com sucesso.")
-        else:
-            print("Tabela 'tratamento' não foi criada.")
+        
+        # Verificar tabelas criadas
+        tables = ['paciente', 'acompanhamentos', 'tratamento', 'convenio', 'plano']
+        for table in tables:
+            if table in db.metadata.tables:
+                print(f"Tabela '{table}' criada com sucesso.")
+            else:
+                print(f"Tabela '{table}' não foi criada.")
     except Exception as e:
         print(f"Erro ao inicializar o banco de dados: {e}")
 
 # Registro de rotas
-app.register_blueprint(app_routes)
-register_user_routes(app)
-app.register_blueprint(pacientes_routes)
-app.register_blueprint(tratamentos_routes)
+register_routes(app)
+app.register_blueprint(pacientes_routes) 
 app.register_blueprint(auth_bp)
-
+app.register_blueprint(tratamentos_routes)
+app.register_blueprint(convenios_routes)
+# app.register_blueprint(acompanhamentos_routes)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

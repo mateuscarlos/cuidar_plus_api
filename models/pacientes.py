@@ -7,9 +7,7 @@ class Paciente(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nome_completo = db.Column(db.String(100), nullable=False)
     cpf = db.Column(db.String(11), unique=True, nullable=False)
-    # Substituição de operadora por convenio_id
     convenio_id = db.Column(db.Integer, nullable=True)
-    # Substituição de identificador_prestadora por numero_carteirinha
     numero_carteirinha = db.Column(db.String(50), nullable=True)
     acomodacao = db.Column(db.String(50), nullable=False)
     telefone = db.Column(db.String(15), nullable=False)

@@ -28,8 +28,8 @@ def atualizar_paciente(paciente_id):
         update_fields = {
             'nome_completo': sanitize_input(data.get('nome_completo'), 100) if 'nome_completo' in data else None,
             'cpf': sanitize_input(data.get('cpf'), 11) if 'cpf' in data else None,
-            'operadora': sanitize_input(data.get('operadora'), 50) if 'operadora' in data else None,
-            'identificador_prestadora': sanitize_input(data.get('identificador_prestadora'), 50) if 'identificador_prestadora' in data else None,
+            'convenio_id': sanitize_input(data.get('convenio_id'), 50) if 'convenio_id' in data else None,
+            'numero_carteirinha': sanitize_input(data.get('numero_carteirinha'), 50) if 'numero_carteirinha' in data else None,
             'acomodacao': sanitize_input(data.get('acomodacao'), 50) if 'acomodacao' in data else None,
             'telefone': sanitize_input(data.get('telefone'), 15) if 'telefone' in data else None,
             'alergias': sanitize_input(data.get('alergias'), 200) if 'alergias' in data else None,

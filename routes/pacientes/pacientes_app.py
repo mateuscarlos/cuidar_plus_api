@@ -1,16 +1,16 @@
 from flask import Blueprint
-from .create_paciente import create_paciente
+from .get_paciente import buscar_paciente
+from .exibe_paciente import exibir_paciente, exibir_pacientes
+from routes.pacientes.create_paciente import create_paciente
 from .update_paciente import atualizar_paciente
 from .delete_paciente import excluir_paciente
-from .get_paciente import buscar_paciente
-from .get_all_pacientes import get_all_pacientes
-from .get_paciente_by_id import get_paciente_by_id
 
-pacientes_routes = Blueprint('pacientes_routes', __name__)
+pacientes_routes = Blueprint('pacientes', __name__, url_prefix='/api')
 
-pacientes_routes.route('/api/criar_paciente', methods=['POST'])(create_paciente)
-pacientes_routes.route('/api/atualizar_paciente/<int:paciente_id>', methods=['PUT'])(atualizar_paciente)
-pacientes_routes.route('/api/excluir_paciente/<int:paciente_id>', methods=['DELETE'])(excluir_paciente)
-pacientes_routes.route('/api/buscar_paciente', methods=['GET'])(buscar_paciente)
-pacientes_routes.route('/api/exibe_pacientes', methods=['GET'])(get_all_pacientes)
-pacientes_routes.route('/api/paciente/<int:id>', methods=['GET'])(get_paciente_by_id)
+# Rotas de pacientes
+pacientes_routes.route('/exibe_pacientes', methods=['GET'])(exibir_pacientes)
+pacientes_routes.route('/exibe_paciente/<int:id>', methods=['GET'])(exibir_paciente)
+pacientes_routes.route('/criar_paciente', methods=['GET'])(create_paciente)
+#pacientes_routes.route('/cadastra_paciente', methods=['POST'])(cadastrar_paciente)
+pacientes_routes.route('/atualiza_paciente/<int:id>', methods=['PUT'])(atualizar_paciente)
+pacientes_routes.route('/excluir_paciente/<int:id>', methods=['DELETE'])(excluir_paciente)

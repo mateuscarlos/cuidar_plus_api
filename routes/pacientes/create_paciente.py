@@ -9,9 +9,10 @@ from datetime import datetime, timezone
 def create_paciente():
     try:
         data = request.get_json()
-        required_fields = ['nome_completo', 'cpf', 'operadora', 'cid_primario', 'cep', 'identificador_prestadora']
+        # Atualizar os campos para os novos nomes
+        required_fields = ['nome_completo', 'cpf', 'convenio_id', 'cid_primario', 'cep', 'numero_carteirinha']
         if not all(field in data for field in required_fields):
-            raise BadRequest("Campos obrigatórios faltando: nome_completo, cpf, operadora, cid_primario, cep, identificador_prestadora")
+            raise BadRequest("Campos obrigatórios faltando: nome_completo, cpf, convenio_id, cid_primario, cep, numero_carteirinha")
         
         cpf = re.sub(r'[^\d]', '', data['cpf'])
         if not validate_cpf(cpf):
@@ -25,9 +26,9 @@ def create_paciente():
         paciente_data = {
             'nome_completo': sanitize_input(str(data['nome_completo']), 100),
             'cpf': cpf,
-            'operadora': sanitize_input(str(data['operadora']), 50),
+            'convenio_id': sanitize_input(str(data['convenio_id']), 50),
             'cid_primario': sanitize_input(str(data['cid_primario']), 10),
-            'identificador_prestadora': sanitize_input(str(data['identificador_prestadora']), 50),
+            'numero_carteirinha': sanitize_input(str(data['numero_carteirinha']), 50),
             'acomodacao': sanitize_input(str(data.get('acomodacao', '')), 50) if data.get('acomodacao') else None,
             'telefone': sanitize_input(str(data.get('telefone')), 20) if data.get('telefone') else None,
             'alergias': sanitize_input(str(data.get('alergias', '')), 200) if data.get('alergias') else None,
@@ -43,7 +44,6 @@ def create_paciente():
             'created_at': datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S'),
             'updated_at': datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S'),
             'status': sanitize_input(str(data.get('status', '')), 50),
-            # Adicionando os campos que faltavam
             'email': sanitize_input(str(data.get('email', '')), 100) if data.get('email') else None,
             'telefone_emergencia': sanitize_input(str(data.get('telefone_emergencia', '')), 15) if data.get('telefone_emergencia') else None,
             'contato_emergencia': sanitize_input(str(data.get('contato_emergencia', '')), 100) if data.get('contato_emergencia') else None,
