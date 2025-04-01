@@ -1,6 +1,7 @@
 from datetime import datetime
 from db import db
 from utils import convert_utc_to_db_format, convert_ddmmyyyy_to_db_format
+from sqlalchemy.dialects.postgresql import JSONB
 
 class Paciente(db.Model):
     __tablename__ = 'paciente'
@@ -15,13 +16,10 @@ class Paciente(db.Model):
     cid_primario = db.Column(db.String(10), nullable=False)
     cid_secundario = db.Column(db.String(10), nullable=True)
     data_nascimento = db.Column(db.Date, nullable=False)
-    rua = db.Column(db.String(100), nullable=True)
-    numero = db.Column(db.String(10), nullable=True)
-    complemento = db.Column(db.String(50), nullable=True)
-    cep = db.Column(db.String(8), nullable=False)
-    bairro = db.Column(db.String(50), nullable=False)
-    cidade = db.Column(db.String(50), nullable=False)
-    estado = db.Column(db.String(2), nullable=False)
+    
+    # Substituir campos individuais de endereço por um campo JSON
+    endereco = db.Column(JSONB, nullable=False, default={})
+    
     status = db.Column(db.String(20), nullable=False, default='em-avaliacao')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -52,13 +50,8 @@ class Paciente(db.Model):
             'cid_primario': self.cid_primario,
             'cid_secundario': self.cid_secundario,
             'data_nascimento': self.data_nascimento.strftime('%Y-%m-%d') if self.data_nascimento else None,
-            'rua': self.rua,
-            'numero': self.numero,
-            'complemento': self.complemento,
-            'cep': self.cep,
-            'bairro': self.bairro,
-            'cidade': self.cidade,
-            'estado': self.estado,
+            # Retornar o objeto JSON de endereço diretamente
+            'endereco': self.endereco,
             'status': self.status,
             'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S') if self.created_at else None,
             'updated_at': self.updated_at.strftime('%Y-%m-%d %H:%M:%S') if self.updated_at else None,
