@@ -1,0 +1,21 @@
+services:
+  backend:
+    build: ../cuidar_plus_api
+    ports:
+      - "5001:5000"  # Mapeia a porta 5001 do host para a porta 5000 do container
+    volumes:
+      - ../cuidar_plus_api:/app
+    environment:
+      DATABASE_HOST: mysql  # Nome do serviço do MySQL
+      DATABASE_PORT: 3306   # Porta do MySQL
+      DATABASE_NAME: mydatabase
+      DATABASE_USER: myuser
+      DATABASE_PASSWORD: mypassword
+    depends_on:
+      - mysql  # Dependência do serviço MySQL
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
