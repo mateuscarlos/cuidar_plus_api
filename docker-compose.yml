@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  # Serviço Frontend Angular
+  frontend:
+    build:
+      context: ./cuidar-plus
+      dockerfile: Dockerfile
+    container_name: cuidar-plus-frontend
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+    networks:
+      - app-network
+    depends_on:
+      - backend
+
+  # Serviço Backend API
+  backend:
+    build: ./cuidar_plus_api
+    container_name: cuidar-plus-backend
+    ports:
+      - "5001:5000"
+    volumes:
+      - ./cuidar_plus_api:/app
+    environment:
+      DATABASE_HOST: mysql
+      DATABASE_PORT: 3306
+      DATABASE_NAME: cuidar_plus_bd
+      DATABASE_USER: myuser
+      DATABASE_PASSWORD: mypassword
+    depends_on:
+      - mysql
+    networks:
+      - app-network
+
+  # Serviço de Banco de Dados MySQL
+  mysql:
+    image: mysql:8.0
+    container_name: cuidar-plus-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: cuidar_plus_bd
+      MYSQL_USER: myuser
+      MYSQL_PASSWORD: mypassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - app-network
+
+volumes:
+  mysql_data:
+
+networks:
+  app-network:
+    driver: bridge
