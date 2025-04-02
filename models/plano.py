@@ -13,6 +13,9 @@ class Plano(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
+    # Relacionamentos
+    pacientes = db.relationship('Paciente', backref='plano', lazy=True)
+    
     def to_dict(self):
         return {
             'id': self.id,

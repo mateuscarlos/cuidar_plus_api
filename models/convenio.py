@@ -12,8 +12,9 @@ class Convenio(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
-    # Relação com Plano
-    planos = db.relationship('Plano', backref='convenio', lazy=True)
+    # Relacionamentos
+    planos = db.relationship('Plano', backref='convenio', lazy=True, cascade="all, delete-orphan")
+    pacientes = db.relationship('Paciente', backref='convenio', lazy=True)
     
     def to_dict(self):
         return {
@@ -23,5 +24,6 @@ class Convenio(db.Model):
             'tipo': self.tipo,
             'ativo': self.ativo,
             'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S') if self.created_at else None,
-            'updated_at': self.updated_at.strftime('%Y-%m-%d %H:%M:%S') if self.updated_at else None
+            'updated_at': self.updated_at.strftime('%Y-%m-%d %H:%M:%S') if self.updated_at else None,
+            'planos': [plano.to_dict() for plano in self.planos] if self.planos else []
         }

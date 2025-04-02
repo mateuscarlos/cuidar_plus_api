@@ -3,18 +3,15 @@ from flask_cors import CORS
 from db import db
 from routes.usuarios import register_user_routes
 from routes.routes_app import register_routes
-from routes.pacientes.pacientes_app import pacientes_routes
-from routes.tratamento.tratamentos_routes import tratamentos_routes
-from routes.convenios.convenios_routes import convenios_routes
-#from routes.acompanhamentos.acompanhamentos_routes import acompanhamentos_routes
+from routes.pacientes_routes import pacientes_routes
+from routes.convenios_routes import convenios_routes
+from routes.acompanhamentos_routes import acompanhamentos_routes
 from flasgger import Swagger
 from config import Config
 from models.pacientes import Paciente
 from models.acompanhamento import Acompanhamento
 from models.user import User
-from models.tratamento import Tratamento
 from models.convenio import Convenio
-from models.plano import Plano
 from flask_migrate import Migrate
 from routes.auth_routes import auth_bp
 
@@ -33,7 +30,7 @@ with app.app_context():
         print("Banco de dados criado com sucesso.")
         
         # Verificar tabelas criadas
-        tables = ['paciente', 'acompanhamentos', 'tratamento', 'convenio', 'plano']
+        tables = ['paciente', 'acompanhamento', 'tratamento', 'convenio', 'plano']
         for table in tables:
             if table in db.metadata.tables:
                 print(f"Tabela '{table}' criada com sucesso.")
@@ -48,7 +45,7 @@ app.register_blueprint(pacientes_routes)
 app.register_blueprint(auth_bp)
 app.register_blueprint(tratamentos_routes)
 app.register_blueprint(convenios_routes)
-# app.register_blueprint(acompanhamentos_routes)
+app.register_blueprint(acompanhamentos_routes)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
