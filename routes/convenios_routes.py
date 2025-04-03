@@ -3,17 +3,15 @@ from db import db
 from models.convenio import Convenio
 from models.plano import Plano
 
-convenios_routes = Blueprint('convenios', __name__)
+convenios_routes = Blueprint('convenios_routes', __name__)
 
-@convenios_routes.route('/convenios', methods=['GET'])
-def obter_convenios():
-    """Obter todos os convênios"""
+@convenios_routes.route('/convenios/listar', methods=['GET'])
+def listar_convenios():
+    """Listar todos os convênios"""
     try:
         convenios = Convenio.query.all()
-        resultado = [c.to_dict() for c in convenios]
-        
+        resultado = [convenio.to_dict() for convenio in convenios]
         return jsonify(resultado), 200
-        
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -30,7 +28,7 @@ def obter_convenio(id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@convenios_routes.route('/convenios', methods=['POST'])
+@convenios_routes.route('/convenios/criar', methods=['POST'])
 def criar_convenio():
     """Criar um novo convênio"""
     try:

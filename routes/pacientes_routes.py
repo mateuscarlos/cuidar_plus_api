@@ -7,20 +7,26 @@ from werkzeug.exceptions import NotFound, BadRequest
 
 pacientes_routes = Blueprint('pacientes', __name__)
 
-@pacientes_routes.route('/pacientes', methods=['POST'])
+@pacientes_routes.route('/pacientes/criar', methods=['POST'])
 def criar_paciente():
     """Criar um novo paciente"""
     try:
+        # Obter os dados do corpo da requisição
         data = request.get_json()
-        
+
+        # Validar os dados obrigatórios
+        if not data.get('nome_completo') or not data.get('cpf') or not data.get('data_nascimento'):
+            return jsonify({'error': 'Campos obrigatórios não foram preenchidos.'}), 400
+
         # Criar o paciente a partir do dicionário
         novo_paciente = Paciente.from_dict(data)
-        
+
+        # Salvar no banco de dados
         db.session.add(novo_paciente)
         db.session.commit()
-        
+
         return jsonify(novo_paciente.to_dict()), 201
-        
+
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
@@ -153,4 +159,14 @@ def excluir_paciente(id):
         
     except Exception as e:
         db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+@pacientes_routes.route('/pacientes', methods=['GET'])
+def listar_todos_pacientes():
+    """Listar todos os pacientes"""
+    try:
+        pacientes = Paciente.query.all()
+        resultado = [paciente.to_dict() for paciente in pacientes]
+        return jsonify(resultado), 200
+    except Exception as e:
         return jsonify({'error': str(e)}), 500

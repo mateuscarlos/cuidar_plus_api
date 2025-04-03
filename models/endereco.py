@@ -31,8 +31,6 @@ class Endereco:
     @classmethod
     def from_dict(cls, data):
         """Cria um objeto Endereco a partir de um dicionário"""
-        if data is None:
-            return None
         return cls(
             rua=data.get('rua'),
             numero=data.get('numero'),
