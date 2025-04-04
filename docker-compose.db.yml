@@ -1,22 +1,14 @@
 services:
-  mysql:
-    image: mysql:8.0
-    container_name: mysql_container
+  postgres:
+    image: postgres:13
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: cuidar_plus_bd
-      MYSQL_USER: myuser
-      MYSQL_PASSWORD: mypassword
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: cuidar_plus_bd
     ports:
-      - "3306:3306"
+      - "5432:5432"
     volumes:
-      - mysql_data:/var/lib/mysql
-    networks:
-      - app-network
+      - postgres_data:/var/lib/postgresql/data
 
 volumes:
-  mysql_data:
-
-networks:
-  app-network:
-    driver: bridge
+  postgres_data:

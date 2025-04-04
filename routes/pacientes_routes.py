@@ -2,6 +2,8 @@ from flask import Blueprint, request, jsonify
 from db import db
 from models.pacientes import Paciente
 from models.endereco import Endereco
+from models.convenio import Convenio  # Adicionar importação
+from models.plano import Plano  # Adicionar importação
 import json
 from werkzeug.exceptions import NotFound, BadRequest
 
@@ -14,9 +16,31 @@ def criar_paciente():
         # Obter os dados do corpo da requisição
         data = request.get_json()
 
-        # Validar os dados obrigatórios
-        if not data.get('nome_completo') or not data.get('cpf') or not data.get('data_nascimento'):
-            return jsonify({'error': 'Campos obrigatórios não foram preenchidos.'}), 400
+        # Validar campos obrigatórios
+        campos_obrigatorios = ['nome_completo', 'cpf', 'data_nascimento', 'telefone',
+                              'cid_primario', 'acomodacao', 'convenio_id', 'plano_id',
+                              'numero_carteirinha', 'data_validade']
+        
+        for campo in campos_obrigatorios:
+            if not data.get(campo):
+                return jsonify({'error': f'O campo {campo} é obrigatório.'}), 400
+
+        # Verificar se o convênio existe
+        convenio_id = data.get('convenio_id')
+        if convenio_id:
+            convenio = Convenio.query.filter_by(id=convenio_id, ativo=True).first()
+            if not convenio:
+                return jsonify({'error': 'O convênio selecionado não existe ou está inativo.'}), 400
+
+        # Verificar se o plano existe e pertence ao convênio
+        plano_id = data.get('plano_id')
+        convenio_id = data.get('convenio_id')
+        if plano_id and convenio_id:
+            plano = Plano.query.get(plano_id)
+            if not plano:
+                return jsonify({'error': 'O plano selecionado não existe.'}), 400
+            if plano.convenio_id != convenio_id:
+                return jsonify({'error': 'O plano selecionado não pertence ao convênio informado.'}), 400
 
         # Criar o paciente a partir do dicionário
         novo_paciente = Paciente.from_dict(data)

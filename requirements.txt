@@ -13,3 +13,5 @@ cryptography
 pytz
 PyJWT
 argon2-cffi
+psycopg2-binary
+python-dotenv

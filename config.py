@@ -3,8 +3,8 @@ import os
 class Config:
     BASE_DIR = os.path.abspath(os.path.dirname(__file__))
     SQLALCHEMY_DATABASE_URI = (
-        f"mysql+pymysql://{os.getenv('DB_USER', 'myuser')}:{os.getenv('DB_PASSWORD', 'mypassword')}"
-        f"@mysql:3306/{os.getenv('DB_NAME', 'cuidar_plus_bd')}"
+        f"postgresql+psycopg2://{os.getenv('DB_USER', 'myuser')}:{os.getenv('DB_PASSWORD', 'mypassword')}"
+        f"@{os.getenv('DB_HOST', 'localhost')}:5432/{os.getenv('DB_NAME', 'cuidar_plus_bd')}"
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SECRET_KEY = os.getenv('SECRET_KEY', 'your_secret_key')
@@ -52,3 +52,7 @@ class Config:
             "supports_credentials": True
         }
     }
+
+
+if __name__ == "__main__":
+    print("DB URI:", Config.SQLALCHEMY_DATABASE_URI)
