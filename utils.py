@@ -4,6 +4,7 @@ from datetime import datetime
 import pytz
 import requests
 from werkzeug.exceptions import BadRequest
+from services.datetime_service import DateTimeService
 
 def validate_cpf(cpf: str) -> bool:
     """Valida o formato e dígitos verificadores do CPF"""
@@ -33,7 +34,7 @@ def sanitize_input(value: str, max_length=100) -> str:
         raise ValueError(f"Campo excede o tamanho máximo de {max_length} caracteres")
     return cleaned
 
-def get_local_time(utc_dt, timezone_str):
+def get_local_time(utc_dt, timezone_str='America/Sao_Paulo'):
     """
     Converte a data e hora UTC para o fuso horário local do usuário.
     
@@ -56,9 +57,9 @@ def get_user_timezone(ip_address):
         response = requests.get(f'http://ip-api.com/json/{ip_address}')
         response.raise_for_status()
         data = response.json()
-        return data.get('timezone', 'UTC')
+        return data.get('timezone', 'America/Sao_Paulo')
     except requests.RequestException:
-        return 'UTC'
+        return 'America/Sao_Paulo'  # Default para São Paulo
 
 def get_address_from_cep(cep):
     """
@@ -82,8 +83,17 @@ def convert_utc_to_db_format(utc_date_str):
     :param utc_date_str: string de data em UTC (ex: '2025-03-13T12:00:00Z')
     :return: string de data no formato do banco de dados (ex: '2025-03-13 12:00:00')
     """
-    utc_date = datetime.strptime(utc_date_str, '%Y-%m-%dT%H:%M:%SZ')
-    return utc_date.strftime('%Y-%m-%d %H:%M:%S')
+    # Usando o novo serviço de datas
+    dt = DateTimeService.parse_brazilian_datetime(utc_date_str)
+    if dt:
+        return DateTimeService.to_db_datetime(utc_date_str)
+    
+    # Fallback para o método antigo se não estiver no formato brasileiro
+    try:
+        utc_date = datetime.strptime(utc_date_str, '%Y-%m-%dT%H:%M:%SZ')
+        return utc_date.strftime('%Y-%m-%d %H:%M:%S')
+    except ValueError:
+        return utc_date_str
 
 def convert_ddmmyyyy_to_db_format(date_str):
     """
@@ -92,5 +102,14 @@ def convert_ddmmyyyy_to_db_format(date_str):
     :param date_str: string de data no formato dd/mm/yyyy (ex: '13/03/2025')
     :return: string de data no formato do banco de dados (ex: '2025-03-13')
     """
-    date = datetime.strptime(date_str, '%d/%m/%Y')
-    return date.strftime('%Y-%m-%d')
+    # Usando o novo serviço de datas
+    db_date = DateTimeService.to_db_date(date_str)
+    if db_date:
+        return db_date
+    
+    # Fallback para o método antigo
+    try:
+        date = datetime.strptime(date_str, '%d/%m/%Y')
+        return date.strftime('%Y-%m-%d')
+    except ValueError:
+        return date_str
