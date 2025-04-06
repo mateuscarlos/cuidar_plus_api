@@ -6,41 +6,66 @@ class Endereco:
     """
     Classe modelo para representar um endereço.
     Esta classe não é uma tabela do banco de dados, mas um tipo de dado JSON.
+    Usa as mesmas nomenclaturas da API ViaCEP para facilitar a interoperabilidade.
     """
-    def __init__(self, rua=None, numero=None, complemento=None, cep=None, bairro=None, cidade=None, estado=None):
-        self.rua = rua
-        self.numero = numero
-        self.complemento = complemento
+    def __init__(self, cep=None, logradouro=None, complemento=None, bairro=None, 
+                 localidade=None, uf=None, ibge=None, gia=None, ddd=None, siafi=None,
+                 numero=None, unidade=None, estado=None, regiao=None):
+        # Campos padrão da API ViaCEP
         self.cep = cep
+        self.logradouro = logradouro
+        self.complemento = complemento
         self.bairro = bairro
-        self.cidade = cidade
-        self.estado = estado
+        self.localidade = localidade  # Cidade
+        self.uf = uf                  # Estado (sigla)
+        self.ibge = ibge
+        self.gia = gia
+        self.ddd = ddd
+        self.siafi = siafi
+        self.unidade = unidade
+        self.estado = estado          # Nome do estado por extenso
+        self.regiao = regiao          # Nome da região
+        
+        # Campo adicional não presente na API ViaCEP mas necessário
+        self.numero = numero
     
     def to_dict(self):
         """Converte o objeto Endereco para um dicionário"""
         return {
-            'rua': self.rua,
-            'numero': self.numero,
-            'complemento': self.complemento,
             'cep': self.cep,
+            'logradouro': self.logradouro,
+            'complemento': self.complemento,
             'bairro': self.bairro,
-            'cidade': self.cidade,
-            'estado': self.estado
+            'localidade': self.localidade,
+            'uf': self.uf,
+            'ibge': self.ibge,
+            'gia': self.gia,
+            'ddd': self.ddd,
+            'siafi': self.siafi,
+            'unidade': self.unidade,
+            'estado': self.estado,
+            'regiao': self.regiao,
+            'numero': self.numero
         }
     
     @classmethod
     def from_dict(cls, data):
         """Cria um objeto Endereco a partir de um dicionário"""
-        if data is None:
-            return None
         return cls(
-            rua=data.get('rua'),
-            numero=data.get('numero'),
-            complemento=data.get('complemento'),
             cep=data.get('cep'),
+            logradouro=data.get('logradouro'),
+            complemento=data.get('complemento'),
             bairro=data.get('bairro'),
-            cidade=data.get('cidade'),
-            estado=data.get('estado')
+            localidade=data.get('localidade'),
+            uf=data.get('uf'),
+            ibge=data.get('ibge'),
+            gia=data.get('gia'),
+            ddd=data.get('ddd'),
+            siafi=data.get('siafi'),
+            unidade=data.get('unidade'),
+            estado=data.get('estado'),
+            regiao=data.get('regiao'),
+            numero=data.get('numero')
         )
     
     def to_json(self):
@@ -52,5 +77,8 @@ class Endereco:
         """Cria um objeto Endereco a partir de uma string JSON"""
         if not json_str:
             return None
-        data = json.loads(json_str)
-        return cls.from_dict(data)
+        try:
+            data = json.loads(json_str)
+            return cls.from_dict(data)
+        except json.JSONDecodeError:
+            return None

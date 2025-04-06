@@ -24,14 +24,10 @@ class Config:
         'specs_route': '/docs/'
     }
     CORS_RESOURCES = {
-        r"/api/*": {
-            "origins": ["http://localhost:4200","http://127.0.0.1:5000", "http://127.0.0.1:80", "http://localhost", "http://127.0.0.1:5001"],
-            "methods": ["GET", "POST", "PUT", "DELETE"],
-            "allow_headers": ["Authorization", "Content-Type"],
-            },
-        r"/api/update_user/*": {
-        "origins": ["http://localhost:4200","http://127.0.0.1:5000", "http://127.0.0.1:80", "http://localhost", "http://127.0.0.1:5001"],
-        "methods": ["PUT"],
-        "allow_headers": ["Authorization", "Content-Type"],
+        r"/*": {
+            "origins": ["http://localhost:4200", "http://127.0.0.1:4200", "http://localhost:5001", "http://127.0.0.1:5001", "http://localhost:5000", "http://127.0.0.1:5000"],  # Permitir apenas este domínio
+            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+            "allow_headers": ["Authorization", "Content-Type", "X-Test-Environment"],
+            "supports_credentials": True
+        }
     }
-}
