@@ -7,8 +7,8 @@ class Endereco:
     Classe modelo para representar um endereço.
     Esta classe não é uma tabela do banco de dados, mas um tipo de dado JSON.
     """
-    def __init__(self, rua=None, numero=None, complemento=None, cep=None, bairro=None, cidade=None, estado=None):
-        self.rua = rua
+    def __init__(self, logradouro=None, numero=None, complemento=None, cep=None, bairro=None, cidade=None, estado=None):
+        self.logradouro = logradouro
         self.numero = numero
         self.complemento = complemento
         self.cep = cep
@@ -19,7 +19,7 @@ class Endereco:
     def to_dict(self):
         """Converte o objeto Endereco para um dicionário"""
         return {
-            'rua': self.rua,
+            'logradouro': self.logradouro,
             'numero': self.numero,
             'complemento': self.complemento,
             'cep': self.cep,
@@ -32,7 +32,7 @@ class Endereco:
     def from_dict(cls, data):
         """Cria um objeto Endereco a partir de um dicionário"""
         return cls(
-            rua=data.get('rua'),
+            logradouro=data.get('logradouro'),
             numero=data.get('numero'),
             complemento=data.get('complemento'),
             cep=data.get('cep'),
