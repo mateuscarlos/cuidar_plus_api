@@ -115,7 +115,7 @@ class Paciente(db.Model):
         # Processar o endereço
         if data.get('endereco'):
             endereco_data = data.get('endereco')
-            endereco_data['rua'] = endereco_data.pop('logradouro', None)  # Mapear 'logradouro' para 'rua'
+            # Não é mais necessário mapear 'logradouro' para 'rua', pois agora usamos a nomenclatura da ViaCEP
             paciente.endereco = Endereco.from_dict(endereco_data)
 
         return paciente
