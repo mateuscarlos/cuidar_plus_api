@@ -21,15 +21,15 @@ app = Flask(__name__, template_folder='../cuidar-plus/cuidar-plus', static_folde
 app.config.from_object(Config)
 swagger = Swagger(app)
 
-# Configurar CORS para permitir o cabeçalho 'x-test-environment'
-CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
+# Configurar CORS para permitir apenas o domínio necessário
+CORS(app, resources={r"/*": {"origins": "http://localhost:4200"}}, supports_credentials=True)
 
 @app.after_request
 def add_cors_headers(response):
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization,x-test-environment')
-    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
-    response.headers.add('Access-Control-Allow-Credentials', 'true')
+    response.headers['Access-Control-Allow-Origin'] = 'http://localhost:4200'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Authorization,x-test-environment'
+    response.headers['Access-Control-Allow-Methods'] = 'GET,PUT,POST,DELETE,OPTIONS'
+    response.headers['Access-Control-Allow-Credentials'] = 'true'
     return response
 
 @app.route('/api/options', methods=['OPTIONS'])
@@ -45,10 +45,12 @@ with app.app_context():
         db.create_all()
         print("Banco de dados criado com sucesso.")
         
-        # Verificar tabelas criadas
-        tables = ['paciente', 'acompanhamento', 'convenio', 'plano']
+        # Verificar tabelas criadas no banco de dados
+        inspector = db.inspect(db.engine)
+        existing_tables = inspector.get_table_names()
+        tables = ['paciente', 'acompanhamento', 'convenio', 'plano', 'user']
         for table in tables:
-            if table in db.metadata.tables:
+            if table in existing_tables:
                 print(f"Tabela '{table}' criada com sucesso.")
             else:
                 print(f"Tabela '{table}' não foi criada.")
