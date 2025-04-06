@@ -10,7 +10,7 @@ class Endereco:
     """
     def __init__(self, cep=None, logradouro=None, complemento=None, bairro=None, 
                  localidade=None, uf=None, ibge=None, gia=None, ddd=None, siafi=None,
-                 numero=None, unidade=None):
+                 numero=None, unidade=None, estado=None, regiao=None):
         # Campos padrão da API ViaCEP
         self.cep = cep
         self.logradouro = logradouro
@@ -23,6 +23,8 @@ class Endereco:
         self.ddd = ddd
         self.siafi = siafi
         self.unidade = unidade
+        self.estado = estado          # Nome do estado por extenso
+        self.regiao = regiao          # Nome da região
         
         # Campo adicional não presente na API ViaCEP mas necessário
         self.numero = numero
@@ -41,6 +43,8 @@ class Endereco:
             'ddd': self.ddd,
             'siafi': self.siafi,
             'unidade': self.unidade,
+            'estado': self.estado,
+            'regiao': self.regiao,
             'numero': self.numero
         }
     
@@ -52,13 +56,15 @@ class Endereco:
             logradouro=data.get('logradouro'),
             complemento=data.get('complemento'),
             bairro=data.get('bairro'),
-            localidade=data.get('localidade'),  # cidade
-            uf=data.get('uf'),                  # estado (sigla)
+            localidade=data.get('localidade'),
+            uf=data.get('uf'),
             ibge=data.get('ibge'),
             gia=data.get('gia'),
             ddd=data.get('ddd'),
             siafi=data.get('siafi'),
             unidade=data.get('unidade'),
+            estado=data.get('estado'),
+            regiao=data.get('regiao'),
             numero=data.get('numero')
         )
     
@@ -71,5 +77,8 @@ class Endereco:
         """Cria um objeto Endereco a partir de uma string JSON"""
         if not json_str:
             return None
-        data = json.loads(json_str)
-        return cls.from_dict(data)
+        try:
+            data = json.loads(json_str)
+            return cls.from_dict(data)
+        except json.JSONDecodeError:
+            return None
