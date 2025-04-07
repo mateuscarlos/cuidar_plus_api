@@ -29,6 +29,6 @@ def migrate_endereco():
 
 if __name__ == "__main__":
     # Importar o app para pegar o contexto da aplicação
-    from app import app
+    from src.interfaces.api.app import app
     with app.app_context():
         migrate_endereco()

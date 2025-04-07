@@ -3,7 +3,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import pytest
 import json
-from app import app
+from src.interfaces.api.app import app
 from db import db
 from models.user import User
 

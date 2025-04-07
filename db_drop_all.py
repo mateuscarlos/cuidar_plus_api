@@ -1,4 +1,4 @@
-from app import app
+from src.interfaces.api.app import app
 from db import db
 from sqlalchemy import text
 
