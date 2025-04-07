@@ -1,0 +1,545 @@
+2025-04-07 10:50:50 cuidar_plus_backend  | [2025-04-07 13:50:50 +0000] [1] [INFO] Starting gunicorn 22.0.0
+2025-04-07 10:50:50 cuidar_plus_backend  | [2025-04-07 13:50:50 +0000] [1] [INFO] Listening at: http://0.0.0.0:5000 (1)
+2025-04-07 10:50:50 cuidar_plus_backend  | [2025-04-07 13:50:50 +0000] [1] [INFO] Using worker: sync
+2025-04-07 10:38:11 mysql_container      | 2025-04-07 13:38:11+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.0.41-1.el9 started.
+2025-04-07 10:38:12 mysql_container      | 2025-04-07 13:38:12+00:00 [Note] [Entrypoint]: Switching to dedicated user 'mysql'
+2025-04-07 10:38:12 mysql_container      | 2025-04-07 13:38:12+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.0.41-1.el9 started.
+2025-04-07 10:38:12 mysql_container      | '/var/lib/mysql/mysql.sock' -> '/var/run/mysqld/mysqld.sock'
+2025-04-07 10:50:50 cuidar_plus_backend  | [2025-04-07 13:50:50 +0000] [7] [INFO] Booting worker with pid: 7
+2025-04-07 10:38:13 mysql_container      | 2025-04-07T13:38:13.274535Z 0 [Warning] [MY-011068] [Server] The syntax '--skip-host-cache' is deprecated and will be removed in a future release. Please use SET GLOBAL host_cache_size=0 instead.
+2025-04-07 10:50:51 cuidar_plus_backend  | [2025-04-07 13:50:51 +0000] [7] [ERROR] Exception in worker process
+2025-04-07 10:50:51 cuidar_plus_backend  | Traceback (most recent call last):
+2025-04-07 10:50:51 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/arbiter.py", line 609, in spawn_worker
+2025-04-07 10:50:51 cuidar_plus_backend  |     worker.init_process()
+2025-04-07 10:50:51 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/workers/base.py", line 134, in init_process
+2025-04-07 10:50:51 cuidar_plus_backend  |     self.load_wsgi()
+2025-04-07 10:38:13 mysql_container      | 2025-04-07T13:38:13.292107Z 0 [System] [MY-010116] [Server] /usr/sbin/mysqld (mysqld 8.0.41) starting as process 1
+2025-04-07 10:38:13 mysql_container      | 2025-04-07T13:38:13.322601Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+2025-04-07 10:50:51 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/workers/base.py", line 146, in load_wsgi
+2025-04-07 10:38:14 mysql_container      | 2025-04-07T13:38:14.279199Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+2025-04-07 10:50:51 cuidar_plus_backend  |     self.wsgi = self.app.wsgi()
+2025-04-07 10:50:51 cuidar_plus_backend  |                 ^^^^^^^^^^^^^^^
+2025-04-07 10:38:14 mysql_container      | 2025-04-07T13:38:14.931727Z 0 [Warning] [MY-010068] [Server] CA certificate ca.pem is self signed.
+2025-04-07 10:38:14 mysql_container      | 2025-04-07T13:38:14.931822Z 0 [System] [MY-013602] [Server] Channel mysql_main configured to support TLS. Encrypted connections are now supported for this channel.
+2025-04-07 10:50:51 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/app/base.py", line 67, in wsgi
+2025-04-07 10:38:14 mysql_container      | 2025-04-07T13:38:14.945058Z 0 [Warning] [MY-011810] [Server] Insecure configuration for --pid-file: Location '/var/run/mysqld' in the path is accessible to all OS users. Consider choosing a different directory.
+2025-04-07 10:50:51 cuidar_plus_backend  |     self.callable = self.load()
+2025-04-07 10:38:15 mysql_container      | 2025-04-07T13:38:15.105730Z 0 [System] [MY-011323] [Server] X Plugin ready for connections. Bind-address: '::' port: 33060, socket: /var/run/mysqld/mysqlx.sock
+2025-04-07 10:38:15 mysql_container      | 2025-04-07T13:38:15.106076Z 0 [System] [MY-010931] [Server] /usr/sbin/mysqld: ready for connections. Version: '8.0.41'  socket: '/var/run/mysqld/mysqld.sock'  port: 3306  MySQL Community Server - GPL.
+2025-04-07 10:41:43 mysql_container      | 2025-04-07T13:41:43.364018Z 0 [System] [MY-013172] [Server] Received SHUTDOWN from user <via user signal>. Shutting down mysqld (Version: 8.0.41).
+2025-04-07 10:41:44 mysql_container      | 2025-04-07T13:41:44.457623Z 0 [System] [MY-010910] [Server] /usr/sbin/mysqld: Shutdown complete (mysqld 8.0.41)  MySQL Community Server - GPL.
+2025-04-07 10:50:51 cuidar_plus_backend  |                     ^^^^^^^^^^^
+2025-04-07 10:50:51 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 58, in load
+2025-04-07 10:41:56 mysql_container      | 2025-04-07 13:41:56+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.0.41-1.el9 started.
+2025-04-07 10:50:51 cuidar_plus_backend  |     return self.load_wsgiapp()
+2025-04-07 10:50:51 cuidar_plus_backend  |            ^^^^^^^^^^^^^^^^^^^
+2025-04-07 10:50:51 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 48, in load_wsgiapp
+2025-04-07 10:41:57 mysql_container      | 2025-04-07 13:41:57+00:00 [Note] [Entrypoint]: Switching to dedicated user 'mysql'
+2025-04-07 10:50:51 cuidar_plus_backend  |     return util.import_app(self.app_uri)
+2025-04-07 10:50:51 cuidar_plus_backend  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-04-07 10:50:51 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/util.py", line 371, in import_app
+2025-04-07 10:50:51 cuidar_plus_backend  |     mod = importlib.import_module(module)
+2025-04-07 10:41:57 mysql_container      | 2025-04-07 13:41:57+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.0.41-1.el9 started.
+2025-04-07 10:41:57 mysql_container      | '/var/lib/mysql/mysql.sock' -> '/var/run/mysqld/mysqld.sock'
+2025-04-07 10:50:51 cuidar_plus_backend  |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-04-07 10:41:58 mysql_container      | 2025-04-07T13:41:58.029477Z 0 [Warning] [MY-011068] [Server] The syntax '--skip-host-cache' is deprecated and will be removed in a future release. Please use SET GLOBAL host_cache_size=0 instead.
+2025-04-07 10:50:51 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/importlib/__init__.py", line 126, in import_module
+2025-04-07 10:50:51 cuidar_plus_backend  |     return _bootstrap._gcd_import(name[level:], package, level)
+2025-04-07 10:50:51 cuidar_plus_backend  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-04-07 10:50:51 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+2025-04-07 10:41:58 mysql_container      | 2025-04-07T13:41:58.033245Z 0 [System] [MY-010116] [Server] /usr/sbin/mysqld (mysqld 8.0.41) starting as process 1
+2025-04-07 10:50:51 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+2025-04-07 10:41:58 mysql_container      | 2025-04-07T13:41:58.045104Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+2025-04-07 10:50:51 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+2025-04-07 10:41:58 mysql_container      | 2025-04-07T13:41:58.533554Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+2025-04-07 10:50:51 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+2025-04-07 10:41:59 mysql_container      | 2025-04-07T13:41:59.296294Z 0 [Warning] [MY-010068] [Server] CA certificate ca.pem is self signed.
+2025-04-07 10:41:59 mysql_container      | 2025-04-07T13:41:59.296422Z 0 [System] [MY-013602] [Server] Channel mysql_main configured to support TLS. Encrypted connections are now supported for this channel.
+2025-04-07 10:41:59 mysql_container      | 2025-04-07T13:41:59.303498Z 0 [Warning] [MY-011810] [Server] Insecure configuration for --pid-file: Location '/var/run/mysqld' in the path is accessible to all OS users. Consider choosing a different directory.
+2025-04-07 10:50:51 cuidar_plus_backend  |   File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+2025-04-07 10:41:59 mysql_container      | 2025-04-07T13:41:59.395998Z 0 [System] [MY-011323] [Server] X Plugin ready for connections. Bind-address: '::' port: 33060, socket: /var/run/mysqld/mysqlx.sock
+2025-04-07 10:50:51 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+2025-04-07 10:50:51 cuidar_plus_backend  |   File "/app/wsgi.py", line 1, in <module>
+2025-04-07 10:50:51 cuidar_plus_backend  |     from src.interfaces.api.app import app
+2025-04-07 10:41:59 mysql_container      | 2025-04-07T13:41:59.396200Z 0 [System] [MY-010931] [Server] /usr/sbin/mysqld: ready for connections. Version: '8.0.41'  socket: '/var/run/mysqld/mysqld.sock'  port: 3306  MySQL Community Server - GPL.
+2025-04-07 10:50:51 cuidar_plus_backend  |   File "/app/src/interfaces/api/app.py", line 5, in <module>
+2025-04-07 10:50:51 cuidar_plus_backend  |     from src.interfaces.api.routes.user_routes import user_routes
+2025-04-07 10:42:37 mysql_container      | 2025-04-07T13:42:37.962393Z 0 [System] [MY-013172] [Server] Received SHUTDOWN from user <via user signal>. Shutting down mysqld (Version: 8.0.41).
+2025-04-07 10:42:39 mysql_container      | 2025-04-07T13:42:39.381130Z 0 [System] [MY-010910] [Server] /usr/sbin/mysqld: Shutdown complete (mysqld 8.0.41)  MySQL Community Server - GPL.
+2025-04-07 10:42:53 mysql_container      | 2025-04-07 13:42:53+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.0.41-1.el9 started.
+2025-04-07 10:42:53 mysql_container      | 2025-04-07 13:42:53+00:00 [Note] [Entrypoint]: Switching to dedicated user 'mysql'
+2025-04-07 10:42:53 mysql_container      | 2025-04-07 13:42:53+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.0.41-1.el9 started.
+2025-04-07 10:42:54 mysql_container      | '/var/lib/mysql/mysql.sock' -> '/var/run/mysqld/mysqld.sock'
+2025-04-07 10:42:54 mysql_container      | 2025-04-07T13:42:54.546875Z 0 [Warning] [MY-011068] [Server] The syntax '--skip-host-cache' is deprecated and will be removed in a future release. Please use SET GLOBAL host_cache_size=0 instead.
+2025-04-07 10:50:51 cuidar_plus_backend  |   File "/app/src/interfaces/api/routes/__init__.py", line 1, in <module>
+2025-04-07 10:50:51 cuidar_plus_backend  |     from .pacientes_routes import pacientes_routes
+2025-04-07 10:50:51 cuidar_plus_backend  |   File "/app/src/interfaces/api/routes/pacientes_routes.py", line 2, in <module>
+2025-04-07 10:50:51 cuidar_plus_backend  |     from infrastructure.database.db_config import db
+2025-04-07 10:50:51 cuidar_plus_backend  | ModuleNotFoundError: No module named 'infrastructure'
+2025-04-07 10:42:54 mysql_container      | 2025-04-07T13:42:54.550579Z 0 [System] [MY-010116] [Server] /usr/sbin/mysqld (mysqld 8.0.41) starting as process 1
+2025-04-07 10:42:54 mysql_container      | 2025-04-07T13:42:54.565762Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+2025-04-07 10:50:51 cuidar_plus_backend  | [2025-04-07 13:50:51 +0000] [7] [INFO] Worker exiting (pid: 7)
+2025-04-07 10:42:55 mysql_container      | 2025-04-07T13:42:55.051964Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+2025-04-07 10:42:55 mysql_container      | 2025-04-07T13:42:55.496471Z 0 [Warning] [MY-010068] [Server] CA certificate ca.pem is self signed.
+2025-04-07 10:50:52 cuidar_plus_backend  | [2025-04-07 13:50:52 +0000] [1] [ERROR] Worker (pid:7) exited with code 3
+2025-04-07 10:42:55 mysql_container      | 2025-04-07T13:42:55.496545Z 0 [System] [MY-013602] [Server] Channel mysql_main configured to support TLS. Encrypted connections are now supported for this channel.
+2025-04-07 10:50:52 cuidar_plus_backend  | [2025-04-07 13:50:52 +0000] [1] [ERROR] Shutting down: Master
+2025-04-07 10:42:55 mysql_container      | 2025-04-07T13:42:55.503009Z 0 [Warning] [MY-011810] [Server] Insecure configuration for --pid-file: Location '/var/run/mysqld' in the path is accessible to all OS users. Consider choosing a different directory.
+2025-04-07 10:50:52 cuidar_plus_backend  | [2025-04-07 13:50:52 +0000] [1] [ERROR] Reason: Worker failed to boot.
+2025-04-07 10:42:55 mysql_container      | 2025-04-07T13:42:55.549233Z 0 [System] [MY-011323] [Server] X Plugin ready for connections. Bind-address: '::' port: 33060, socket: /var/run/mysqld/mysqlx.sock
+2025-04-07 10:42:55 mysql_container      | 2025-04-07T13:42:55.549471Z 0 [System] [MY-010931] [Server] /usr/sbin/mysqld: ready for connections. Version: '8.0.41'  socket: '/var/run/mysqld/mysqld.sock'  port: 3306  MySQL Community Server - GPL.
+2025-04-07 10:44:03 mysql_container      | 2025-04-07T13:44:03.530846Z 0 [System] [MY-013172] [Server] Received SHUTDOWN from user <via user signal>. Shutting down mysqld (Version: 8.0.41).
+2025-04-07 10:50:53 cuidar_plus_backend  | [2025-04-07 13:50:53 +0000] [1] [INFO] Starting gunicorn 22.0.0
+2025-04-07 10:44:04 mysql_container      | 2025-04-07T13:44:04.904412Z 0 [System] [MY-010910] [Server] /usr/sbin/mysqld: Shutdown complete (mysqld 8.0.41)  MySQL Community Server - GPL.
+2025-04-07 10:47:33 mysql_container      | 2025-04-07 13:47:33+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.0.41-1.el9 started.
+2025-04-07 10:47:34 mysql_container      | 2025-04-07 13:47:34+00:00 [Note] [Entrypoint]: Switching to dedicated user 'mysql'
+2025-04-07 10:47:34 mysql_container      | 2025-04-07 13:47:34+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.0.41-1.el9 started.
+2025-04-07 10:47:34 mysql_container      | '/var/lib/mysql/mysql.sock' -> '/var/run/mysqld/mysqld.sock'
+2025-04-07 10:47:34 mysql_container      | 2025-04-07T13:47:34.885705Z 0 [Warning] [MY-011068] [Server] The syntax '--skip-host-cache' is deprecated and will be removed in a future release. Please use SET GLOBAL host_cache_size=0 instead.
+2025-04-07 10:47:34 mysql_container      | 2025-04-07T13:47:34.889289Z 0 [System] [MY-010116] [Server] /usr/sbin/mysqld (mysqld 8.0.41) starting as process 1
+2025-04-07 10:47:34 mysql_container      | 2025-04-07T13:47:34.902602Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+2025-04-07 10:47:35 mysql_container      | 2025-04-07T13:47:35.392083Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+2025-04-07 10:50:53 cuidar_plus_backend  | [2025-04-07 13:50:53 +0000] [1] [INFO] Listening at: http://0.0.0.0:5000 (1)
+2025-04-07 10:50:53 cuidar_plus_backend  | [2025-04-07 13:50:53 +0000] [1] [INFO] Using worker: sync
+2025-04-07 10:50:53 cuidar_plus_backend  | [2025-04-07 13:50:53 +0000] [7] [INFO] Booting worker with pid: 7
+2025-04-07 10:50:54 cuidar_plus_backend  | [2025-04-07 13:50:54 +0000] [7] [ERROR] Exception in worker process
+2025-04-07 10:50:54 cuidar_plus_backend  | Traceback (most recent call last):
+2025-04-07 10:50:54 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/arbiter.py", line 609, in spawn_worker
+2025-04-07 10:50:54 cuidar_plus_backend  |     worker.init_process()
+2025-04-07 10:50:54 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/workers/base.py", line 134, in init_process
+2025-04-07 10:50:54 cuidar_plus_backend  |     self.load_wsgi()
+2025-04-07 10:50:54 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/workers/base.py", line 146, in load_wsgi
+2025-04-07 10:50:54 cuidar_plus_backend  |     self.wsgi = self.app.wsgi()
+2025-04-07 10:50:54 cuidar_plus_backend  |                 ^^^^^^^^^^^^^^^
+2025-04-07 10:50:54 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/app/base.py", line 67, in wsgi
+2025-04-07 10:50:54 cuidar_plus_backend  |     self.callable = self.load()
+2025-04-07 10:50:54 cuidar_plus_backend  |                     ^^^^^^^^^^^
+2025-04-07 10:50:54 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 58, in load
+2025-04-07 10:50:54 cuidar_plus_backend  |     return self.load_wsgiapp()
+2025-04-07 10:50:54 cuidar_plus_backend  |            ^^^^^^^^^^^^^^^^^^^
+2025-04-07 10:50:54 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 48, in load_wsgiapp
+2025-04-07 10:47:35 mysql_container      | 2025-04-07T13:47:35.803748Z 0 [Warning] [MY-010068] [Server] CA certificate ca.pem is self signed.
+2025-04-07 10:50:54 cuidar_plus_backend  |     return util.import_app(self.app_uri)
+2025-04-07 10:50:54 cuidar_plus_backend  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-04-07 10:50:54 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/util.py", line 371, in import_app
+2025-04-07 10:50:54 cuidar_plus_backend  |     mod = importlib.import_module(module)
+2025-04-07 10:50:54 cuidar_plus_backend  |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-04-07 10:50:54 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/importlib/__init__.py", line 126, in import_module
+2025-04-07 10:47:35 mysql_container      | 2025-04-07T13:47:35.803831Z 0 [System] [MY-013602] [Server] Channel mysql_main configured to support TLS. Encrypted connections are now supported for this channel.
+2025-04-07 10:47:35 mysql_container      | 2025-04-07T13:47:35.812567Z 0 [Warning] [MY-011810] [Server] Insecure configuration for --pid-file: Location '/var/run/mysqld' in the path is accessible to all OS users. Consider choosing a different directory.
+2025-04-07 10:47:35 mysql_container      | 2025-04-07T13:47:35.860177Z 0 [System] [MY-011323] [Server] X Plugin ready for connections. Bind-address: '::' port: 33060, socket: /var/run/mysqld/mysqlx.sock
+2025-04-07 10:50:54 cuidar_plus_backend  |     return _bootstrap._gcd_import(name[level:], package, level)
+2025-04-07 10:47:35 mysql_container      | 2025-04-07T13:47:35.860393Z 0 [System] [MY-010931] [Server] /usr/sbin/mysqld: ready for connections. Version: '8.0.41'  socket: '/var/run/mysqld/mysqld.sock'  port: 3306  MySQL Community Server - GPL.
+2025-04-07 10:49:13 mysql_container      | 2025-04-07T13:49:13.187768Z 0 [System] [MY-013172] [Server] Received SHUTDOWN from user <via user signal>. Shutting down mysqld (Version: 8.0.41).
+2025-04-07 10:50:54 cuidar_plus_backend  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-04-07 10:50:54 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+2025-04-07 10:49:14 mysql_container      | 2025-04-07T13:49:14.299167Z 0 [System] [MY-010910] [Server] /usr/sbin/mysqld: Shutdown complete (mysqld 8.0.41)  MySQL Community Server - GPL.
+2025-04-07 10:50:50 mysql_container      | 2025-04-07 13:50:50+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.0.41-1.el9 started.
+2025-04-07 10:50:54 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+2025-04-07 10:50:50 mysql_container      | 2025-04-07 13:50:50+00:00 [Note] [Entrypoint]: Switching to dedicated user 'mysql'
+2025-04-07 10:50:54 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+2025-04-07 10:50:50 mysql_container      | 2025-04-07 13:50:50+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.0.41-1.el9 started.
+2025-04-07 10:50:50 mysql_container      | '/var/lib/mysql/mysql.sock' -> '/var/run/mysqld/mysqld.sock'
+2025-04-07 10:50:51 mysql_container      | 2025-04-07T13:50:51.140737Z 0 [Warning] [MY-011068] [Server] The syntax '--skip-host-cache' is deprecated and will be removed in a future release. Please use SET GLOBAL host_cache_size=0 instead.
+2025-04-07 10:50:51 mysql_container      | 2025-04-07T13:50:51.144459Z 0 [System] [MY-010116] [Server] /usr/sbin/mysqld (mysqld 8.0.41) starting as process 1
+2025-04-07 10:50:51 mysql_container      | 2025-04-07T13:50:51.159770Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+2025-04-07 10:50:51 mysql_container      | 2025-04-07T13:50:51.889198Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+2025-04-07 10:50:52 mysql_container      | 2025-04-07T13:50:52.368434Z 0 [Warning] [MY-010068] [Server] CA certificate ca.pem is self signed.
+2025-04-07 10:50:54 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+2025-04-07 10:50:52 mysql_container      | 2025-04-07T13:50:52.368512Z 0 [System] [MY-013602] [Server] Channel mysql_main configured to support TLS. Encrypted connections are now supported for this channel.
+2025-04-07 10:50:52 mysql_container      | 2025-04-07T13:50:52.388490Z 0 [Warning] [MY-011810] [Server] Insecure configuration for --pid-file: Location '/var/run/mysqld' in the path is accessible to all OS users. Consider choosing a different directory.
+2025-04-07 10:50:52 mysql_container      | 2025-04-07T13:50:52.426212Z 0 [System] [MY-011323] [Server] X Plugin ready for connections. Bind-address: '::' port: 33060, socket: /var/run/mysqld/mysqlx.sock
+2025-04-07 10:50:54 cuidar_plus_backend  |   File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+2025-04-07 10:50:54 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+2025-04-07 10:50:54 cuidar_plus_backend  |   File "/app/wsgi.py", line 1, in <module>
+2025-04-07 10:50:54 cuidar_plus_backend  |     from src.interfaces.api.app import app
+2025-04-07 10:50:52 mysql_container      | 2025-04-07T13:50:52.426517Z 0 [System] [MY-010931] [Server] /usr/sbin/mysqld: ready for connections. Version: '8.0.41'  socket: '/var/run/mysqld/mysqld.sock'  port: 3306  MySQL Community Server - GPL.
+2025-04-07 10:50:54 cuidar_plus_backend  |   File "/app/src/interfaces/api/app.py", line 5, in <module>
+2025-04-07 10:50:54 cuidar_plus_backend  |     from src.interfaces.api.routes.user_routes import user_routes
+2025-04-07 10:50:54 cuidar_plus_backend  |   File "/app/src/interfaces/api/routes/__init__.py", line 1, in <module>
+2025-04-07 10:50:54 cuidar_plus_backend  |     from .pacientes_routes import pacientes_routes
+2025-04-07 10:50:54 cuidar_plus_backend  |   File "/app/src/interfaces/api/routes/pacientes_routes.py", line 2, in <module>
+2025-04-07 10:50:54 cuidar_plus_backend  |     from infrastructure.database.db_config import db
+2025-04-07 10:50:54 cuidar_plus_backend  | ModuleNotFoundError: No module named 'infrastructure'
+2025-04-07 10:50:54 cuidar_plus_backend  | [2025-04-07 13:50:54 +0000] [7] [INFO] Worker exiting (pid: 7)
+2025-04-07 10:50:54 cuidar_plus_backend  | [2025-04-07 13:50:54 +0000] [1] [ERROR] Worker (pid:7) exited with code 3
+2025-04-07 10:50:54 cuidar_plus_backend  | [2025-04-07 13:50:54 +0000] [1] [ERROR] Shutting down: Master
+2025-04-07 10:50:54 cuidar_plus_backend  | [2025-04-07 13:50:54 +0000] [1] [ERROR] Reason: Worker failed to boot.
+2025-04-07 10:50:55 cuidar_plus_backend  | [2025-04-07 13:50:55 +0000] [1] [INFO] Starting gunicorn 22.0.0
+2025-04-07 10:50:55 cuidar_plus_backend  | [2025-04-07 13:50:55 +0000] [1] [INFO] Listening at: http://0.0.0.0:5000 (1)
+2025-04-07 10:50:55 cuidar_plus_backend  | [2025-04-07 13:50:55 +0000] [1] [INFO] Using worker: sync
+2025-04-07 10:50:55 cuidar_plus_backend  | [2025-04-07 13:50:55 +0000] [7] [INFO] Booting worker with pid: 7
+2025-04-07 10:50:55 cuidar_plus_backend  | [2025-04-07 13:50:55 +0000] [7] [ERROR] Exception in worker process
+2025-04-07 10:50:55 cuidar_plus_backend  | Traceback (most recent call last):
+2025-04-07 10:50:55 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/arbiter.py", line 609, in spawn_worker
+2025-04-07 10:50:55 cuidar_plus_backend  |     worker.init_process()
+2025-04-07 10:50:55 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/workers/base.py", line 134, in init_process
+2025-04-07 10:50:55 cuidar_plus_backend  |     self.load_wsgi()
+2025-04-07 10:50:55 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/workers/base.py", line 146, in load_wsgi
+2025-04-07 10:50:55 cuidar_plus_backend  |     self.wsgi = self.app.wsgi()
+2025-04-07 10:50:55 cuidar_plus_backend  |                 ^^^^^^^^^^^^^^^
+2025-04-07 10:50:55 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/app/base.py", line 67, in wsgi
+2025-04-07 10:50:55 cuidar_plus_backend  |     self.callable = self.load()
+2025-04-07 10:50:55 cuidar_plus_backend  |                     ^^^^^^^^^^^
+2025-04-07 10:50:55 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 58, in load
+2025-04-07 10:50:55 cuidar_plus_backend  |     return self.load_wsgiapp()
+2025-04-07 10:50:55 cuidar_plus_backend  |            ^^^^^^^^^^^^^^^^^^^
+2025-04-07 10:50:55 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 48, in load_wsgiapp
+2025-04-07 10:50:55 cuidar_plus_backend  |     return util.import_app(self.app_uri)
+2025-04-07 10:50:55 cuidar_plus_backend  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-04-07 10:50:55 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/util.py", line 371, in import_app
+2025-04-07 10:50:55 cuidar_plus_backend  |     mod = importlib.import_module(module)
+2025-04-07 10:50:55 cuidar_plus_backend  |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-04-07 10:50:55 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/importlib/__init__.py", line 126, in import_module
+2025-04-07 10:50:55 cuidar_plus_backend  |     return _bootstrap._gcd_import(name[level:], package, level)
+2025-04-07 10:50:55 cuidar_plus_backend  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-04-07 10:50:55 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+2025-04-07 10:50:55 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+2025-04-07 10:50:55 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+2025-04-07 10:50:55 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+2025-04-07 10:50:55 cuidar_plus_backend  |   File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+2025-04-07 10:50:55 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+2025-04-07 10:50:55 cuidar_plus_backend  |   File "/app/wsgi.py", line 1, in <module>
+2025-04-07 10:50:55 cuidar_plus_backend  |     from src.interfaces.api.app import app
+2025-04-07 10:50:55 cuidar_plus_backend  |   File "/app/src/interfaces/api/app.py", line 5, in <module>
+2025-04-07 10:50:55 cuidar_plus_backend  |     from src.interfaces.api.routes.user_routes import user_routes
+2025-04-07 10:50:55 cuidar_plus_backend  |   File "/app/src/interfaces/api/routes/__init__.py", line 1, in <module>
+2025-04-07 10:50:55 cuidar_plus_backend  |     from .pacientes_routes import pacientes_routes
+2025-04-07 10:50:55 cuidar_plus_backend  |   File "/app/src/interfaces/api/routes/pacientes_routes.py", line 2, in <module>
+2025-04-07 10:50:55 cuidar_plus_backend  |     from infrastructure.database.db_config import db
+2025-04-07 10:50:55 cuidar_plus_backend  | ModuleNotFoundError: No module named 'infrastructure'
+2025-04-07 10:50:55 cuidar_plus_backend  | [2025-04-07 13:50:55 +0000] [7] [INFO] Worker exiting (pid: 7)
+2025-04-07 10:50:56 cuidar_plus_backend  | [2025-04-07 13:50:56 +0000] [1] [ERROR] Worker (pid:7) exited with code 3
+2025-04-07 10:50:56 cuidar_plus_backend  | [2025-04-07 13:50:56 +0000] [1] [ERROR] Shutting down: Master
+2025-04-07 10:50:56 cuidar_plus_backend  | [2025-04-07 13:50:56 +0000] [1] [ERROR] Reason: Worker failed to boot.
+2025-04-07 10:50:57 cuidar_plus_backend  | [2025-04-07 13:50:57 +0000] [1] [INFO] Starting gunicorn 22.0.0
+2025-04-07 10:50:57 cuidar_plus_backend  | [2025-04-07 13:50:57 +0000] [1] [INFO] Listening at: http://0.0.0.0:5000 (1)
+2025-04-07 10:50:57 cuidar_plus_backend  | [2025-04-07 13:50:57 +0000] [1] [INFO] Using worker: sync
+2025-04-07 10:50:57 cuidar_plus_backend  | [2025-04-07 13:50:57 +0000] [7] [INFO] Booting worker with pid: 7
+2025-04-07 10:50:57 cuidar_plus_backend  | [2025-04-07 13:50:57 +0000] [7] [ERROR] Exception in worker process
+2025-04-07 10:50:57 cuidar_plus_backend  | Traceback (most recent call last):
+2025-04-07 10:50:57 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/arbiter.py", line 609, in spawn_worker
+2025-04-07 10:50:57 cuidar_plus_backend  |     worker.init_process()
+2025-04-07 10:50:57 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/workers/base.py", line 134, in init_process
+2025-04-07 10:50:57 cuidar_plus_backend  |     self.load_wsgi()
+2025-04-07 10:50:57 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/workers/base.py", line 146, in load_wsgi
+2025-04-07 10:50:57 cuidar_plus_backend  |     self.wsgi = self.app.wsgi()
+2025-04-07 10:50:57 cuidar_plus_backend  |                 ^^^^^^^^^^^^^^^
+2025-04-07 10:50:57 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/app/base.py", line 67, in wsgi
+2025-04-07 10:50:57 cuidar_plus_backend  |     self.callable = self.load()
+2025-04-07 10:50:57 cuidar_plus_backend  |                     ^^^^^^^^^^^
+2025-04-07 10:50:57 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 58, in load
+2025-04-07 10:50:57 cuidar_plus_backend  |     return self.load_wsgiapp()
+2025-04-07 10:50:57 cuidar_plus_backend  |            ^^^^^^^^^^^^^^^^^^^
+2025-04-07 10:50:57 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 48, in load_wsgiapp
+2025-04-07 10:50:57 cuidar_plus_backend  |     return util.import_app(self.app_uri)
+2025-04-07 10:50:57 cuidar_plus_backend  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-04-07 10:50:57 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/util.py", line 371, in import_app
+2025-04-07 10:50:57 cuidar_plus_backend  |     mod = importlib.import_module(module)
+2025-04-07 10:50:57 cuidar_plus_backend  |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-04-07 10:50:57 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/importlib/__init__.py", line 126, in import_module
+2025-04-07 10:50:57 cuidar_plus_backend  |     return _bootstrap._gcd_import(name[level:], package, level)
+2025-04-07 10:50:57 cuidar_plus_backend  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-04-07 10:50:57 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+2025-04-07 10:50:57 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+2025-04-07 10:50:57 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+2025-04-07 10:50:57 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+2025-04-07 10:50:57 cuidar_plus_backend  |   File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+2025-04-07 10:50:57 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+2025-04-07 10:50:57 cuidar_plus_backend  |   File "/app/wsgi.py", line 1, in <module>
+2025-04-07 10:50:57 cuidar_plus_backend  |     from src.interfaces.api.app import app
+2025-04-07 10:50:57 cuidar_plus_backend  |   File "/app/src/interfaces/api/app.py", line 5, in <module>
+2025-04-07 10:50:57 cuidar_plus_backend  |     from src.interfaces.api.routes.user_routes import user_routes
+2025-04-07 10:50:57 cuidar_plus_backend  |   File "/app/src/interfaces/api/routes/__init__.py", line 1, in <module>
+2025-04-07 10:50:57 cuidar_plus_backend  |     from .pacientes_routes import pacientes_routes
+2025-04-07 10:50:57 cuidar_plus_backend  |   File "/app/src/interfaces/api/routes/pacientes_routes.py", line 2, in <module>
+2025-04-07 10:50:57 cuidar_plus_backend  |     from infrastructure.database.db_config import db
+2025-04-07 10:50:57 cuidar_plus_backend  | ModuleNotFoundError: No module named 'infrastructure'
+2025-04-07 10:50:57 cuidar_plus_backend  | [2025-04-07 13:50:57 +0000] [7] [INFO] Worker exiting (pid: 7)
+2025-04-07 10:50:58 cuidar_plus_backend  | [2025-04-07 13:50:58 +0000] [1] [ERROR] Worker (pid:7) exited with code 3
+2025-04-07 10:50:58 cuidar_plus_backend  | [2025-04-07 13:50:58 +0000] [1] [ERROR] Shutting down: Master
+2025-04-07 10:50:58 cuidar_plus_backend  | [2025-04-07 13:50:58 +0000] [1] [ERROR] Reason: Worker failed to boot.
+2025-04-07 10:50:59 cuidar_plus_backend  | [2025-04-07 13:50:59 +0000] [1] [INFO] Starting gunicorn 22.0.0
+2025-04-07 10:50:59 cuidar_plus_backend  | [2025-04-07 13:50:59 +0000] [1] [INFO] Listening at: http://0.0.0.0:5000 (1)
+2025-04-07 10:50:59 cuidar_plus_backend  | [2025-04-07 13:50:59 +0000] [1] [INFO] Using worker: sync
+2025-04-07 10:50:59 cuidar_plus_backend  | [2025-04-07 13:50:59 +0000] [7] [INFO] Booting worker with pid: 7
+2025-04-07 10:51:00 cuidar_plus_backend  | [2025-04-07 13:51:00 +0000] [7] [ERROR] Exception in worker process
+2025-04-07 10:51:00 cuidar_plus_backend  | Traceback (most recent call last):
+2025-04-07 10:51:00 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/arbiter.py", line 609, in spawn_worker
+2025-04-07 10:51:00 cuidar_plus_backend  |     worker.init_process()
+2025-04-07 10:51:00 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/workers/base.py", line 134, in init_process
+2025-04-07 10:51:00 cuidar_plus_backend  |     self.load_wsgi()
+2025-04-07 10:51:00 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/workers/base.py", line 146, in load_wsgi
+2025-04-07 10:51:00 cuidar_plus_backend  |     self.wsgi = self.app.wsgi()
+2025-04-07 10:51:00 cuidar_plus_backend  |                 ^^^^^^^^^^^^^^^
+2025-04-07 10:51:00 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/app/base.py", line 67, in wsgi
+2025-04-07 10:51:00 cuidar_plus_backend  |     self.callable = self.load()
+2025-04-07 10:51:00 cuidar_plus_backend  |                     ^^^^^^^^^^^
+2025-04-07 10:51:00 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 58, in load
+2025-04-07 10:51:00 cuidar_plus_backend  |     return self.load_wsgiapp()
+2025-04-07 10:51:00 cuidar_plus_backend  |            ^^^^^^^^^^^^^^^^^^^
+2025-04-07 10:51:00 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 48, in load_wsgiapp
+2025-04-07 10:51:00 cuidar_plus_backend  |     return util.import_app(self.app_uri)
+2025-04-07 10:51:00 cuidar_plus_backend  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-04-07 10:51:00 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/util.py", line 371, in import_app
+2025-04-07 10:51:00 cuidar_plus_backend  |     mod = importlib.import_module(module)
+2025-04-07 10:51:00 cuidar_plus_backend  |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-04-07 10:51:00 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/importlib/__init__.py", line 126, in import_module
+2025-04-07 10:51:00 cuidar_plus_backend  |     return _bootstrap._gcd_import(name[level:], package, level)
+2025-04-07 10:51:00 cuidar_plus_backend  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-04-07 10:51:00 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+2025-04-07 10:51:00 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+2025-04-07 10:51:00 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+2025-04-07 10:51:00 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+2025-04-07 10:51:00 cuidar_plus_backend  |   File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+2025-04-07 10:51:00 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+2025-04-07 10:51:00 cuidar_plus_backend  |   File "/app/wsgi.py", line 1, in <module>
+2025-04-07 10:51:00 cuidar_plus_backend  |     from src.interfaces.api.app import app
+2025-04-07 10:51:00 cuidar_plus_backend  |   File "/app/src/interfaces/api/app.py", line 5, in <module>
+2025-04-07 10:51:00 cuidar_plus_backend  |     from src.interfaces.api.routes.user_routes import user_routes
+2025-04-07 10:51:00 cuidar_plus_backend  |   File "/app/src/interfaces/api/routes/__init__.py", line 1, in <module>
+2025-04-07 10:51:00 cuidar_plus_backend  |     from .pacientes_routes import pacientes_routes
+2025-04-07 10:51:00 cuidar_plus_backend  |   File "/app/src/interfaces/api/routes/pacientes_routes.py", line 2, in <module>
+2025-04-07 10:51:00 cuidar_plus_backend  |     from infrastructure.database.db_config import db
+2025-04-07 10:51:00 cuidar_plus_backend  | ModuleNotFoundError: No module named 'infrastructure'
+2025-04-07 10:51:00 cuidar_plus_backend  | [2025-04-07 13:51:00 +0000] [7] [INFO] Worker exiting (pid: 7)
+2025-04-07 10:51:00 cuidar_plus_backend  | [2025-04-07 13:51:00 +0000] [1] [ERROR] Worker (pid:7) exited with code 3
+2025-04-07 10:51:00 cuidar_plus_backend  | [2025-04-07 13:51:00 +0000] [1] [ERROR] Shutting down: Master
+2025-04-07 10:51:00 cuidar_plus_backend  | [2025-04-07 13:51:00 +0000] [1] [ERROR] Reason: Worker failed to boot.
+2025-04-07 10:51:02 cuidar_plus_backend  | [2025-04-07 13:51:02 +0000] [1] [INFO] Starting gunicorn 22.0.0
+2025-04-07 10:51:02 cuidar_plus_backend  | [2025-04-07 13:51:02 +0000] [1] [INFO] Listening at: http://0.0.0.0:5000 (1)
+2025-04-07 10:51:02 cuidar_plus_backend  | [2025-04-07 13:51:02 +0000] [1] [INFO] Using worker: sync
+2025-04-07 10:51:02 cuidar_plus_backend  | [2025-04-07 13:51:02 +0000] [7] [INFO] Booting worker with pid: 7
+2025-04-07 10:51:03 cuidar_plus_backend  | [2025-04-07 13:51:03 +0000] [7] [ERROR] Exception in worker process
+2025-04-07 10:51:03 cuidar_plus_backend  | Traceback (most recent call last):
+2025-04-07 10:51:03 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/arbiter.py", line 609, in spawn_worker
+2025-04-07 10:51:03 cuidar_plus_backend  |     worker.init_process()
+2025-04-07 10:51:03 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/workers/base.py", line 134, in init_process
+2025-04-07 10:51:03 cuidar_plus_backend  |     self.load_wsgi()
+2025-04-07 10:51:03 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/workers/base.py", line 146, in load_wsgi
+2025-04-07 10:51:03 cuidar_plus_backend  |     self.wsgi = self.app.wsgi()
+2025-04-07 10:51:03 cuidar_plus_backend  |                 ^^^^^^^^^^^^^^^
+2025-04-07 10:51:03 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/app/base.py", line 67, in wsgi
+2025-04-07 10:51:03 cuidar_plus_backend  |     self.callable = self.load()
+2025-04-07 10:51:03 cuidar_plus_backend  |                     ^^^^^^^^^^^
+2025-04-07 10:51:03 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 58, in load
+2025-04-07 10:51:03 cuidar_plus_backend  |     return self.load_wsgiapp()
+2025-04-07 10:51:03 cuidar_plus_backend  |            ^^^^^^^^^^^^^^^^^^^
+2025-04-07 10:51:03 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 48, in load_wsgiapp
+2025-04-07 10:51:03 cuidar_plus_backend  |     return util.import_app(self.app_uri)
+2025-04-07 10:51:03 cuidar_plus_backend  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-04-07 10:51:03 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/util.py", line 371, in import_app
+2025-04-07 10:51:03 cuidar_plus_backend  |     mod = importlib.import_module(module)
+2025-04-07 10:51:03 cuidar_plus_backend  |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-04-07 10:51:03 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/importlib/__init__.py", line 126, in import_module
+2025-04-07 10:51:03 cuidar_plus_backend  |     return _bootstrap._gcd_import(name[level:], package, level)
+2025-04-07 10:51:03 cuidar_plus_backend  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-04-07 10:51:03 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+2025-04-07 10:51:03 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+2025-04-07 10:51:03 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+2025-04-07 10:51:03 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+2025-04-07 10:51:03 cuidar_plus_backend  |   File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+2025-04-07 10:51:03 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+2025-04-07 10:51:03 cuidar_plus_backend  |   File "/app/wsgi.py", line 1, in <module>
+2025-04-07 10:51:03 cuidar_plus_backend  |     from src.interfaces.api.app import app
+2025-04-07 10:51:03 cuidar_plus_backend  |   File "/app/src/interfaces/api/app.py", line 5, in <module>
+2025-04-07 10:51:03 cuidar_plus_backend  |     from src.interfaces.api.routes.user_routes import user_routes
+2025-04-07 10:51:03 cuidar_plus_backend  |   File "/app/src/interfaces/api/routes/__init__.py", line 1, in <module>
+2025-04-07 10:51:03 cuidar_plus_backend  |     from .pacientes_routes import pacientes_routes
+2025-04-07 10:51:03 cuidar_plus_backend  |   File "/app/src/interfaces/api/routes/pacientes_routes.py", line 2, in <module>
+2025-04-07 10:51:03 cuidar_plus_backend  |     from infrastructure.database.db_config import db
+2025-04-07 10:51:03 cuidar_plus_backend  | ModuleNotFoundError: No module named 'infrastructure'
+2025-04-07 10:51:03 cuidar_plus_backend  | [2025-04-07 13:51:03 +0000] [7] [INFO] Worker exiting (pid: 7)
+2025-04-07 10:51:03 cuidar_plus_backend  | [2025-04-07 13:51:03 +0000] [1] [ERROR] Worker (pid:7) exited with code 3
+2025-04-07 10:51:03 cuidar_plus_backend  | [2025-04-07 13:51:03 +0000] [1] [ERROR] Shutting down: Master
+2025-04-07 10:51:03 cuidar_plus_backend  | [2025-04-07 13:51:03 +0000] [1] [ERROR] Reason: Worker failed to boot.
+2025-04-07 10:51:07 cuidar_plus_backend  | [2025-04-07 13:51:07 +0000] [1] [INFO] Starting gunicorn 22.0.0
+2025-04-07 10:51:07 cuidar_plus_backend  | [2025-04-07 13:51:07 +0000] [1] [INFO] Listening at: http://0.0.0.0:5000 (1)
+2025-04-07 10:51:07 cuidar_plus_backend  | [2025-04-07 13:51:07 +0000] [1] [INFO] Using worker: sync
+2025-04-07 10:51:07 cuidar_plus_backend  | [2025-04-07 13:51:07 +0000] [7] [INFO] Booting worker with pid: 7
+2025-04-07 10:51:08 cuidar_plus_backend  | [2025-04-07 13:51:08 +0000] [7] [ERROR] Exception in worker process
+2025-04-07 10:51:08 cuidar_plus_backend  | Traceback (most recent call last):
+2025-04-07 10:51:08 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/arbiter.py", line 609, in spawn_worker
+2025-04-07 10:51:08 cuidar_plus_backend  |     worker.init_process()
+2025-04-07 10:51:08 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/workers/base.py", line 134, in init_process
+2025-04-07 10:51:08 cuidar_plus_backend  |     self.load_wsgi()
+2025-04-07 10:51:08 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/workers/base.py", line 146, in load_wsgi
+2025-04-07 10:51:08 cuidar_plus_backend  |     self.wsgi = self.app.wsgi()
+2025-04-07 10:51:08 cuidar_plus_backend  |                 ^^^^^^^^^^^^^^^
+2025-04-07 10:51:08 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/app/base.py", line 67, in wsgi
+2025-04-07 10:51:08 cuidar_plus_backend  |     self.callable = self.load()
+2025-04-07 10:51:08 cuidar_plus_backend  |                     ^^^^^^^^^^^
+2025-04-07 10:51:08 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 58, in load
+2025-04-07 10:51:08 cuidar_plus_backend  |     return self.load_wsgiapp()
+2025-04-07 10:51:08 cuidar_plus_backend  |            ^^^^^^^^^^^^^^^^^^^
+2025-04-07 10:51:08 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 48, in load_wsgiapp
+2025-04-07 10:51:08 cuidar_plus_backend  |     return util.import_app(self.app_uri)
+2025-04-07 10:51:08 cuidar_plus_backend  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-04-07 10:51:08 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/util.py", line 371, in import_app
+2025-04-07 10:51:08 cuidar_plus_backend  |     mod = importlib.import_module(module)
+2025-04-07 10:51:08 cuidar_plus_backend  |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-04-07 10:51:08 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/importlib/__init__.py", line 126, in import_module
+2025-04-07 10:51:08 cuidar_plus_backend  |     return _bootstrap._gcd_import(name[level:], package, level)
+2025-04-07 10:51:08 cuidar_plus_backend  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-04-07 10:51:08 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+2025-04-07 10:51:08 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+2025-04-07 10:51:08 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+2025-04-07 10:51:08 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+2025-04-07 10:51:08 cuidar_plus_backend  |   File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+2025-04-07 10:51:08 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+2025-04-07 10:51:08 cuidar_plus_backend  |   File "/app/wsgi.py", line 1, in <module>
+2025-04-07 10:51:08 cuidar_plus_backend  |     from src.interfaces.api.app import app
+2025-04-07 10:51:08 cuidar_plus_backend  |   File "/app/src/interfaces/api/app.py", line 5, in <module>
+2025-04-07 10:51:08 cuidar_plus_backend  |     from src.interfaces.api.routes.user_routes import user_routes
+2025-04-07 10:51:08 cuidar_plus_backend  |   File "/app/src/interfaces/api/routes/__init__.py", line 1, in <module>
+2025-04-07 10:51:08 cuidar_plus_backend  |     from .pacientes_routes import pacientes_routes
+2025-04-07 10:51:08 cuidar_plus_backend  |   File "/app/src/interfaces/api/routes/pacientes_routes.py", line 2, in <module>
+2025-04-07 10:51:08 cuidar_plus_backend  |     from infrastructure.database.db_config import db
+2025-04-07 10:51:08 cuidar_plus_backend  | ModuleNotFoundError: No module named 'infrastructure'
+2025-04-07 10:51:08 cuidar_plus_backend  | [2025-04-07 13:51:08 +0000] [7] [INFO] Worker exiting (pid: 7)
+2025-04-07 10:51:08 cuidar_plus_backend  | [2025-04-07 13:51:08 +0000] [1] [ERROR] Worker (pid:7) exited with code 3
+2025-04-07 10:51:08 cuidar_plus_backend  | [2025-04-07 13:51:08 +0000] [1] [ERROR] Shutting down: Master
+2025-04-07 10:51:08 cuidar_plus_backend  | [2025-04-07 13:51:08 +0000] [1] [ERROR] Reason: Worker failed to boot.
+2025-04-07 10:51:15 cuidar_plus_backend  | [2025-04-07 13:51:15 +0000] [1] [INFO] Starting gunicorn 22.0.0
+2025-04-07 10:51:15 cuidar_plus_backend  | [2025-04-07 13:51:15 +0000] [1] [INFO] Listening at: http://0.0.0.0:5000 (1)
+2025-04-07 10:51:15 cuidar_plus_backend  | [2025-04-07 13:51:15 +0000] [1] [INFO] Using worker: sync
+2025-04-07 10:51:15 cuidar_plus_backend  | [2025-04-07 13:51:15 +0000] [7] [INFO] Booting worker with pid: 7
+2025-04-07 10:51:16 cuidar_plus_backend  | [2025-04-07 13:51:16 +0000] [7] [ERROR] Exception in worker process
+2025-04-07 10:51:16 cuidar_plus_backend  | Traceback (most recent call last):
+2025-04-07 10:51:16 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/arbiter.py", line 609, in spawn_worker
+2025-04-07 10:51:16 cuidar_plus_backend  |     worker.init_process()
+2025-04-07 10:51:16 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/workers/base.py", line 134, in init_process
+2025-04-07 10:51:16 cuidar_plus_backend  |     self.load_wsgi()
+2025-04-07 10:51:16 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/workers/base.py", line 146, in load_wsgi
+2025-04-07 10:51:16 cuidar_plus_backend  |     self.wsgi = self.app.wsgi()
+2025-04-07 10:51:16 cuidar_plus_backend  |                 ^^^^^^^^^^^^^^^
+2025-04-07 10:51:16 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/app/base.py", line 67, in wsgi
+2025-04-07 10:51:16 cuidar_plus_backend  |     self.callable = self.load()
+2025-04-07 10:51:16 cuidar_plus_backend  |                     ^^^^^^^^^^^
+2025-04-07 10:51:16 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 58, in load
+2025-04-07 10:51:16 cuidar_plus_backend  |     return self.load_wsgiapp()
+2025-04-07 10:51:16 cuidar_plus_backend  |            ^^^^^^^^^^^^^^^^^^^
+2025-04-07 10:51:16 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 48, in load_wsgiapp
+2025-04-07 10:51:16 cuidar_plus_backend  |     return util.import_app(self.app_uri)
+2025-04-07 10:51:16 cuidar_plus_backend  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-04-07 10:51:16 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/util.py", line 371, in import_app
+2025-04-07 10:51:16 cuidar_plus_backend  |     mod = importlib.import_module(module)
+2025-04-07 10:51:16 cuidar_plus_backend  |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-04-07 10:51:16 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/importlib/__init__.py", line 126, in import_module
+2025-04-07 10:51:16 cuidar_plus_backend  |     return _bootstrap._gcd_import(name[level:], package, level)
+2025-04-07 10:51:16 cuidar_plus_backend  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-04-07 10:51:16 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+2025-04-07 10:51:16 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+2025-04-07 10:51:16 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+2025-04-07 10:51:16 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+2025-04-07 10:51:16 cuidar_plus_backend  |   File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+2025-04-07 10:51:16 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+2025-04-07 10:51:16 cuidar_plus_backend  |   File "/app/wsgi.py", line 1, in <module>
+2025-04-07 10:51:16 cuidar_plus_backend  |     from src.interfaces.api.app import app
+2025-04-07 10:51:16 cuidar_plus_backend  |   File "/app/src/interfaces/api/app.py", line 5, in <module>
+2025-04-07 10:51:16 cuidar_plus_backend  |     from src.interfaces.api.routes.user_routes import user_routes
+2025-04-07 10:51:16 cuidar_plus_backend  |   File "/app/src/interfaces/api/routes/__init__.py", line 1, in <module>
+2025-04-07 10:51:16 cuidar_plus_backend  |     from .pacientes_routes import pacientes_routes
+2025-04-07 10:51:16 cuidar_plus_backend  |   File "/app/src/interfaces/api/routes/pacientes_routes.py", line 2, in <module>
+2025-04-07 10:51:16 cuidar_plus_backend  |     from infrastructure.database.db_config import db
+2025-04-07 10:51:16 cuidar_plus_backend  | ModuleNotFoundError: No module named 'infrastructure'
+2025-04-07 10:51:16 cuidar_plus_backend  | [2025-04-07 13:51:16 +0000] [7] [INFO] Worker exiting (pid: 7)
+2025-04-07 10:51:16 cuidar_plus_backend  | [2025-04-07 13:51:16 +0000] [1] [ERROR] Worker (pid:7) exited with code 3
+2025-04-07 10:51:16 cuidar_plus_backend  | [2025-04-07 13:51:16 +0000] [1] [ERROR] Shutting down: Master
+2025-04-07 10:51:16 cuidar_plus_backend  | [2025-04-07 13:51:16 +0000] [1] [ERROR] Reason: Worker failed to boot.
+2025-04-07 10:51:30 cuidar_plus_backend  | [2025-04-07 13:51:30 +0000] [1] [INFO] Starting gunicorn 22.0.0
+2025-04-07 10:51:30 cuidar_plus_backend  | [2025-04-07 13:51:30 +0000] [1] [INFO] Listening at: http://0.0.0.0:5000 (1)
+2025-04-07 10:51:30 cuidar_plus_backend  | [2025-04-07 13:51:30 +0000] [1] [INFO] Using worker: sync
+2025-04-07 10:51:30 cuidar_plus_backend  | [2025-04-07 13:51:30 +0000] [7] [INFO] Booting worker with pid: 7
+2025-04-07 10:51:30 cuidar_plus_backend  | [2025-04-07 13:51:30 +0000] [7] [ERROR] Exception in worker process
+2025-04-07 10:51:30 cuidar_plus_backend  | Traceback (most recent call last):
+2025-04-07 10:51:30 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/arbiter.py", line 609, in spawn_worker
+2025-04-07 10:51:30 cuidar_plus_backend  |     worker.init_process()
+2025-04-07 10:51:30 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/workers/base.py", line 134, in init_process
+2025-04-07 10:51:30 cuidar_plus_backend  |     self.load_wsgi()
+2025-04-07 10:51:30 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/workers/base.py", line 146, in load_wsgi
+2025-04-07 10:51:30 cuidar_plus_backend  |     self.wsgi = self.app.wsgi()
+2025-04-07 10:51:30 cuidar_plus_backend  |                 ^^^^^^^^^^^^^^^
+2025-04-07 10:51:30 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/app/base.py", line 67, in wsgi
+2025-04-07 10:51:30 cuidar_plus_backend  |     self.callable = self.load()
+2025-04-07 10:51:30 cuidar_plus_backend  |                     ^^^^^^^^^^^
+2025-04-07 10:51:30 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 58, in load
+2025-04-07 10:51:30 cuidar_plus_backend  |     return self.load_wsgiapp()
+2025-04-07 10:51:30 cuidar_plus_backend  |            ^^^^^^^^^^^^^^^^^^^
+2025-04-07 10:51:30 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 48, in load_wsgiapp
+2025-04-07 10:51:30 cuidar_plus_backend  |     return util.import_app(self.app_uri)
+2025-04-07 10:51:30 cuidar_plus_backend  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-04-07 10:51:30 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/util.py", line 371, in import_app
+2025-04-07 10:51:30 cuidar_plus_backend  |     mod = importlib.import_module(module)
+2025-04-07 10:51:30 cuidar_plus_backend  |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-04-07 10:51:30 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/importlib/__init__.py", line 126, in import_module
+2025-04-07 10:51:30 cuidar_plus_backend  |     return _bootstrap._gcd_import(name[level:], package, level)
+2025-04-07 10:51:30 cuidar_plus_backend  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-04-07 10:51:30 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+2025-04-07 10:51:30 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+2025-04-07 10:51:30 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+2025-04-07 10:51:30 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+2025-04-07 10:51:30 cuidar_plus_backend  |   File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+2025-04-07 10:51:30 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+2025-04-07 10:51:30 cuidar_plus_backend  |   File "/app/wsgi.py", line 1, in <module>
+2025-04-07 10:51:30 cuidar_plus_backend  |     from src.interfaces.api.app import app
+2025-04-07 10:51:30 cuidar_plus_backend  |   File "/app/src/interfaces/api/app.py", line 5, in <module>
+2025-04-07 10:51:30 cuidar_plus_backend  |     from src.interfaces.api.routes.user_routes import user_routes
+2025-04-07 10:51:30 cuidar_plus_backend  |   File "/app/src/interfaces/api/routes/__init__.py", line 1, in <module>
+2025-04-07 10:51:30 cuidar_plus_backend  |     from .pacientes_routes import pacientes_routes
+2025-04-07 10:51:30 cuidar_plus_backend  |   File "/app/src/interfaces/api/routes/pacientes_routes.py", line 2, in <module>
+2025-04-07 10:51:30 cuidar_plus_backend  |     from infrastructure.database.db_config import db
+2025-04-07 10:51:30 cuidar_plus_backend  | ModuleNotFoundError: No module named 'infrastructure'
+2025-04-07 10:51:30 cuidar_plus_backend  | [2025-04-07 13:51:30 +0000] [7] [INFO] Worker exiting (pid: 7)
+2025-04-07 10:51:31 cuidar_plus_backend  | [2025-04-07 13:51:31 +0000] [1] [ERROR] Worker (pid:7) exited with code 3
+2025-04-07 10:51:31 cuidar_plus_backend  | [2025-04-07 13:51:31 +0000] [1] [ERROR] Shutting down: Master
+2025-04-07 10:51:31 cuidar_plus_backend  | [2025-04-07 13:51:31 +0000] [1] [ERROR] Reason: Worker failed to boot.
+2025-04-07 10:51:57 cuidar_plus_backend  | [2025-04-07 13:51:57 +0000] [1] [INFO] Starting gunicorn 22.0.0
+2025-04-07 10:51:57 cuidar_plus_backend  | [2025-04-07 13:51:57 +0000] [1] [INFO] Listening at: http://0.0.0.0:5000 (1)
+2025-04-07 10:51:57 cuidar_plus_backend  | [2025-04-07 13:51:57 +0000] [1] [INFO] Using worker: sync
+2025-04-07 10:51:57 cuidar_plus_backend  | [2025-04-07 13:51:57 +0000] [7] [INFO] Booting worker with pid: 7
+2025-04-07 10:51:58 cuidar_plus_backend  | [2025-04-07 13:51:58 +0000] [7] [ERROR] Exception in worker process
+2025-04-07 10:51:58 cuidar_plus_backend  | Traceback (most recent call last):
+2025-04-07 10:51:58 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/arbiter.py", line 609, in spawn_worker
+2025-04-07 10:51:58 cuidar_plus_backend  |     worker.init_process()
+2025-04-07 10:51:58 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/workers/base.py", line 134, in init_process
+2025-04-07 10:51:58 cuidar_plus_backend  |     self.load_wsgi()
+2025-04-07 10:51:58 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/workers/base.py", line 146, in load_wsgi
+2025-04-07 10:51:58 cuidar_plus_backend  |     self.wsgi = self.app.wsgi()
+2025-04-07 10:51:58 cuidar_plus_backend  |                 ^^^^^^^^^^^^^^^
+2025-04-07 10:51:58 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/app/base.py", line 67, in wsgi
+2025-04-07 10:51:58 cuidar_plus_backend  |     self.callable = self.load()
+2025-04-07 10:51:58 cuidar_plus_backend  |                     ^^^^^^^^^^^
+2025-04-07 10:51:58 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 58, in load
+2025-04-07 10:51:58 cuidar_plus_backend  |     return self.load_wsgiapp()
+2025-04-07 10:51:58 cuidar_plus_backend  |            ^^^^^^^^^^^^^^^^^^^
+2025-04-07 10:51:58 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 48, in load_wsgiapp
+2025-04-07 10:51:58 cuidar_plus_backend  |     return util.import_app(self.app_uri)
+2025-04-07 10:51:58 cuidar_plus_backend  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-04-07 10:51:58 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/site-packages/gunicorn/util.py", line 371, in import_app
+2025-04-07 10:51:58 cuidar_plus_backend  |     mod = importlib.import_module(module)
+2025-04-07 10:51:58 cuidar_plus_backend  |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-04-07 10:51:58 cuidar_plus_backend  |   File "/usr/local/lib/python3.11/importlib/__init__.py", line 126, in import_module
+2025-04-07 10:51:58 cuidar_plus_backend  |     return _bootstrap._gcd_import(name[level:], package, level)
+2025-04-07 10:51:58 cuidar_plus_backend  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-04-07 10:51:58 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+2025-04-07 10:51:58 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+2025-04-07 10:51:58 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+2025-04-07 10:51:58 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+2025-04-07 10:51:58 cuidar_plus_backend  |   File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+2025-04-07 10:51:58 cuidar_plus_backend  |   File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+2025-04-07 10:51:58 cuidar_plus_backend  |   File "/app/wsgi.py", line 1, in <module>
+2025-04-07 10:51:58 cuidar_plus_backend  |     from src.interfaces.api.app import app
+2025-04-07 10:51:58 cuidar_plus_backend  |   File "/app/src/interfaces/api/app.py", line 5, in <module>
+2025-04-07 10:51:58 cuidar_plus_backend  |     from src.interfaces.api.routes.user_routes import user_routes
+2025-04-07 10:51:58 cuidar_plus_backend  |   File "/app/src/interfaces/api/routes/__init__.py", line 1, in <module>
+2025-04-07 10:51:58 cuidar_plus_backend  |     from .pacientes_routes import pacientes_routes
+2025-04-07 10:51:58 cuidar_plus_backend  |   File "/app/src/interfaces/api/routes/pacientes_routes.py", line 2, in <module>
+2025-04-07 10:51:58 cuidar_plus_backend  |     from infrastructure.database.db_config import db
+2025-04-07 10:51:58 cuidar_plus_backend  | ModuleNotFoundError: No module named 'infrastructure'
+2025-04-07 10:51:58 cuidar_plus_backend  | [2025-04-07 13:51:58 +0000] [7] [INFO] Worker exiting (pid: 7)
+2025-04-07 10:51:58 cuidar_plus_backend  | [2025-04-07 13:51:58 +0000] [1] [ERROR] Worker (pid:7) exited with code 3
+2025-04-07 10:51:58 cuidar_plus_backend  | [2025-04-07 13:51:58 +0000] [1] [ERROR] Shutting down: Master
+2025-04-07 10:51:58 cuidar_plus_backend  | [2025-04-07 13:51:58 +0000] [1] [ERROR] Reason: Worker failed to boot.
+2036-01-01 00:00:00 
+cuidar_plus_backend exited with code 3
