@@ -1,5 +1,5 @@
 from datetime import datetime
-from db import db
+from infrastructure.database.db_config import db
 import json
 
 class Acompanhamento(db.Model):

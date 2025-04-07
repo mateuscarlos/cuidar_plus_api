@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from db import db
+from infrastructure.database.db_config import db
 from models.pacientes import Paciente
 from models.endereco import Endereco
 import json
@@ -124,11 +124,11 @@ def atualizar_paciente(id):
             
         # Tratar datas
         if 'data_nascimento' in data:
-            from utils import convert_ddmmyyyy_to_db_format
+            from infrastructure.utils.validators import convert_ddmmyyyy_to_db_format
             paciente.data_nascimento = convert_ddmmyyyy_to_db_format(data['data_nascimento'])
             
         if 'data_validade' in data:
-            from utils import convert_ddmmyyyy_to_db_format
+            from infrastructure.utils.validators import convert_ddmmyyyy_to_db_format
             paciente.data_validade = convert_ddmmyyyy_to_db_format(data['data_validade'])
             
         # Atualizar endereço se fornecido

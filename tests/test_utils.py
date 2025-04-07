@@ -2,7 +2,7 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import pytest
-from utils import validate_cpf, sanitize_input
+from infrastructure.utils.validators import validate_cpf, sanitize_input
 
 
 def test_validate_cpf_valid():

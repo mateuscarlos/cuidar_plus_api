@@ -1,6 +1,6 @@
 from datetime import datetime
-from db import db
-from utils import convert_utc_to_db_format, convert_ddmmyyyy_to_db_format
+from infrastructure.database.db_config import db
+from infrastructure.utils.validators import convert_utc_to_db_format, convert_ddmmyyyy_to_db_format
 from models.endereco import Endereco
 import json
 

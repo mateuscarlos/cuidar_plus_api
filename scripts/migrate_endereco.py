@@ -1,6 +1,6 @@
 from models.pacientes import Paciente
 from models.endereco import Endereco
-from db import db
+from infrastructure.database.db_config import db
 import sys
 sys.path.append('..')
 

@@ -4,7 +4,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import pytest
 import json
 from src.interfaces.api.app import app
-from db import db
+from infrastructure.database.db_config import db
 from models.user import User
 
 @pytest.fixture(scope='module')

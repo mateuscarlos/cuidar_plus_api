@@ -1,10 +1,10 @@
 from flask import Blueprint, request, jsonify, abort
-from db import db
+from infrastructure.database.db_config import db
 from models.acompanhamento import Acompanhamento
 from models.pacientes import Paciente
 import json
 from datetime import datetime
-from utils import convert_ddmmyyyy_to_db_format, convert_utc_to_db_format
+from infrastructure.utils.validators import convert_ddmmyyyy_to_db_format, convert_utc_to_db_format
 
 acompanhamentos_routes = Blueprint('acompanhamentos', __name__)
 

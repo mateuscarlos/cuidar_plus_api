@@ -1,4 +1,4 @@
-from db import db
+from infrastructure.database.db_config import db
 import json
 from sqlalchemy import Column, Integer, String, Text
 

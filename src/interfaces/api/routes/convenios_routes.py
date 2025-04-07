@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from db import db
+from infrastructure.database.db_config import db
 from models.convenio import Convenio
 from models.plano import Plano
 

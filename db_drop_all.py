@@ -1,5 +1,5 @@
 from src.interfaces.api.app import app
-from db import db
+from infrastructure.database.db_config import db
 from sqlalchemy import text
 
 with app.app_context():
