@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app as app
 from werkzeug.security import check_password_hash
 from models.user import User
 from db import db
@@ -6,94 +6,113 @@ import datetime
 import re
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
+import jwt
+from datetime import datetime, timedelta
 
 auth_bp = Blueprint('auth', __name__)
 ph = PasswordHasher()  # Inicializa o objeto PasswordHasher da biblioteca argon2-cffi
 
 @auth_bp.route('/api/register', methods=['POST'])
 def register():
+    """
+    Rota para registrar um novo usuário.
+    """
     try:
         data = request.get_json()
-        password = data.get('password')
-        email = data.get('email')
-        nome = data.get('nome')
-        cpf = data.get('cpf')
-        rua = data.get('rua')
-        numero = data.get('numero')
-        complemento = data.get('complemento')
-        cep = data.get('cep')
-        bairro = data.get('bairro')
-        cidade = data.get('cidade')
-        estado = data.get('estado')
-        setor = data.get('setor')
-        funcao = data.get('funcao')
-        especialidade = data.get('especialidade')
-        registro_categoria = data.get('registro_categoria')
-        telefone = data.get('telefone')
-        data_admissao = data.get('data_admissao')
-        status = data.get('status')
-        tipo_acesso = data.get('tipo_acesso')
 
-        # Convertendo a data_admissao para o formato YYYY-MM-DD
-        data_admissao = datetime.datetime.strptime(data_admissao, '%d%m%Y').strftime('%Y-%m-%d')
+        # Validação de campos obrigatórios
+        required_fields = ['nome', 'email', 'password', 'cpf', 'setor', 'funcao', 'cep']
+        for field in required_fields:
+            if not data.get(field):
+                return jsonify({'message': f'O campo {field} é obrigatório'}), 400
 
-        if User.query.filter_by(email=email).first() or User.query.filter_by(cpf=cpf).first():
-            return jsonify({'message': 'Email or CPF already exists'}), 409
+        # Validação de CPF
+        if not validate_cpf(data['cpf']):
+            return jsonify({'message': 'CPF inválido'}), 400
 
-        # Usando Argon2 para criar hash da senha de maneira mais segura
-        hashed_password = ph.hash(password)
+        # Verificar duplicidade de email ou CPF
+        if User.query.filter((User.email == data['email']) | (User.cpf == data['cpf'])).first():
+            return jsonify({'message': 'Email ou CPF já cadastrado'}), 409
 
+        # Hash da senha
+        hashed_password = ph.hash(data['password'])
+
+        # Consulta o CEP na API ViaCEP
+        response = requests.get(f'https://viacep.com.br/ws/{data["cep"]}/json/')
+        response.raise_for_status()
+        endereco_data = response.json()
+
+        if 'erro' in endereco_data:
+            return jsonify({'message': 'CEP não encontrado'}), 404
+
+        # Criar novo usuário
         new_user = User(
-            email=email, nome=nome, cpf=cpf, rua=rua, numero=numero, complemento=complemento,
-            cep=cep, bairro=bairro, cidade=cidade, estado=estado, setor=setor, funcao=funcao,
-            especialidade=especialidade, registro_categoria=registro_categoria, telefone=telefone,
-            data_admissao=data_admissao, status=status, tipo_acesso=tipo_acesso, password_hash=hashed_password
+            nome=data['nome'],
+            email=data['email'],
+            password_hash=hashed_password,
+            cpf=data['cpf'],
+            setor=data['setor'],
+            funcao=data['funcao'],
+            endereco=endereco_data,  # Salva o endereço como JSON
+            status='Ativo',  # Status padrão
+            tipo_acesso=data.get('tipo_acesso', 'Usuário')  # Tipo de acesso padrão
         )
 
         db.session.add(new_user)
         db.session.commit()
 
-        return jsonify({'message': 'User registered successfully'}), 201
+        return jsonify({'message': 'Usuário registrado com sucesso', 'user': new_user.to_dict()}), 201
 
+    except requests.exceptions.RequestException as e:
+        return jsonify({'message': f'Erro ao consultar o serviço de CEP: {str(e)}'}), 500
     except Exception as e:
         db.session.rollback()
-        return jsonify({'message': str(e)}), 500
+        return jsonify({'message': f'Erro ao registrar usuário: {str(e)}'}), 500
 
 @auth_bp.route('/api/login', methods=['POST'])
 def login():
+    """
+    Rota para autenticar um usuário.
+    """
     try:
         data = request.get_json()
+
+        # Buscar usuário pelo email
         user = User.query.filter_by(email=data.get('email')).first()
         if not user:
-            return jsonify({'message': 'Invalid email or password'}), 401
+            return jsonify({'message': 'Email ou senha inválidos'}), 401
+
+        # Verificar a senha usando Argon2
         try:
-            # Verifica a senha usando Argon2
             ph.verify(user.password_hash, data.get('password'))
-            # Se a senha precisa ser rehashed (devido a mudanças nos parâmetros de segurança)
-            if ph.check_needs_rehash(user.password_hash):
-                user.password_hash = ph.hash(data.get('password'))
-                db.session.commit()
-                
-            # Gerando o token JWT
-            expiration = datetime.utcnow() + timedelta(hours=24)
-            payload = {
-                'user_id': user.id,
-                'exp': expiration
-            }
-            token = jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256')
-                
-            return jsonify({
-                'message': 'Login successful',
-                'user': {
-                    'id': user.id,
-                    'nome': user.nome,
-                    'email': user.email,
-                    'cargo': user.cargo,
-                    'permissions': user.permissions
-                },
-                'token': token
-            }), 200
         except VerifyMismatchError:
-            return jsonify({'message': 'Invalid email or password'}), 401
+            return jsonify({'message': 'Email ou senha inválidos'}), 401
+
+        # Rehash da senha, se necessário
+        if ph.check_needs_rehash(user.password_hash):
+            user.password_hash = ph.hash(data.get('password'))
+            db.session.commit()
+
+        # Gerar token JWT
+        expiration = datetime.utcnow() + timedelta(hours=24)
+        payload = {
+            'user_id': user.id,
+            'exp': expiration
+        }
+        token = jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256')
+
+        return jsonify({
+            'message': 'Login realizado com sucesso',
+            'user': {
+                'id': user.id,
+                'nome': user.nome,
+                'email': user.email,
+                'setor': user.setor,
+                'funcao': user.funcao,
+                'status': user.status
+            },
+            'token': token
+        }), 200
+
     except Exception as e:
-        return jsonify({'message': f'Login error: {str(e)}'}), 500
+        return jsonify({'message': f'Erro ao realizar login: {str(e)}'}), 500

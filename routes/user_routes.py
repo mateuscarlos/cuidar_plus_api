@@ -82,6 +82,75 @@ def create_user():
         db.session.rollback()
         return jsonify({'error': f'Erro ao criar usuário: {str(e)}'}), 500
 
+@user_routes.route('/users', methods=['GET'])
+def get_all_users():
+    """
+    Lista todos os usuários cadastrados.
+    """
+    try:
+        users = User.query.all()
+        return jsonify([user.to_dict() for user in users]), 200
+    except Exception as e:
+        return jsonify({'error': f'Erro ao listar usuários: {str(e)}'}), 500
+
+
+@user_routes.route('/users/<int:id>', methods=['GET'])
+def get_user_by_id(id):
+    """
+    Retorna os detalhes de um usuário específico pelo ID.
+    """
+    try:
+        user = User.query.get(id)
+        if not user:
+            raise NotFound('Usuário não encontrado')
+        return jsonify(user.to_dict()), 200
+    except Exception as e:
+        return jsonify({'error': f'Erro ao buscar usuário: {str(e)}'}), 500
+
+
+@user_routes.route('/users/<int:id>', methods=['PUT'])
+def update_user(id):
+    """
+    Atualiza as informações de um usuário existente.
+    """
+    data = request.get_json()
+    try:
+        user = User.query.get(id)
+        if not user:
+            raise NotFound('Usuário não encontrado')
+
+        # Atualiza os campos permitidos
+        user.nome = data.get('nome', user.nome)
+        user.email = data.get('email', user.email)
+        user.setor = data.get('setor', user.setor)
+        user.funcao = data.get('funcao', user.funcao)
+        user.endereco = data.get('endereco', user.endereco)
+
+        db.session.commit()
+        return jsonify({'message': 'Usuário atualizado com sucesso', 'user': user.to_dict()}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': f'Erro ao atualizar usuário: {str(e)}'}), 500
+
+
+@user_routes.route('/users/<int:id>', methods=['DELETE'])
+def delete_user(id):
+    """
+    Exclui logicamente um usuário (soft delete).
+    """
+    try:
+        user = User.query.get(id)
+        if not user:
+            raise NotFound('Usuário não encontrado')
+
+        # Marca o usuário como inativo
+        user.status = 'Inativo'
+        db.session.commit()
+        return jsonify({'message': 'Usuário excluído com sucesso'}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': f'Erro ao excluir usuário: {str(e)}'}), 500
+
 # Registrar o Blueprint no aplicativo
 app.register_blueprint(user_routes)
 
