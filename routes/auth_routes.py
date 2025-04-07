@@ -64,28 +64,36 @@ def login():
     try:
         data = request.get_json()
         user = User.query.filter_by(email=data.get('email')).first()
-        
         if not user:
             return jsonify({'message': 'Invalid email or password'}), 401
-            
         try:
             # Verifica a senha usando Argon2
             ph.verify(user.password_hash, data.get('password'))
-            
             # Se a senha precisa ser rehashed (devido a mudanças nos parâmetros de segurança)
             if ph.check_needs_rehash(user.password_hash):
                 user.password_hash = ph.hash(data.get('password'))
                 db.session.commit()
                 
+            # Gerando o token JWT
+            expiration = datetime.utcnow() + timedelta(hours=24)
+            payload = {
+                'user_id': user.id,
+                'exp': expiration
+            }
+            token = jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256')
+                
             return jsonify({
                 'message': 'Login successful',
-                'user_id': user.id,
-                'nome': user.nome,
-                'email': user.email
+                'user': {
+                    'id': user.id,
+                    'nome': user.nome,
+                    'email': user.email,
+                    'cargo': user.cargo,
+                    'permissions': user.permissions
+                },
+                'token': token
             }), 200
-            
         except VerifyMismatchError:
             return jsonify({'message': 'Invalid email or password'}), 401
-            
     except Exception as e:
-        return jsonify({'message': str(e)}), 500
+        return jsonify({'message': f'Login error: {str(e)}'}), 500

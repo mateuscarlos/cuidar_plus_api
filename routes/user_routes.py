@@ -6,6 +6,7 @@ import re
 import bleach
 from werkzeug.exceptions import BadRequest, Conflict, NotFound
 from utils import validate_cpf, sanitize_input
+import requests
 
 # Inicialização do Flask
 app = Flask(__name__)
@@ -39,6 +40,47 @@ def handle_internal_error(e):
         'message': 'Erro interno no servidor',
         'error': 'InternalServerError'
     }), 500
+
+@user_routes.route('/users', methods=['POST'])
+def create_user():
+    """
+    Cria um novo usuário e consulta o endereço via API ViaCEP.
+    """
+    data = request.get_json()
+    try:
+        # Consulta o CEP na API ViaCEP
+        cep = data.get('cep')
+        if not cep:
+            return jsonify({'error': 'CEP é obrigatório'}), 400
+
+        response = requests.get(f'https://viacep.com.br/ws/{cep}/json/')
+        response.raise_for_status()
+        endereco_data = response.json()
+
+        if 'erro' in endereco_data:
+            return jsonify({'error': 'CEP não encontrado'}), 404
+
+        # Cria o usuário
+        user = User(
+            nome=data.get('nome'),
+            email=data.get('email'),
+            password_hash=data.get('password_hash'),
+            cargo=data.get('cargo'),
+            cpf=data.get('cpf'),
+            setor=data.get('setor'),
+            funcao=data.get('funcao'),
+            endereco=endereco_data  # Salva o endereço como JSON
+        )
+        db.session.add(user)
+        db.session.commit()
+
+        return jsonify({'message': 'Usuário criado com sucesso', 'user': user.to_dict()}), 201
+
+    except requests.exceptions.RequestException as e:
+        return jsonify({'error': f'Erro ao consultar o serviço de CEP: {str(e)}'}), 500
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': f'Erro ao criar usuário: {str(e)}'}), 500
 
 # Registrar o Blueprint no aplicativo
 app.register_blueprint(user_routes)
