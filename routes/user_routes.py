@@ -41,7 +41,7 @@ def handle_internal_error(e):
         'error': 'InternalServerError'
     }), 500
 
-@user_routes.route('/users', methods=['POST'])
+@user_routes.route('/usuarios', methods=['POST'])
 def create_user():
     """
     Cria um novo usuário e consulta o endereço via API ViaCEP.
@@ -82,19 +82,19 @@ def create_user():
         db.session.rollback()
         return jsonify({'error': f'Erro ao criar usuário: {str(e)}'}), 500
 
-@user_routes.route('/users', methods=['GET'])
+@user_routes.route('/usuarios', methods=['GET'])
 def get_all_users():
     """
     Lista todos os usuários cadastrados.
     """
     try:
-        users = User.query.all()
-        return jsonify([user.to_dict() for user in users]), 200
+        usuarios = User.query.all()
+        return jsonify([user.to_dict() for user in usuarios]), 200
     except Exception as e:
         return jsonify({'error': f'Erro ao listar usuários: {str(e)}'}), 500
 
 
-@user_routes.route('/users/<int:id>', methods=['GET'])
+@user_routes.route('/usuarios/<int:id>', methods=['GET'])
 def get_user_by_id(id):
     """
     Retorna os detalhes de um usuário específico pelo ID.
@@ -108,7 +108,7 @@ def get_user_by_id(id):
         return jsonify({'error': f'Erro ao buscar usuário: {str(e)}'}), 500
 
 
-@user_routes.route('/users/<int:id>', methods=['PUT'])
+@user_routes.route('/usuarios/<int:id>', methods=['PUT'])
 def update_user(id):
     """
     Atualiza as informações de um usuário existente.
@@ -133,7 +133,7 @@ def update_user(id):
         return jsonify({'error': f'Erro ao atualizar usuário: {str(e)}'}), 500
 
 
-@user_routes.route('/users/<int:id>', methods=['DELETE'])
+@user_routes.route('/usuarios/<int:id>', methods=['DELETE'])
 def delete_user(id):
     """
     Exclui logicamente um usuário (soft delete).

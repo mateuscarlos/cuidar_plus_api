@@ -1,7 +1,10 @@
-from flask import Blueprint, jsonify, request
-from models import db, Setor, Funcao
+# Change the import statement
+from flask import Blueprint, request, jsonify
+from models.setores_funcoes import Setor, Funcao  # Import models directly
+from db import db  # Import db directly
 
-bp = Blueprint('api', __name__, url_prefix='/api')
+# Fixed url_prefix from ' ' to '' (empty string)
+bp = Blueprint('api', __name__, url_prefix='')
 
 # -------------------------------
 # Rotas para Setores

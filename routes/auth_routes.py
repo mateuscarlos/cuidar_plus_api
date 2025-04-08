@@ -8,6 +8,7 @@ from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 import jwt
 from datetime import datetime, timedelta
+from config import Config  # Certifique-se de que o Config está importado
 
 auth_bp = Blueprint('auth', __name__)
 ph = PasswordHasher()  # Inicializa o objeto PasswordHasher da biblioteca argon2-cffi
@@ -69,10 +70,37 @@ def register():
         db.session.rollback()
         return jsonify({'message': f'Erro ao registrar usuário: {str(e)}'}), 500
 
-@auth_bp.route('/api/login', methods=['POST'])
+@auth_bp.route('/login', methods=['POST'])
 def login():
     """
     Rota para autenticar um usuário.
+    ---
+    tags:
+      - Autenticação
+    parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            email:
+              type: string
+              example: admin@cuidarplus.com
+            senha:
+              type: string
+              example: CuidarPlus@2025
+    responses:
+      200:
+        description: Login bem-sucedido
+        schema:
+          type: object
+          properties:
+            token:
+              type: string
+              example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+      401:
+        description: Credenciais inválidas
     """
     try:
         data = request.get_json()
@@ -116,3 +144,23 @@ def login():
 
     except Exception as e:
         return jsonify({'message': f'Erro ao realizar login: {str(e)}'}), 500
+
+@auth_bp.route('/api/protected-route', methods=['GET'])
+def protected_route():
+    """
+    Exemplo de rota protegida que ignora a validação de token em modo de desenvolvimento.
+    """
+    if Config.ENV != 'development':  # Apenas verifica o token fora do modo de desenvolvimento
+        auth_header = request.headers.get('Authorization')
+        if not auth_header:
+            return jsonify({'message': 'Token não fornecido'}), 401
+
+        try:
+            token = auth_header.split(" ")[1]
+            jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            return jsonify({'message': 'Token expirado'}), 401
+        except jwt.InvalidTokenError:
+            return jsonify({'message': 'Token inválido'}), 401
+
+    return jsonify({'message': 'Acesso permitido (modo de desenvolvimento)'}), 200

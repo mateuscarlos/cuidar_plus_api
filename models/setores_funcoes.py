@@ -1,8 +1,4 @@
-from flask_sqlalchemy import SQLAlchemy
-
-db = SQLAlchemy()
-
-from app import db  # Retain this import and remove the redundant one
+from db import db  # Keep only this import
 
 class Setor(db.Model):
     __tablename__ = 'setores'

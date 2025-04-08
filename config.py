@@ -7,7 +7,8 @@ class Config:
         f"@mysql:3306/{os.getenv('DB_NAME', 'cuidar_plus_bd')}"
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SECRET_KEY = os.getenv('SECRET_KEY', 'your_secret_key')
+    SECRET_KEY = 'sua_chave_secreta'
+    ENV = 'development'  # Altere para 'production' em produção
     SWAGGER = {
         'title': 'API Cuidar+',
         'uiversion': 3,

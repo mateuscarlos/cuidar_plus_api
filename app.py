@@ -8,6 +8,7 @@ from routes.acompanhamentos_routes import acompanhamentos_routes
 from routes.auth_routes import auth_bp
 from routes.planos_routes import planos_routes
 from routes.cep_routes import cep_routes
+from routes.routes_setor import bp as setor_bp
 from flasgger import Swagger
 from config import Config
 from models.pacientes import Paciente
@@ -16,13 +17,41 @@ from models.user import User
 from models.convenio import Convenio
 from flask_migrate import Migrate
 
+# Fix imports for routes
+try:
+    from routes.user_routes import user_routes
+    from routes.routes_setor import bp as setor_bp
+    # Import other routes as needed
+except ImportError as e:
+    print(f"Error importing routes: {e}")
+
 # Inicialização da aplicação
 app = Flask(__name__, template_folder='../cuidar-plus/cuidar-plus', static_folder='../cuidar-plus/cuidar-plus')
 app.config.from_object(Config)
-swagger = Swagger(app)
 
-# Configurar CORS para permitir apenas o domínio necessário
-CORS(app, resources={r"/*": {"origins": "http://localhost:4200"}}, supports_credentials=True)
+# Configurar CORS
+CORS(app, resources=Config.CORS_RESOURCES, supports_credentials=True)
+
+# Configurar Swagger
+swagger = Swagger(app, template={
+    "swagger": "2.0",
+    "info": {
+        "title": "Cuidar Plus API",
+        "description": "Documentação das APIs do Cuidar Plus",
+        "version": "1.0.0"
+    },
+    "host": "localhost:5001",  # Atualize conforme necessário
+    "basePath": "/api",
+    "schemes": ["http"],
+    "securityDefinitions": {
+        "Bearer": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header",
+            "description": "Adicione o token JWT no formato: Bearer <token>"
+        }
+    }
+})
 
 @app.after_request
 def add_cors_headers(response):
@@ -35,6 +64,10 @@ def add_cors_headers(response):
 @app.route('/api/options', methods=['OPTIONS'])
 def options():
     return make_response('', 200)
+
+@app.route('/health', methods=['GET'])
+def health_check():
+    return {'status': 'ok'}, 200
 
 # Inicialização do banco de dados
 db.init_app(app)
@@ -59,12 +92,13 @@ with app.app_context():
 
 # Registro de rotas
 app.register_blueprint(pacientes_routes)
+app.register_blueprint(user_routes)
+app.register_blueprint(auth_bp)
 app.register_blueprint(convenios_routes)
 app.register_blueprint(acompanhamentos_routes)
-app.register_blueprint(auth_bp)
-app.register_blueprint(user_routes)
 app.register_blueprint(planos_routes)
-app.register_blueprint(cep_routes, url_prefix='/api')
+app.register_blueprint(cep_routes)
+app.register_blueprint(setor_bp)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5001, debug=True)
