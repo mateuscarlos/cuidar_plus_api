@@ -1,4 +1,5 @@
 from db import db  # Keep only this import
+from flask import jsonify
 
 class Setor(db.Model):
     __tablename__ = 'setores'
@@ -10,6 +11,11 @@ class Setor(db.Model):
 
     def __repr__(self):
         return f"<Setor {self.nome}>"
+
+    @staticmethod
+    def get_setores_dict():
+        setores = Setor.query.all()
+        return {setor.id: setor.nome for setor in setores}
 
 
 class Funcao(db.Model):
@@ -24,6 +30,11 @@ class Funcao(db.Model):
 
     def __repr__(self):
         return f"<Funcao {self.nome}>"
+
+    @staticmethod
+    def get_funcoes_dict():
+        funcoes = Funcao.query.all()
+        return {funcao.id: funcao.nome for funcao in funcoes}
 
     @property
     def tipo_contratacao_extenso(self):

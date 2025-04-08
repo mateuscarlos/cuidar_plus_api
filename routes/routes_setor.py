@@ -151,3 +151,19 @@ def delete_funcao(funcao_id):
     db.session.delete(funcao)
     db.session.commit()
     return jsonify({"message": "Função excluída com sucesso."}), 200
+
+# -------------------------------
+# Rotas para Dicionários
+# -------------------------------
+
+setores_funcoes_bp = Blueprint('setores_funcoes', __name__)
+
+@setores_funcoes_bp.route('/setores/dicionario', methods=['GET'])
+def get_setores_dicionario():
+    setores_dict = Setor.get_setores_dict()
+    return jsonify(setores_dict)
+
+@setores_funcoes_bp.route('/funcoes/dicionario', methods=['GET'])
+def get_funcoes_dicionario():
+    funcoes_dict = Funcao.get_funcoes_dict()
+    return jsonify(funcoes_dict)
