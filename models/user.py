@@ -11,7 +11,8 @@ class User(db.Model):
     password_hash = db.Column(db.String(255), nullable=False)
     cargo = db.Column(db.String(50))
     cpf = db.Column(db.String(11), unique=True, nullable=False)
-    _endereco = db.Column(db.Text)  # Armazena o endereço como JSON
+    cep = db.Column(db.String(10), nullable=False)  # CEP obrigatório
+    _endereco = db.Column(db.Text)  # Armazena o restante do endereço como JSON
     setor = db.Column(db.String(50), nullable=False)
     funcao = db.Column(db.String(50), nullable=False)
     especialidade = db.Column(db.String(50))
@@ -33,6 +34,7 @@ class User(db.Model):
     @endereco.setter
     def endereco(self, value):
         if value:
+            # Removemos a validação de CEP pois agora está separado
             self._endereco = json.dumps(value)
         else:
             self._endereco = None
@@ -57,6 +59,7 @@ class User(db.Model):
             'email': self.email,
             'cargo': self.cargo,
             'cpf': self.cpf,
+            'cep': self.cep,  # Incluímos o CEP aqui
             'setor': self.setor,
             'funcao': self.funcao,
             'endereco': self.endereco,

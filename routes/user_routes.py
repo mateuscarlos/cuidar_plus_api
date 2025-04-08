@@ -67,9 +67,10 @@ def create_user():
             password_hash=data.get('password_hash'),
             cargo=data.get('cargo'),
             cpf=data.get('cpf'),
+            cep=cep,  # Salva o CEP no campo específico
             setor=data.get('setor'),
             funcao=data.get('funcao'),
-            endereco=endereco_data  # Salva o endereço como JSON
+            endereco=endereco_data  # Salva o restante do endereço como JSON
         )
         db.session.add(user)
         db.session.commit()
@@ -119,12 +120,31 @@ def update_user(id):
         if not user:
             raise NotFound('Usuário não encontrado')
 
+        # Se o CEP foi alterado, consultar a API ViaCEP
+        new_cep = data.get('cep')
+        if new_cep and new_cep != user.cep:
+            try:
+                response = requests.get(f'https://viacep.com.br/ws/{new_cep}/json/')
+                response.raise_for_status()
+                endereco_data = response.json()
+                
+                if 'erro' in endereco_data:
+                    return jsonify({'error': 'CEP não encontrado'}), 404
+                    
+                user.cep = new_cep
+                user.endereco = endereco_data
+            except requests.exceptions.RequestException as e:
+                return jsonify({'error': f'Erro ao consultar o serviço de CEP: {str(e)}'}), 500
+
         # Atualiza os campos permitidos
         user.nome = data.get('nome', user.nome)
         user.email = data.get('email', user.email)
         user.setor = data.get('setor', user.setor)
         user.funcao = data.get('funcao', user.funcao)
-        user.endereco = data.get('endereco', user.endereco)
+        
+        # Só atualizar o endereço se não foi alterado pelo CEP
+        if 'endereco' in data and not new_cep:
+            user.endereco = data.get('endereco')
 
         db.session.commit()
         return jsonify({'message': 'Usuário atualizado com sucesso', 'user': user.to_dict()}), 200
