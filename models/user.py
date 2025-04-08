@@ -24,6 +24,7 @@ class User(db.Model):
     _permissions = db.Column(db.Text)  # Armazena permissões como JSON
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    tipo_contratacao = db.Column(db.String(30), nullable=True)
 
     @property
     def endereco(self):
@@ -71,7 +72,8 @@ class User(db.Model):
             'data_admissao': self.data_admissao.isoformat() if self.data_admissao else None,
             'tipo_acesso': self.tipo_acesso,
             'created_at': self.created_at.isoformat(),
-            'updated_at': self.updated_at.isoformat()
+            'updated_at': self.updated_at.isoformat(),
+            'tipo_contratacao': self.tipo_contratacao,
         }
 
     def __repr__(self):

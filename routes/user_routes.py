@@ -7,6 +7,7 @@ import bleach
 from werkzeug.exceptions import BadRequest, Conflict, NotFound
 from utils import validate_cpf, sanitize_input
 import requests
+from datetime import datetime
 
 # Inicialização do Flask
 app = Flask(__name__)
@@ -41,12 +42,29 @@ def handle_internal_error(e):
         'error': 'InternalServerError'
     }), 500
 
+import re
+
+def camel_to_snake(data):
+    """
+    Converte as chaves de um dicionário de camelCase para snake_case.
+    """
+    if isinstance(data, dict):
+        new_data = {}
+        for key, value in data.items():
+            new_key = re.sub(r'(?<!^)(?=[A-Z])', '_', key).lower()
+            new_data[new_key] = camel_to_snake(value) if isinstance(value, (dict, list)) else value
+        return new_data
+    elif isinstance(data, list):
+        return [camel_to_snake(item) for item in data]
+    else:
+        return data
+
 @user_routes.route('/usuarios', methods=['POST'])
 def create_user():
     """
     Cria um novo usuário e consulta o endereço via API ViaCEP.
     """
-    data = request.get_json()
+    data = camel_to_snake(request.get_json())  # Converte camelCase para snake_case
     try:
         # Consulta o CEP na API ViaCEP
         cep = data.get('cep')
@@ -60,6 +78,14 @@ def create_user():
         if 'erro' in endereco_data:
             return jsonify({'error': 'CEP não encontrado'}), 404
 
+        # Converte data_admissao para o formato correto (YYYY-MM-DD)
+        data_admissao = data.get('data_admissao')
+        if data_admissao:
+            try:
+                data_admissao = datetime.fromisoformat(data_admissao.replace("Z", "")).date()
+            except ValueError:
+                return jsonify({'error': 'Formato de data_admissao inválido. Use o formato ISO 8601.'}), 400
+
         # Cria o usuário
         user = User(
             nome=data.get('nome'),
@@ -67,19 +93,20 @@ def create_user():
             password_hash=data.get('password_hash'),
             cargo=data.get('cargo'),
             cpf=data.get('cpf'),
-            cep=cep,  # Correto: usar a variável cep diretamente (sem .get)
+            cep=cep,
             setor=data.get('setor'),
             funcao=data.get('funcao'),
-            endereco=endereco_data,  # Salva o restante do endereço como JSON
+            endereco=endereco_data,
             status=data.get('status'),
-            telefone=data.get('telefone'), 
+            telefone=data.get('telefone'),
             especialidade=data.get('especialidade'),
             registro_categoria=data.get('registro_categoria'),
-            data_admissao=data.get('data_admissao'),
+            data_admissao=data_admissao,  # Valor convertido
             tipo_acesso=data.get('tipo_acesso'),
+            tipo_contratacao=data.get('tipo_contratacao'),
             created_at=data.get('created_at'),
             updated_at=data.get('updated_at')
-       )
+        )
         db.session.add(user)
         db.session.commit()
 
@@ -128,17 +155,17 @@ def update_user(id):
         if not user:
             raise NotFound('Usuário não encontrado')
 
-        # Se o CEP foi alterado, consultar a API ViaCEP
+        # Atualiza o CEP e consulta o endereço via API ViaCEP
         new_cep = data.get('cep')
         if new_cep and new_cep != user.cep:
             try:
                 response = requests.get(f'https://viacep.com.br/ws/{new_cep}/json/')
                 response.raise_for_status()
                 endereco_data = response.json()
-                
+
                 if 'erro' in endereco_data:
                     return jsonify({'error': 'CEP não encontrado'}), 404
-                    
+
                 user.cep = new_cep
                 user.endereco = endereco_data
             except requests.exceptions.RequestException as e:
@@ -149,7 +176,7 @@ def update_user(id):
         user.email = data.get('email', user.email)
         user.setor = data.get('setor', user.setor)
         user.funcao = data.get('funcao', user.funcao)
-        
+
         # Só atualizar o endereço se não foi alterado pelo CEP
         if 'endereco' in data and not new_cep:
             user.endereco = data.get('endereco')
@@ -159,7 +186,6 @@ def update_user(id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': f'Erro ao atualizar usuário: {str(e)}'}), 500
-
 
 @user_routes.route('/usuarios/<int:id>', methods=['DELETE'])
 def delete_user(id):
