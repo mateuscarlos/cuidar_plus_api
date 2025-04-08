@@ -67,11 +67,19 @@ def create_user():
             password_hash=data.get('password_hash'),
             cargo=data.get('cargo'),
             cpf=data.get('cpf'),
-            cep=cep,  # Salva o CEP no campo específico
+            cep=cep,  # Correto: usar a variável cep diretamente (sem .get)
             setor=data.get('setor'),
             funcao=data.get('funcao'),
-            endereco=endereco_data  # Salva o restante do endereço como JSON
-        )
+            endereco=endereco_data,  # Salva o restante do endereço como JSON
+            status=data.get('status'),
+            telefone=data.get('telefone'), 
+            especialidade=data.get('especialidade'),
+            registro_categoria=data.get('registro_categoria'),
+            data_admissao=data.get('data_admissao'),
+            tipo_acesso=data.get('tipo_acesso'),
+            created_at=data.get('created_at'),
+            updated_at=data.get('updated_at')
+       )
         db.session.add(user)
         db.session.commit()
 

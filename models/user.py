@@ -63,7 +63,15 @@ class User(db.Model):
             'setor': self.setor,
             'funcao': self.funcao,
             'endereco': self.endereco,
-            'permissions': self.permissions
+            'permissions': self.permissions,
+            'status': self.status,
+            'especialidade': self.especialidade,
+            'registro_categoria': self.registro_categoria,
+            'telefone': self.telefone,
+            'data_admissao': self.data_admissao.isoformat() if self.data_admissao else None,
+            'tipo_acesso': self.tipo_acesso,
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat()
         }
 
     def __repr__(self):
