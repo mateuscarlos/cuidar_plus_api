@@ -15,7 +15,7 @@ class Setor(db.Model):
     @staticmethod
     def get_setores_dict():
         setores = Setor.query.all()
-        return {setor.id: setor.nome for setor in setores}
+        return {str(setor.id): setor.nome for setor in setores}
 
 
 class Funcao(db.Model):

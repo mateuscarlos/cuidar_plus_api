@@ -8,8 +8,9 @@ from routes.acompanhamentos_routes import acompanhamentos_routes
 from routes.auth_routes import auth_bp
 from routes.planos_routes import planos_routes
 from routes.cep_routes import cep_routes
-from routes.routes_setor import bp as setor_bp
+""" from routes.routes_setor import bp as setor_bp """
 from routes.routes_setor import setores_funcoes_bp
+from routes.routes_setor import bp as setores_bp
 from flasgger import Swagger
 from config import Config
 from models.pacientes import Paciente
@@ -101,7 +102,9 @@ app.register_blueprint(convenios_routes)
 app.register_blueprint(acompanhamentos_routes)
 app.register_blueprint(planos_routes)
 app.register_blueprint(cep_routes)
-app.register_blueprint(setor_bp)
+""" app.register_blueprint(setor_bp)
+app.register_blueprint(setores_funcoes_bp) """
+app.register_blueprint(setores_bp)
 app.register_blueprint(setores_funcoes_bp)
 
 if __name__ == '__main__':
