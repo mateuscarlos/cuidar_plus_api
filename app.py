@@ -56,7 +56,9 @@ swagger = Swagger(app, template={
 
 @app.after_request
 def add_cors_headers(response):
-    response.headers['Access-Control-Allow-Origin'] = 'http://localhost:4200'
+    origin = request.headers.get('Origin')
+    if origin in Config.CORS_RESOURCES[r"/*"]["origins"]:
+        response.headers['Access-Control-Allow-Origin'] = origin
     response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Authorization,x-test-environment'
     response.headers['Access-Control-Allow-Methods'] = 'GET,PUT,POST,DELETE,OPTIONS'
     response.headers['Access-Control-Allow-Credentials'] = 'true'

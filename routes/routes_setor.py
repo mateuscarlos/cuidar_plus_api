@@ -65,9 +65,7 @@ def get_funcoes():
             "id": f.id,
             "nome": f.nome,
             "setor_id": f.setor_id,
-            "conselho_profissional": f.conselho_profissional,
-            "especializacao_recomendada": f.especializacao_recomendada,
-            "tipo_contratacao": f.tipo_contratacao
+            "especializacao_recomendada": f.especializacao_recomendada
         }
         for f in funcoes
     ])
@@ -82,9 +80,7 @@ def get_funcoes_por_setor(setor_id):
         {
             "id": f.id,
             "nome": f.nome,
-            "conselho_profissional": f.conselho_profissional,
             "especializacao_recomendada": f.especializacao_recomendada,
-            "tipo_contratacao": f.tipo_contratacao
         }
         for f in funcoes
     ])
@@ -96,22 +92,14 @@ def create_funcao():
 
     nome = data.get('nome')
     setor_id = data.get('setor_id')
-    conselho_profissional = data.get('conselho_profissional')
-    tipo_contratacao = data.get('tipo_contratacao')
 
-    if not nome or not setor_id or not tipo_contratacao:
-        return jsonify({"error": "Os campos 'nome', 'setor_id' e 'tipo_contratacao' são obrigatórios."}), 400
-
-    # Validação do campo conselho_profissional
-    if conselho_profissional is not None and conselho_profissional.strip() == '':
-        return jsonify({"error": "O campo 'conselho_profissional' não pode ser vazio."}), 400
+    if not nome or not setor_id:
+        return jsonify({"error": "Os campos 'nome' e 'setor_id' são obrigatórios."}), 400
 
     funcao = Funcao(
         nome=nome,
         setor_id=setor_id,
-        conselho_profissional=conselho_profissional,
-        especializacao_recomendada=data.get('especializacao_recomendada'),
-        tipo_contratacao=tipo_contratacao
+        especializacao_recomendada=data.get('especializacao_recomendada')
     )
     db.session.add(funcao)
     db.session.commit()
@@ -125,21 +113,13 @@ def update_funcao(funcao_id):
 
     nome = data.get('nome')
     setor_id = data.get('setor_id')
-    conselho_profissional = data.get('conselho_profissional')
-    tipo_contratacao = data.get('tipo_contratacao')
 
-    if not nome or not setor_id or not tipo_contratacao:
-        return jsonify({"error": "Os campos 'nome', 'setor_id' e 'tipo_contratacao' são obrigatórios."}), 400
-
-    # Validação do campo conselho_profissional
-    if conselho_profissional is not None and conselho_profissional.strip() == '':
-        return jsonify({"error": "O campo 'conselho_profissional' não pode ser vazio."}), 400
+    if not nome or not setor_id:
+        return jsonify({"error": "Os campos 'nome' e 'setor_id' são obrigatórios."}), 400
 
     funcao.nome = nome
     funcao.setor_id = setor_id
-    funcao.conselho_profissional = conselho_profissional
     funcao.especializacao_recomendada = data.get('especializacao_recomendada')
-    funcao.tipo_contratacao = tipo_contratacao
 
     db.session.commit()
     return jsonify({"id": funcao.id, "nome": funcao.nome}), 200
