@@ -73,10 +73,32 @@ def create_user():
 
         response = requests.get(f'https://viacep.com.br/ws/{cep}/json/')
         response.raise_for_status()
-        endereco_data = response.json()
+        endereco_via_cep = response.json()
 
-        if 'erro' in endereco_data:
+        if 'erro' in endereco_via_cep:
             return jsonify({'error': 'CEP não encontrado'}), 404
+
+        # Mesclar o endereço da API ViaCEP com os dados enviados pelo formulário
+        endereco_formulario = data.get('endereco', {})
+        endereco_final = {
+            # Dados do ViaCEP como referência
+            'cep': cep,
+            'logradouro': endereco_via_cep.get('logradouro', ''),
+            'bairro': endereco_via_cep.get('bairro', ''),
+            'localidade': endereco_via_cep.get('localidade', ''),
+            'uf': endereco_via_cep.get('uf', ''),
+            'estado': endereco_via_cep.get('uf', ''),
+            
+            # Sobrescrever com dados do formulário que têm prioridade
+            'numero': endereco_formulario.get('numero', ''),
+            'complemento': endereco_formulario.get('complemento', ''),
+        }
+        
+        # Se houver mais campos no formulário, preservá-los
+        if endereco_formulario:
+            for key, value in endereco_formulario.items():
+                if key not in ['cep'] and key not in endereco_final:
+                    endereco_final[key] = value
 
         # Converte data_admissao para o formato correto (YYYY-MM-DD)
         data_admissao = data.get('data_admissao')
@@ -96,7 +118,7 @@ def create_user():
             cep=cep,
             setor=data.get('setor'),
             funcao=data.get('funcao'),
-            endereco=endereco_data,
+            endereco=endereco_final,  # Usando o endereço mesclado
             status=data.get('status'),
             telefone=data.get('telefone'),
             especialidade=data.get('especialidade'),
@@ -149,7 +171,7 @@ def update_user(id):
     """
     Atualiza as informações de um usuário existente.
     """
-    data = request.get_json()
+    data = camel_to_snake(request.get_json())  # Converte camelCase para snake_case
     try:
         user = User.query.get(id)
         if not user:
@@ -161,13 +183,35 @@ def update_user(id):
             try:
                 response = requests.get(f'https://viacep.com.br/ws/{new_cep}/json/')
                 response.raise_for_status()
-                endereco_data = response.json()
+                endereco_via_cep = response.json()
 
-                if 'erro' in endereco_data:
+                if 'erro' in endereco_via_cep:
                     return jsonify({'error': 'CEP não encontrado'}), 404
+                
+                # Mesclar o endereço da API ViaCEP com os dados enviados pelo formulário
+                endereco_formulario = data.get('endereco', {})
+                endereco_final = {
+                    # Dados do ViaCEP como referência
+                    'cep': new_cep,
+                    'logradouro': endereco_via_cep.get('logradouro', ''),
+                    'bairro': endereco_via_cep.get('bairro', ''),
+                    'localidade': endereco_via_cep.get('localidade', ''),
+                    'uf': endereco_via_cep.get('uf', ''),
+                    'estado': endereco_via_cep.get('uf', ''),
+                    
+                    # Sobrescrever com dados do formulário que têm prioridade
+                    'numero': endereco_formulario.get('numero', ''),
+                    'complemento': endereco_formulario.get('complemento', '')
+                }
+                
+                # Se houver mais campos no formulário, preservá-los
+                if endereco_formulario:
+                    for key, value in endereco_formulario.items():
+                        if key not in ['cep'] and key not in endereco_final:
+                            endereco_final[key] = value
 
                 user.cep = new_cep
-                user.endereco = endereco_data
+                user.endereco = endereco_final
             except requests.exceptions.RequestException as e:
                 return jsonify({'error': f'Erro ao consultar o serviço de CEP: {str(e)}'}), 500
 
@@ -176,6 +220,12 @@ def update_user(id):
         user.email = data.get('email', user.email)
         user.setor = data.get('setor', user.setor)
         user.funcao = data.get('funcao', user.funcao)
+        user.telefone = data.get('telefone', user.telefone)
+        user.especialidade = data.get('especialidade', user.especialidade)
+        user.registro_categoria = data.get('registro_categoria', user.registro_categoria)
+        user.tipo_acesso = data.get('tipo_acesso', user.tipo_acesso)
+        user.tipo_contratacao = data.get('tipo_contratacao', user.tipo_contratacao)
+        user.status = data.get('status', user.status)
 
         # Só atualizar o endereço se não foi alterado pelo CEP
         if 'endereco' in data and not new_cep:
