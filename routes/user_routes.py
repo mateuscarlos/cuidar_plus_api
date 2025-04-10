@@ -59,7 +59,7 @@ def camel_to_snake(data):
     else:
         return data
 
-@user_routes.route('/usuarios/create', methods=['POST'])
+@user_routes.route('/usuarios/criar', methods=['POST'])
 def create_user():
     """
     Cria um novo usuário e consulta o endereço via API ViaCEP.
