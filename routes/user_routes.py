@@ -59,7 +59,7 @@ def camel_to_snake(data):
     else:
         return data
 
-@user_routes.route('/usuarios', methods=['POST'])
+@user_routes.route('/usuarios/create', methods=['POST'])
 def create_user():
     """
     Cria um novo usuário e consulta o endereço via API ViaCEP.
@@ -254,6 +254,24 @@ def delete_user(id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': f'Erro ao excluir usuário: {str(e)}'}), 500
+
+@user_routes.route('/usuarios/visualizar/<int:id>', methods=['GET'])
+def visualizar_usuario(id):
+    """
+    Retorna os detalhes de um usuário específico pelo ID, excluindo o campo password_hash.
+    """
+    try:
+        user = User.query.get(id)
+        if not user:
+            raise NotFound('Usuário não encontrado')
+
+        # Converte o usuário para dicionário e remove o campo password_hash
+        user_data = user.to_dict()
+        user_data.pop('password_hash', None)
+
+        return jsonify(user_data), 200
+    except Exception as e:
+        return jsonify({'error': f'Erro ao buscar usuário: {str(e)}'}), 500
 
 # Registrar o Blueprint no aplicativo
 app.register_blueprint(user_routes)
