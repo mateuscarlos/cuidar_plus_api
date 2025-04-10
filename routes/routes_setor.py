@@ -147,3 +147,42 @@ def get_setores_dicionario():
 def get_funcoes_dicionario():
     funcoes_dict = Funcao.get_funcoes_dict()
     return jsonify(funcoes_dict)
+
+@setores_funcoes_bp.route('/setores/dicionario/<int:setor_id>', methods=['GET'])
+def get_setor_by_id(setor_id):
+    """Retorna um setor específico no formato de dicionário."""
+    setor = Setor.query.get_or_404(setor_id)
+    return jsonify({
+        "id": setor.id,
+        "nome": setor.nome
+    })
+
+@setores_funcoes_bp.route('/funcoes/dicionario/<int:funcao_id>', methods=['GET'])
+def get_funcao_by_id(funcao_id):
+    """Retorna uma função específica no formato de dicionário."""
+    funcao = Funcao.query.get_or_404(funcao_id)
+    return jsonify({
+        "id": funcao.id,
+        "nome": funcao.nome,
+        "setor_id": funcao.setor_id,
+        "especializacao_recomendada": funcao.especializacao_recomendada
+    })
+
+@setores_funcoes_bp.route('/setores/<int:setor_id>/funcoes/dicionario', methods=['GET'])
+def get_funcoes_by_setor_dicionario(setor_id):
+    """Retorna todas as funções de um setor específico no formato de dicionário."""
+    # Verifica se o setor existe
+    Setor.query.get_or_404(setor_id)
+    
+    # Obtém todas as funções do setor
+    funcoes = Funcao.query.filter_by(setor_id=setor_id).all()
+    
+    funcoes_dict = {}
+    for funcao in funcoes:
+        funcoes_dict[funcao.id] = {
+            "id": funcao.id,
+            "nome": funcao.nome,
+            "especializacao_recomendada": funcao.especializacao_recomendada
+        }
+    
+    return jsonify(funcoes_dict)
