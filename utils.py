@@ -87,10 +87,25 @@ def convert_utc_to_db_format(utc_date_str):
 
 def convert_ddmmyyyy_to_db_format(date_str):
     """
-    Converte uma string de data no formato dd/mm/yyyy para o formato do banco de dados.
+    Converte uma string de data para o formato do banco de dados (YYYY-MM-DD).
+    Aceita tanto o formato DD/MM/YYYY quanto YYYY-MM-DD.
     
-    :param date_str: string de data no formato dd/mm/yyyy (ex: '13/03/2025')
+    :param date_str: string de data no formato dd/mm/yyyy ou yyyy-mm-dd
     :return: string de data no formato do banco de dados (ex: '2025-03-13')
     """
-    date = datetime.strptime(date_str, '%d/%m/%Y')
-    return date.strftime('%Y-%m-%d')
+    if not date_str:
+        return None
+        
+    # Verifica se a data já está no formato YYYY-MM-DD
+    if re.match(r'^\d{4}-\d{2}-\d{2}$', date_str):
+        return date_str
+    
+    # Verifica se a data está no formato DD/MM/YYYY
+    elif re.match(r'^\d{2}/\d{2}/\d{4}$', date_str):
+        try:
+            date = datetime.strptime(date_str, '%d/%m/%Y')
+            return date.strftime('%Y-%m-%d')
+        except ValueError:
+            raise ValueError(f"Formato de data inválido: {date_str}. Use DD/MM/YYYY ou YYYY-MM-DD.")
+    else:
+        raise ValueError(f"Formato de data inválido: {date_str}. Use DD/MM/YYYY ou YYYY-MM-DD.")

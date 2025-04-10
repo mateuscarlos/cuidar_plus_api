@@ -18,6 +18,21 @@ def criar_paciente():
         if not data.get('nome_completo') or not data.get('cpf') or not data.get('data_nascimento'):
             return jsonify({'error': 'Campos obrigatórios não foram preenchidos.'}), 400
 
+        # Converter datas para o formato do banco antes de criar o paciente
+        if 'data_nascimento' in data:
+            from utils import convert_ddmmyyyy_to_db_format
+            try:
+                data['data_nascimento'] = convert_ddmmyyyy_to_db_format(data['data_nascimento'])
+            except ValueError as e:
+                return jsonify({'error': str(e)}), 400
+
+        if 'data_validade' in data:
+            from utils import convert_ddmmyyyy_to_db_format
+            try:
+                data['data_validade'] = convert_ddmmyyyy_to_db_format(data['data_validade'])
+            except ValueError as e:
+                return jsonify({'error': str(e)}), 400
+
         # Criar o paciente a partir do dicionário
         novo_paciente = Paciente.from_dict(data)
 
@@ -57,7 +72,7 @@ def buscar_pacientes():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@pacientes_routes.route('/pacientes/<int:id>', methods=['GET'])
+@pacientes_routes.route('/pacientes/buscar/<int:id>', methods=['GET'])
 def obter_paciente(id):
     """Obter um paciente pelo ID"""
     try:
@@ -70,7 +85,7 @@ def obter_paciente(id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@pacientes_routes.route('/pacientes/<int:id>', methods=['PUT'])
+@pacientes_routes.route('/pacientes/atualizar/<int:id>', methods=['PUT'])
 def atualizar_paciente(id):
     """Atualizar um paciente existente"""
     try:
@@ -144,7 +159,7 @@ def atualizar_paciente(id):
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
 
-@pacientes_routes.route('/pacientes/<int:id>', methods=['DELETE'])
+@pacientes_routes.route('/pacientes/delete/<int:id>', methods=['DELETE'])
 def excluir_paciente(id):
     """Excluir um paciente"""
     try:
