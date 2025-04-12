@@ -13,10 +13,7 @@ from routes.routes_setor import setores_funcoes_bp
 from routes.routes_setor import bp as setores_bp
 from flasgger import Swagger
 from config import Config
-from models.pacientes import Paciente
-from models.acompanhamento import Acompanhamento
-from models.user import User
-from models.convenio import Convenio
+
 from flask_migrate import Migrate
 
 # Fix imports for routes
@@ -34,26 +31,83 @@ app.config.from_object(Config)
 # Configurar CORS
 CORS(app, resources=Config.CORS_RESOURCES, supports_credentials=True)
 
-# Configurar Swagger
-swagger = Swagger(app, template={
+# Configuração do Swagger
+swagger_config = {
+    "headers": [],
+    "specs": [
+        {
+            "endpoint": "apispec",
+            "route": "/apispec.json",
+            "rule_filter": lambda rule: True,
+            "model_filter": lambda tag: True,
+        }
+    ],
+    "static_url_path": "/flasgger_static",
+    "swagger_ui": True,
+    "specs_route": "/docs/"
+}
+
+swagger_template = {
     "swagger": "2.0",
     "info": {
-        "title": "Cuidar Plus API",
-        "description": "Documentação das APIs do Cuidar Plus",
-        "version": "1.0.0"
+        "title": "Cuidar+ API",
+        "description": "API para gerenciamento do sistema Cuidar+",
+        "version": "1.0.0",
+        "contact": {
+            "name": "Equipe de Desenvolvimento",
+            "email": "dev@cuidar.com"
+        }
     },
-    "host": "localhost:5001",  # Atualize conforme necessário
-    "basePath": "/api",
-    "schemes": ["http"],
     "securityDefinitions": {
         "Bearer": {
             "type": "apiKey",
             "name": "Authorization",
             "in": "header",
-            "description": "Adicione o token JWT no formato: Bearer <token>"
+            "description": "JWT Authorization header usando o esquema Bearer. Exemplo: \"Authorization: Bearer {token}\""
         }
-    }
-})
+    },
+    "security": [
+        {
+            "Bearer": []
+        }
+    ],
+    "tags": [
+        {
+            "name": "Autenticação",
+            "description": "Endpoints de autenticação e gerenciamento de tokens"
+        },
+        {
+            "name": "Usuários",
+            "description": "Gerenciamento de usuários do sistema"
+        },
+        {
+            "name": "Pacientes",
+            "description": "Cadastro e gerenciamento de pacientes"
+        },
+        {
+            "name": "Acompanhamentos",
+            "description": "Registros de acompanhamentos médicos"
+        },
+        {
+            "name": "Convênios",
+            "description": "Gerenciamento de convênios médicos"
+        },
+        {
+            "name": "Setores",
+            "description": "Gerenciamento de setores da instituição"
+        },
+        {
+            "name": "Funções",
+            "description": "Gerenciamento de funções por setor"
+        },
+        {
+            "name": "Dicionários",
+            "description": "Endpoints que retornam dados no formato de dicionários"
+        }
+    ]
+}
+
+swagger = Swagger(app, config=swagger_config, template=swagger_template)
 
 @app.after_request
 def add_cors_headers(response):

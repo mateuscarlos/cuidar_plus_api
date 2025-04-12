@@ -1,7 +1,7 @@
 from flask import Flask, Blueprint, request, jsonify
 from models.user import User
 from db import db
-from flasgger import Swagger
+from flasgger import Swagger, swag_from
 import re
 import bleach
 from werkzeug.exceptions import BadRequest, Conflict, NotFound
@@ -42,8 +42,6 @@ def handle_internal_error(e):
         'error': 'InternalServerError'
     }), 500
 
-import re
-
 def camel_to_snake(data):
     """
     Converte as chaves de um dicionário de camelCase para snake_case.
@@ -60,6 +58,89 @@ def camel_to_snake(data):
         return data
 
 @user_routes.route('/usuarios/criar', methods=['POST'])
+@swag_from({
+    'tags': ['Usuários'],
+    'parameters': [
+        {
+            'name': 'body',
+            'in': 'body',
+            'required': True,
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'nome': {'type': 'string', 'example': 'Maria Santos'},
+                    'email': {'type': 'string', 'example': 'maria@email.com'},
+                    'password_hash': {'type': 'string', 'example': 'senha_segura_hash'},
+                    'cpf': {'type': 'string', 'example': '12345678901'},
+                    'cep': {'type': 'string', 'example': '01001000'},
+                    'setor': {'type': 'string', 'example': 'Enfermagem'},
+                    'funcao': {'type': 'string', 'example': 'Enfermeira'},
+                    'endereco': {
+                        'type': 'object',
+                        'properties': {
+                            'numero': {'type': 'string', 'example': '123'},
+                            'complemento': {'type': 'string', 'example': 'Apto 45'}
+                        }
+                    },
+                    'telefone': {'type': 'string', 'example': '(11) 98765-4321'},
+                    'especialidade': {'type': 'string', 'example': 'Clínica Geral'},
+                    'registro_categoria': {'type': 'string', 'example': 'CRM-12345'},
+                    'data_admissao': {'type': 'string', 'format': 'date', 'example': '2023-01-15'},
+                    'tipo_acesso': {'type': 'string', 'example': 'Administrador'},
+                    'tipo_contratacao': {'type': 'string', 'example': 'CLT'},
+                    'status': {'type': 'string', 'example': 'Ativo'}
+                },
+                'required': ['nome', 'email', 'password_hash', 'cpf', 'cep']
+            }
+        }
+    ],
+    'responses': {
+        '201': {
+            'description': 'Usuário criado com sucesso',
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'message': {'type': 'string', 'example': 'Usuário criado com sucesso'},
+                    'user': {
+                        'type': 'object',
+                        'properties': {
+                            'id': {'type': 'integer', 'example': 1},
+                            'nome': {'type': 'string', 'example': 'Maria Santos'},
+                            'email': {'type': 'string', 'example': 'maria@email.com'}
+                        }
+                    }
+                }
+            }
+        },
+        '400': {
+            'description': 'Erro nos dados fornecidos',
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'error': {'type': 'string', 'example': 'Formato de data_admissao inválido. Use o formato ISO 8601.'}
+                }
+            }
+        },
+        '404': {
+            'description': 'CEP não encontrado',
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'error': {'type': 'string', 'example': 'CEP não encontrado'}
+                }
+            }
+        },
+        '500': {
+            'description': 'Erro interno',
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'error': {'type': 'string', 'example': 'Erro ao criar usuário: mensagem de erro'}
+                }
+            }
+        }
+    }
+})
 def create_user():
     """
     Cria um novo usuário e consulta o endereço via API ViaCEP.
@@ -141,6 +222,37 @@ def create_user():
         return jsonify({'error': f'Erro ao criar usuário: {str(e)}'}), 500
 
 @user_routes.route('/usuarios', methods=['GET'])
+@swag_from({
+    'tags': ['Usuários'],
+    'responses': {
+        '200': {
+            'description': 'Lista de usuários',
+            'schema': {
+                'type': 'array',
+                'items': {
+                    'type': 'object',
+                    'properties': {
+                        'id': {'type': 'integer', 'example': 1},
+                        'nome': {'type': 'string', 'example': 'Maria Santos'},
+                        'email': {'type': 'string', 'example': 'maria@email.com'},
+                        'setor': {'type': 'string', 'example': 'Enfermagem'},
+                        'funcao': {'type': 'string', 'example': 'Enfermeira'},
+                        'status': {'type': 'string', 'example': 'Ativo'}
+                    }
+                }
+            }
+        },
+        '500': {
+            'description': 'Erro interno',
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'error': {'type': 'string', 'example': 'Erro ao listar usuários: mensagem de erro'}
+                }
+            }
+        }
+    }
+})
 def get_all_users():
     """
     Lista todos os usuários cadastrados.
@@ -153,6 +265,64 @@ def get_all_users():
 
 
 @user_routes.route('/usuarios/<int:id>', methods=['GET'])
+@swag_from({
+    'tags': ['Usuários'],
+    'parameters': [
+        {
+            'name': 'id',
+            'in': 'path',
+            'type': 'integer',
+            'required': True,
+            'description': 'ID do usuário'
+        }
+    ],
+    'responses': {
+        '200': {
+            'description': 'Detalhes do usuário',
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'id': {'type': 'integer', 'example': 1},
+                    'nome': {'type': 'string', 'example': 'Maria Santos'},
+                    'email': {'type': 'string', 'example': 'maria@email.com'},
+                    'cpf': {'type': 'string', 'example': '12345678901'},
+                    'setor': {'type': 'string', 'example': 'Enfermagem'},
+                    'funcao': {'type': 'string', 'example': 'Enfermeira'},
+                    'endereco': {
+                        'type': 'object',
+                        'properties': {
+                            'cep': {'type': 'string', 'example': '01001000'},
+                            'logradouro': {'type': 'string', 'example': 'Praça da Sé'},
+                            'numero': {'type': 'string', 'example': '123'},
+                            'complemento': {'type': 'string', 'example': 'Apto 45'},
+                            'bairro': {'type': 'string', 'example': 'Sé'},
+                            'localidade': {'type': 'string', 'example': 'São Paulo'},
+                            'uf': {'type': 'string', 'example': 'SP'}
+                        }
+                    }
+                }
+            }
+        },
+        '404': {
+            'description': 'Usuário não encontrado',
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'error': {'type': 'string', 'example': 'Erro ao buscar usuário: Usuário não encontrado'}
+                }
+            }
+        },
+        '500': {
+            'description': 'Erro interno',
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'error': {'type': 'string', 'example': 'Erro ao buscar usuário: mensagem de erro'}
+                }
+            }
+        }
+    }
+})
 def get_user_by_id(id):
     """
     Retorna os detalhes de um usuário específico pelo ID.
@@ -167,6 +337,76 @@ def get_user_by_id(id):
 
 
 @user_routes.route('/usuarios/<int:id>', methods=['PUT'])
+@swag_from({
+    'tags': ['Usuários'],
+    'parameters': [
+        {
+            'name': 'id',
+            'in': 'path',
+            'type': 'integer',
+            'required': True,
+            'description': 'ID do usuário'
+        },
+        {
+            'name': 'body',
+            'in': 'body',
+            'required': True,
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'nome': {'type': 'string', 'example': 'Maria Santos Atualizado'},
+                    'email': {'type': 'string', 'example': 'maria_nova@email.com'},
+                    'setor': {'type': 'string', 'example': 'Recepção'},
+                    'funcao': {'type': 'string', 'example': 'Recepcionista'},
+                    'cep': {'type': 'string', 'example': '02001000'},
+                    'telefone': {'type': 'string', 'example': '(11) 98765-4321'},
+                    'especialidade': {'type': 'string', 'example': 'Clínica Geral'},
+                    'registro_categoria': {'type': 'string', 'example': 'CRM-12345'},
+                    'tipo_acesso': {'type': 'string', 'example': 'Usuário'},
+                    'tipo_contratacao': {'type': 'string', 'example': 'PJ'},
+                    'status': {'type': 'string', 'example': 'Ativo'}
+                }
+            }
+        }
+    ],
+    'responses': {
+        '200': {
+            'description': 'Usuário atualizado com sucesso',
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'message': {'type': 'string', 'example': 'Usuário atualizado com sucesso'},
+                    'user': {
+                        'type': 'object',
+                        'properties': {
+                            'id': {'type': 'integer', 'example': 1},
+                            'nome': {'type': 'string', 'example': 'Maria Santos Atualizado'},
+                            'email': {'type': 'string', 'example': 'maria_nova@email.com'}
+                        }
+                    }
+                }
+            }
+        },
+        '404': {
+            'description': 'Usuário não encontrado',
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'error': {'type': 'string', 'example': 'Usuário não encontrado'}
+                }
+            }
+        },
+        '500': {
+            'description': 'Erro interno',
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'error': {'type': 'string', 'example': 'Erro ao atualizar usuário: mensagem de erro'}
+                }
+            }
+        }
+    }
+})
 def update_user(id):
     """
     Atualiza as informações de um usuário existente.
@@ -238,6 +478,47 @@ def update_user(id):
         return jsonify({'error': f'Erro ao atualizar usuário: {str(e)}'}), 500
 
 @user_routes.route('/usuarios/<int:id>', methods=['DELETE'])
+@swag_from({
+    'tags': ['Usuários'],
+    'parameters': [
+        {
+            'name': 'id',
+            'in': 'path',
+            'type': 'integer',
+            'required': True,
+            'description': 'ID do usuário a ser excluído'
+        }
+    ],
+    'responses': {
+        '200': {
+            'description': 'Usuário excluído com sucesso',
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'message': {'type': 'string', 'example': 'Usuário excluído com sucesso'}
+                }
+            }
+        },
+        '404': {
+            'description': 'Usuário não encontrado',
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'error': {'type': 'string', 'example': 'Usuário não encontrado'}
+                }
+            }
+        },
+        '500': {
+            'description': 'Erro interno',
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'error': {'type': 'string', 'example': 'Erro ao excluir usuário: mensagem de erro'}
+                }
+            }
+        }
+    }
+})
 def delete_user(id):
     """
     Exclui logicamente um usuário (soft delete).
@@ -256,6 +537,52 @@ def delete_user(id):
         return jsonify({'error': f'Erro ao excluir usuário: {str(e)}'}), 500
 
 @user_routes.route('/usuarios/visualizar/<int:id>', methods=['GET'])
+@swag_from({
+    'tags': ['Usuários'],
+    'parameters': [
+        {
+            'name': 'id',
+            'in': 'path',
+            'type': 'integer',
+            'required': True,
+            'description': 'ID do usuário'
+        }
+    ],
+    'responses': {
+        '200': {
+            'description': 'Detalhes do usuário sem informações sensíveis',
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'id': {'type': 'integer', 'example': 1},
+                    'nome': {'type': 'string', 'example': 'Maria Santos'},
+                    'email': {'type': 'string', 'example': 'maria@email.com'},
+                    'cpf': {'type': 'string', 'example': '12345678901'},
+                    'setor': {'type': 'string', 'example': 'Enfermagem'},
+                    'funcao': {'type': 'string', 'example': 'Enfermeira'}
+                }
+            }
+        },
+        '404': {
+            'description': 'Usuário não encontrado',
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'error': {'type': 'string', 'example': 'Usuário não encontrado'}
+                }
+            }
+        },
+        '500': {
+            'description': 'Erro interno',
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'error': {'type': 'string', 'example': 'Erro ao buscar usuário: mensagem de erro'}
+                }
+            }
+        }
+    }
+})
 def visualizar_usuario(id):
     """
     Retorna os detalhes de um usuário específico pelo ID, excluindo o campo password_hash.
