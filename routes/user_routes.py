@@ -189,6 +189,16 @@ def create_user():
             except ValueError:
                 return jsonify({'error': 'Formato de data_admissao inválido. Use o formato ISO 8601.'}), 400
 
+        # Converte tipo_contratacao para o formato aceito pelo banco
+        tipo_contratacao = data.get('tipo_contratacao')
+        if tipo_contratacao:
+            if tipo_contratacao.lower() == 'contratada':
+                tipo_contratacao = 'c'
+            elif tipo_contratacao.lower() == 'terceirizada':
+                tipo_contratacao = 't'
+            elif tipo_contratacao.lower() == 'pessoa juridica':
+                tipo_contratacao = 'p'
+
         # Cria o usuário
         user = User(
             nome=data.get('nome'),
@@ -206,7 +216,7 @@ def create_user():
             registro_categoria=data.get('registro_categoria'),
             data_admissao=data_admissao,  # Valor convertido
             tipo_acesso=data.get('tipo_acesso'),
-            tipo_contratacao=data.get('tipo_contratacao'),
+            tipo_contratacao=tipo_contratacao,  # Valor convertido
             created_at=data.get('created_at'),
             updated_at=data.get('updated_at')
         )

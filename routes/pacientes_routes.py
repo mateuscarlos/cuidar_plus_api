@@ -720,3 +720,218 @@ def listar_todos_pacientes():
         return jsonify(resultado), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+# Adicione este novo endpoint de busca avançada
+
+@pacientes_routes.route('/pacientes/busca-avancada', methods=['GET'])
+def busca_avancada_pacientes():
+    """
+    Busca avançada de pacientes com múltiplos filtros
+    ---
+    tags:
+      - Pacientes
+    parameters:
+      - name: nome
+        in: query
+        type: string
+        required: false
+        description: Nome completo ou parcial do paciente
+      - name: cpf
+        in: query
+        type: string
+        required: false
+        description: CPF completo ou parcial do paciente
+      - name: id
+        in: query
+        type: integer
+        required: false
+        description: ID do paciente
+      - name: dataNascimento
+        in: query
+        type: string
+        required: false
+        description: Data de nascimento do paciente (YYYY-MM-DD)
+      - name: convenio
+        in: query
+        type: integer
+        required: false
+        description: ID do convênio
+      - name: status
+        in: query
+        type: string
+        required: false
+        description: Status do paciente
+      - name: page
+        in: query
+        type: integer
+        required: false
+        default: 1
+        description: Página de resultados
+      - name: limit
+        in: query
+        type: integer
+        required: false
+        default: 10
+        description: Quantidade de resultados por página
+    responses:
+      200:
+        description: Lista de pacientes que correspondem aos critérios de busca
+        schema:
+          type: object
+          properties:
+            items:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  nome_completo:
+                    type: string
+                    example: "João da Silva"
+                  cpf:
+                    type: string
+                    example: "12345678901"
+                  data_nascimento:
+                    type: string
+                    example: "1990-01-01"
+                  convenio_id:
+                    type: integer
+                    example: 1
+                  status:
+                    type: string
+                    example: "Ativo"
+            total:
+              type: integer
+              example: 42
+            page:
+              type: integer
+              example: 1
+            total_pages:
+              type: integer
+              example: 5
+      400:
+        description: Parâmetros inválidos
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+              example: "ID do paciente deve ser um número"
+      500:
+        description: Erro interno
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+              example: "Erro ao buscar pacientes: mensagem de erro"
+    """
+    try:
+        # Extrair todos os parâmetros da query
+        nome = request.args.get('nome', '')
+        cpf = request.args.get('cpf', '')
+        id_paciente = request.args.get('id', '')
+        data_nascimento = request.args.get('dataNascimento', '')
+        convenio_id = request.args.get('convenio', '')
+        status = request.args.get('status', '')
+        
+        # Parâmetros de paginação
+        try:
+            page = int(request.args.get('page', 1))
+            limit = int(request.args.get('limit', 10))
+        except ValueError:
+            return jsonify({'error': 'Parâmetros de paginação devem ser numéricos'}), 400
+        
+        # Iniciar a consulta
+        query = Paciente.query
+        
+        # Aplicar filtros somente se os parâmetros forem fornecidos
+        if nome:
+            query = query.filter(Paciente.nome_completo.ilike(f'%{nome}%'))
+        
+        if cpf:
+            query = query.filter(Paciente.cpf.like(f'%{cpf}%'))
+        
+        if id_paciente:
+            try:
+                query = query.filter(Paciente.id == int(id_paciente))
+            except ValueError:
+                return jsonify({'error': 'ID do paciente deve ser um número'}), 400
+        
+        if data_nascimento:
+            # Verificar formato da data
+            try:
+                from datetime import datetime
+                data_obj = datetime.strptime(data_nascimento, '%Y-%m-%d')
+                query = query.filter(Paciente.data_nascimento == data_obj.date())
+            except ValueError:
+                return jsonify({'error': 'Data de nascimento deve estar no formato YYYY-MM-DD'}), 400
+        
+        if convenio_id:
+            try:
+                query = query.filter(Paciente.convenio_id == int(convenio_id))
+            except ValueError:
+                return jsonify({'error': 'ID do convênio deve ser um número'}), 400
+        
+        if status:
+            query = query.filter(Paciente.status == status)
+        
+        # Contar o total de resultados para a paginação
+        total = query.count()
+        
+        # Aplicar a paginação
+        total_pages = (total + limit - 1) // limit  # Cálculo de total de páginas
+        
+        # Ajustar a página se estiver fora dos limites
+        if page < 1:
+            page = 1
+        elif page > total_pages and total_pages > 0:
+            page = total_pages
+        
+        # Aplicar offset e limit para paginação
+        offset = (page - 1) * limit
+        pacientes = query.offset(offset).limit(limit).all()
+        
+        # Converter para dicionário
+        resultado = [p.to_dict() for p in pacientes]
+        
+        # Debug: imprimir o que está sendo retornado
+        print(f"Retornando {len(resultado)} pacientes")
+        
+        # Garantir que a estrutura da resposta é consistente
+        response = {
+            'items': resultado,
+            'total': total,
+            'page': page,
+            'total_pages': total_pages
+        }
+        
+        print("Resposta da API:", response)
+        
+        return jsonify(response), 200
+        
+    except Exception as e:
+        print(f"Erro na busca avançada: {str(e)}")
+        return jsonify({'error': f"Erro ao buscar pacientes: {str(e)}"}), 500
+
+@pacientes_routes.route('/pacientes/status-options', methods=['GET'])
+def listar_status_options():
+    """
+    Listar todas as opções de status disponíveis
+    ---
+    tags:
+      - Pacientes
+    responses:
+      200:
+        description: Lista de status disponíveis
+    """
+    try:
+        # Obter valores distintos da coluna status
+        status_options = db.session.query(Paciente.status).distinct().all()
+        # Converter para lista simples
+        status_list = [status[0] for status in status_options if status[0]]
+        return jsonify(status_list), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
