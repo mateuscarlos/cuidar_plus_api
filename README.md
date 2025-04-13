@@ -32,7 +32,7 @@ Bem-vindo à API do **CUIDAR+**, a espinha dorsal do nosso sistema de assistênc
 
 1. **Clone o repositório:**
    ```bash
-   git clone https://github.com/seu-usuario/cuidar-plus-api.git
+   git clone https://github.com/mateuscarlos/cuidar-plus-api.git
    cd cuidar_plus_api
    ```
 
