@@ -2,7 +2,7 @@ services:
   backend:
     build: ../cuidar_plus_api
     ports:
-      - "5001:5000"  # Mapeia a porta 5001 do host para a porta 5000 do container
+      - "5001:5001"  # Mapeia a porta 5001 do host para a porta 5000 do container
     volumes:
       - ../cuidar_plus_api:/app
     environment:

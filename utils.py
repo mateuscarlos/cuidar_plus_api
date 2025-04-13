@@ -74,3 +74,64 @@ def get_address_from_cep(cep):
     if 'erro' in data:
         raise BadRequest("CEP inválido")
     return data
+
+def convert_utc_to_db_format(utc_date_str):
+    """
+    Converte uma string de data UTC para o formato do banco de dados.
+    
+    :param utc_date_str: string de data em UTC (ex: '2025-03-13T12:00:00Z')
+    :return: string de data no formato do banco de dados (ex: '2025-03-13 12:00:00')
+    """
+    utc_date = datetime.strptime(utc_date_str, '%Y-%m-%dT%H:%M:%SZ')
+    return utc_date.strftime('%Y-%m-%d %H:%M:%S')
+
+def convert_ddmmyyyy_to_db_format(date_str):
+    """
+    Converte uma string de data para o formato do banco de dados (YYYY-MM-DD).
+    Aceita tanto o formato DD/MM/YYYY quanto YYYY-MM-DD.
+    
+    :param date_str: string de data no formato dd/mm/yyyy ou yyyy-mm-dd
+    :return: string de data no formato do banco de dados (ex: '2025-03-13')
+    """
+    if not date_str:
+        return None
+        
+    # Verifica se a data já está no formato YYYY-MM-DD
+    if re.match(r'^\d{4}-\d{2}-\d{2}$', date_str):
+        return date_str
+    
+    # Verifica se a data está no formato DD/MM/YYYY
+    elif re.match(r'^\d{2}/\d{2}/\d{4}$', date_str):
+        try:
+            date = datetime.strptime(date_str, '%d/%m/%Y')
+            return date.strftime('%Y-%m-%d')
+        except ValueError:
+            raise ValueError(f"Formato de data inválido: {date_str}. Use DD/MM/YYYY ou YYYY-MM-DD.")
+    else:
+        raise ValueError(f"Formato de data inválido: {date_str}. Use DD/MM/YYYY ou YYYY-MM-DD.")
+
+def format_date(date_string, output_format='iso'):
+    """
+    Formata uma string de data entre diferentes formatos
+    
+    Args:
+        date_string (str): Data em formato string (DD/MM/YYYY ou YYYY-MM-DD)
+        output_format (str): Formato desejado ('iso' ou 'br')
+    
+    Returns:
+        str: Data formatada no formato especificado
+    """
+    if output_format == 'iso':
+        # Converte formato brasileiro (DD/MM/YYYY) para ISO (YYYY-MM-DD)
+        if '/' in date_string:
+            day, month, year = date_string.split('/')
+            return f"{year}-{month.zfill(2)}-{day.zfill(2)}"
+        return date_string
+    elif output_format == 'br':
+        # Converte formato ISO (YYYY-MM-DD) para brasileiro (DD/MM/YYYY)
+        if '-' in date_string:
+            year, month, day = date_string.split('-')
+            return f"{day}/{month}/{year}"
+        return date_string
+    else:
+        return date_string

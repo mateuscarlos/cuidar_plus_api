@@ -7,7 +7,10 @@ PyMySQL
 bleach
 requests
 pytest
+pytest-cov
 Werkzeug
 SQLAlchemy
 cryptography
 pytz
+PyJWT
+argon2-cffi
