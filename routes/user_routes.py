@@ -189,6 +189,16 @@ def create_user():
             except ValueError:
                 return jsonify({'error': 'Formato de data_admissao inválido. Use o formato ISO 8601.'}), 400
 
+        # Converte tipo_contratacao para o formato aceito pelo banco
+        tipo_contratacao = data.get('tipo_contratacao')
+        if tipo_contratacao:
+            if tipo_contratacao.lower() == 'contratada':
+                tipo_contratacao = 'c'
+            elif tipo_contratacao.lower() == 'terceirizada':
+                tipo_contratacao = 't'
+            elif tipo_contratacao.lower() == 'pessoa jurídica' :
+                tipo_contratacao = 'p'
+
         # Cria o usuário
         user = User(
             nome=data.get('nome'),
@@ -206,7 +216,7 @@ def create_user():
             registro_categoria=data.get('registro_categoria'),
             data_admissao=data_admissao,  # Valor convertido
             tipo_acesso=data.get('tipo_acesso'),
-            tipo_contratacao=data.get('tipo_contratacao'),
+            tipo_contratacao=tipo_contratacao,  # Valor convertido
             created_at=data.get('created_at'),
             updated_at=data.get('updated_at')
         )
@@ -221,7 +231,7 @@ def create_user():
         db.session.rollback()
         return jsonify({'error': f'Erro ao criar usuário: {str(e)}'}), 500
 
-@user_routes.route('/usuarios', methods=['GET'])
+@user_routes.route('/usuarios/lista', methods=['GET'])
 @swag_from({
     'tags': ['Usuários'],
     'responses': {
@@ -599,6 +609,227 @@ def visualizar_usuario(id):
         return jsonify(user_data), 200
     except Exception as e:
         return jsonify({'error': f'Erro ao buscar usuário: {str(e)}'}), 500
+
+# Adicione este novo endpoint de busca avançada para usuários
+
+@user_routes.route('/usuarios/busca-avancada', methods=['GET'])
+@swag_from({
+    'tags': ['Usuários'],
+    'parameters': [
+        {
+            'name': 'nome',
+            'in': 'query',
+            'type': 'string',
+            'required': False,
+            'description': 'Nome completo ou parcial do usuário'
+        },
+        {
+            'name': 'email',
+            'in': 'query',
+            'type': 'string',
+            'required': False,
+            'description': 'Email do usuário'
+        },
+        {
+            'name': 'cpf',
+            'in': 'query',
+            'type': 'string',
+            'required': False,
+            'description': 'CPF completo ou parcial do usuário'
+        },
+        {
+            'name': 'id',
+            'in': 'query',
+            'type': 'integer',
+            'required': False,
+            'description': 'ID do usuário'
+        },
+        {
+            'name': 'setor',
+            'in': 'query',
+            'type': 'string',
+            'required': False,
+            'description': 'ID ou nome do setor'
+        },
+        {
+            'name': 'funcao',
+            'in': 'query',
+            'type': 'string',
+            'required': False,
+            'description': 'ID ou nome da função'
+        },
+        {
+            'name': 'status',
+            'in': 'query',
+            'type': 'string',
+            'required': False,
+            'description': 'Status do usuário'
+        },
+        {
+            'name': 'page',
+            'in': 'query',
+            'type': 'integer',
+            'required': False,
+            'default': 1,
+            'description': 'Página de resultados'
+        },
+        {
+            'name': 'limit',
+            'in': 'query',
+            'type': 'integer',
+            'required': False,
+            'default': 10,
+            'description': 'Quantidade de resultados por página'
+        }
+    ],
+    'responses': {
+        '200': {
+            'description': 'Lista de usuários que correspondem aos critérios de busca',
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'items': {
+                        'type': 'array',
+                        'items': {
+                            'type': 'object',
+                            'properties': {
+                                'id': {'type': 'integer', 'example': 1},
+                                'nome': {'type': 'string', 'example': 'João Silva'},
+                                'email': {'type': 'string', 'example': 'joao.silva@email.com'},
+                                'cpf': {'type': 'string', 'example': '12345678901'},
+                                'setor': {'type': 'string', 'example': 'Enfermagem'},
+                                'funcao': {'type': 'string', 'example': 'Enfermeiro'},
+                                'status': {'type': 'string', 'example': 'Ativo'}
+                            }
+                        }
+                    },
+                    'total': {'type': 'integer', 'example': 42},
+                    'page': {'type': 'integer', 'example': 1},
+                    'total_pages': {'type': 'integer', 'example': 5}
+                }
+            }
+        },
+        '400': {
+            'description': 'Parâmetros inválidos',
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'error': {'type': 'string', 'example': 'ID do usuário deve ser um número'}
+                }
+            }
+        },
+        '500': {
+            'description': 'Erro interno',
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'error': {'type': 'string', 'example': 'Erro ao buscar usuários: mensagem de erro'}
+                }
+            }
+        }
+    }
+})
+def busca_avancada_usuarios():
+    """
+    Realiza busca avançada de usuários com múltiplos critérios.
+    """
+    try:
+        # Extrair todos os parâmetros da query
+        nome = request.args.get('nome', '')
+        email = request.args.get('email', '')
+        cpf = request.args.get('cpf', '')
+        id_usuario = request.args.get('id', '')
+        setor = request.args.get('setor', '')
+        funcao = request.args.get('funcao', '')
+        status = request.args.get('status', '')
+        
+        # Parâmetros de paginação
+        try:
+            page = int(request.args.get('page', 1))
+            limit = int(request.args.get('limit', 10))
+        except ValueError:
+            return jsonify({'error': 'Parâmetros de paginação devem ser numéricos'}), 400
+        
+        # Iniciar a consulta
+        query = User.query
+        
+        # Aplicar filtros somente se os parâmetros forem fornecidos
+        if nome:
+            query = query.filter(User.nome.ilike(f'%{nome}%'))
+        
+        if email:
+            query = query.filter(User.email.ilike(f'%{email}%'))
+        
+        if cpf:
+            query = query.filter(User.cpf.like(f'%{cpf}%'))
+        
+        if id_usuario:
+            try:
+                query = query.filter(User.id == int(id_usuario))
+            except ValueError:
+                return jsonify({'error': 'ID do usuário deve ser um número'}), 400
+        
+        if setor:
+            # Tenta filtrar por ID do setor primeiro
+            try:
+                setor_id = int(setor)
+                query = query.filter(User.setor == setor_id)
+            except ValueError:
+                # Se não for possível converter para int, filtra por nome do setor
+                # Isso requer uma junção com a tabela de setores
+                query = query.join(Setor, User.setor == Setor.id).filter(Setor.nome.ilike(f'%{setor}%'))
+        
+        if funcao:
+            # Tenta filtrar por ID da função primeiro
+            try:
+                funcao_id = int(funcao)
+                query = query.filter(User.funcao == funcao_id)
+            except ValueError:
+                # Se não for possível converter para int, filtra por nome da função
+                query = query.join(Funcao, User.funcao == Funcao.id).filter(Funcao.nome.ilike(f'%{funcao}%'))
+        
+        if status:
+            query = query.filter(User.status == status)
+        
+        # Ordenar os resultados por nome (pode ser customizado)
+        query = query.order_by(User.nome)
+        
+        # Contar o total de resultados para a paginação
+        total = query.count()
+        
+        # Aplicar a paginação
+        total_pages = (total + limit - 1) // limit if limit > 0 else 1
+        
+        # Ajustar a página se estiver fora dos limites
+        if page < 1:
+            page = 1
+        elif page > total_pages and total_pages > 0:
+            page = total_pages
+        
+        # Aplicar offset e limit para paginação
+        offset = (page - 1) * limit
+        usuarios = query.offset(offset).limit(limit).all()
+        
+        # Converter para dicionário e remover senha
+        resultado = []
+        for u in usuarios:
+            user_dict = u.to_dict()
+            if 'password_hash' in user_dict:
+                user_dict.pop('password_hash')
+            resultado.append(user_dict)
+        
+        # Retornar resultado com informações de paginação
+        response = {
+            'items': resultado,
+            'total': total,
+            'page': page,
+            'total_pages': total_pages
+        }
+        
+        return jsonify(response), 200
+        
+    except Exception as e:
+        return jsonify({'error': f"Erro ao buscar usuários: {str(e)}"}), 500
 
 # Registrar o Blueprint no aplicativo
 app.register_blueprint(user_routes)

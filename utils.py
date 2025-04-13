@@ -109,3 +109,29 @@ def convert_ddmmyyyy_to_db_format(date_str):
             raise ValueError(f"Formato de data inválido: {date_str}. Use DD/MM/YYYY ou YYYY-MM-DD.")
     else:
         raise ValueError(f"Formato de data inválido: {date_str}. Use DD/MM/YYYY ou YYYY-MM-DD.")
+
+def format_date(date_string, output_format='iso'):
+    """
+    Formata uma string de data entre diferentes formatos
+    
+    Args:
+        date_string (str): Data em formato string (DD/MM/YYYY ou YYYY-MM-DD)
+        output_format (str): Formato desejado ('iso' ou 'br')
+    
+    Returns:
+        str: Data formatada no formato especificado
+    """
+    if output_format == 'iso':
+        # Converte formato brasileiro (DD/MM/YYYY) para ISO (YYYY-MM-DD)
+        if '/' in date_string:
+            day, month, year = date_string.split('/')
+            return f"{year}-{month.zfill(2)}-{day.zfill(2)}"
+        return date_string
+    elif output_format == 'br':
+        # Converte formato ISO (YYYY-MM-DD) para brasileiro (DD/MM/YYYY)
+        if '-' in date_string:
+            year, month, day = date_string.split('-')
+            return f"{day}/{month}/{year}"
+        return date_string
+    else:
+        return date_string
