@@ -18,40 +18,15 @@ def listar_convenios():
     responses:
       200:
         description: Lista de convênios
-        schema:
-          type: array
-          items:
-            type: object
-            properties:
-              id:
-                type: integer
-                example: 1
-              nome:
-                type: string
-                example: "Unimed"
-              created_at:
-                type: string
-                format: date-time
-                example: "2023-01-01T10:00:00"
-              updated_at:
-                type: string
-                format: date-time
-                example: "2023-01-01T10:00:00"
       500:
         description: Erro interno
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-              example: "Erro ao listar convênios"
     """
     try:
         convenios = Convenio.query.all()
         resultado = [convenio.to_dict() for convenio in convenios]
         return jsonify(resultado), 200
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'error': f'Erro ao listar convênios: {str(e)}'}), 500
 
 @convenios_routes.route('/convenios/<int:id>', methods=['GET'])
 def obter_convenio(id):
@@ -69,49 +44,20 @@ def obter_convenio(id):
     responses:
       200:
         description: Detalhes do convênio
-        schema:
-          type: object
-          properties:
-            id:
-              type: integer
-              example: 1
-            nome:
-              type: string
-              example: "Unimed"
-            created_at:
-              type: string
-              format: date-time
-              example: "2023-01-01T10:00:00"
-            updated_at:
-              type: string
-              format: date-time
-              example: "2023-01-01T10:00:00"
       404:
         description: Convênio não encontrado
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-              example: "Convênio não encontrado"
       500:
         description: Erro interno
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-              example: "Erro ao buscar convênio"
     """
     try:
         convenio = Convenio.query.get(id)
         if not convenio:
             return jsonify({'error': 'Convênio não encontrado'}), 404
             
-        return jsonify(convenio.to_dict()), 200
+        return jsonify(convenio.to_dict(include_planos=True)), 200
         
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'error': f'Erro ao buscar convênio: {str(e)}'}), 500
 
 @convenios_routes.route('/convenios/criar', methods=['POST'])
 def criar_convenio():
@@ -131,40 +77,39 @@ def criar_convenio():
               type: string
               example: "Amil"
               description: "Nome do convênio"
+            codigo:
+              type: string
+              example: "AMIL001"
+              description: "Código do convênio"
+            telefone:
+              type: string
+              example: "(11) 1234-5678"
+              description: "Telefone de contato"
+            email:
+              type: string
+              example: "contato@amil.com.br"
+              description: "E-mail de contato"
+            endereco:
+              type: string
+              example: "Rua das Flores, 123"
+              description: "Endereço completo"
+            observacoes:
+              type: string
+              example: "Observações gerais"
+              description: "Observações sobre o convênio"
+            status:
+              type: string
+              example: "ATIVO"
+              description: "Status do convênio"
           required:
             - nome
     responses:
       201:
         description: Convênio criado com sucesso
-        schema:
-          type: object
-          properties:
-            id:
-              type: integer
-              example: 2
-            nome:
-              type: string
-              example: "Amil"
-            created_at:
-              type: string
-              format: date-time
-              example: "2023-01-15T14:30:00"
       400:
         description: Dados inválidos
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-              example: "O nome do convênio é obrigatório"
       500:
         description: Erro interno
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-              example: "Erro ao criar convênio"
     """
     try:
         data = request.get_json()
@@ -172,7 +117,20 @@ def criar_convenio():
         if not data.get('nome'):
             return jsonify({'error': 'O nome do convênio é obrigatório'}), 400
         
-        novo_convenio = Convenio(nome=data.get('nome'))
+        # Mapear status para ativo (boolean)
+        ativo = True
+        if 'status' in data:
+            ativo = data.get('status') == 'ATIVO'
+        
+        novo_convenio = Convenio(
+            nome=data.get('nome'),
+            codigo=data.get('codigo'),
+            telefone=data.get('telefone'),
+            email=data.get('email'),
+            endereco=data.get('endereco'),
+            observacoes=data.get('observacoes'),
+            ativo=ativo
+        )
         
         db.session.add(novo_convenio)
         db.session.commit()
@@ -181,7 +139,128 @@ def criar_convenio():
         
     except Exception as e:
         db.session.rollback()
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'error': f'Erro ao criar convênio: {str(e)}'}), 500
+
+@convenios_routes.route('/convenios/<int:id>', methods=['PUT'])
+def atualizar_convenio(id):
+    """
+    Atualizar um convênio existente
+    ---
+    tags:
+      - Convênios
+    """
+    try:
+        convenio = Convenio.query.get(id)
+        if not convenio:
+            return jsonify({'error': 'Convênio não encontrado'}), 404
+            
+        data = request.get_json()
+        
+        if not data.get('nome'):
+            return jsonify({'error': 'O nome do convênio é obrigatório'}), 400
+            
+        # Atualizar campos
+        convenio.nome = data.get('nome')
+        if 'codigo' in data:
+            convenio.codigo = data.get('codigo')
+        if 'telefone' in data:
+            convenio.telefone = data.get('telefone')
+        if 'email' in data:
+            convenio.email = data.get('email')
+        if 'endereco' in data:
+            convenio.endereco = data.get('endereco')
+        if 'observacoes' in data:
+            convenio.observacoes = data.get('observacoes')
+        if 'status' in data:
+            convenio.ativo = data.get('status') == 'ATIVO'
+        
+        db.session.commit()
+        
+        return jsonify(convenio.to_dict()), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': f'Erro ao atualizar convênio: {str(e)}'}), 500
+
+@convenios_routes.route('/convenios/<int:id>', methods=['DELETE'])
+def excluir_convenio(id):
+    """
+    Excluir um convênio
+    ---
+    tags:
+      - Convênios
+    """
+    try:
+        convenio = Convenio.query.get(id)
+        if not convenio:
+            return jsonify({'error': 'Convênio não encontrado'}), 404
+            
+        # Verificar se existem planos associados ao convênio
+        planos = Plano.query.filter_by(convenio_id=id).first()
+        if planos:
+            return jsonify({'error': 'Não é possível excluir o convênio, pois existem planos associados'}), 409
+            
+        db.session.delete(convenio)
+        db.session.commit()
+        
+        return jsonify({'message': 'Convênio excluído com sucesso'}), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': f'Erro ao excluir convênio: {str(e)}'}), 500
+
+# PLANOS
+
+@convenios_routes.route('/convenios/<int:id>/planos', methods=['POST'])
+def criar_plano(id):
+    """
+    Criar um novo plano para um convênio
+    ---
+    tags:
+      - Convênios
+    """
+    try:
+        convenio = Convenio.query.get(id)
+        if not convenio:
+            return jsonify({'error': 'Convênio não encontrado'}), 404
+            
+        data = request.get_json()
+        
+        if not data.get('nome'):
+            return jsonify({'error': 'O nome do plano é obrigatório'}), 400
+        
+        # Mapear ativo (boolean)
+        ativo = True
+        if 'ativo' in data:
+            ativo = data.get('ativo')
+        
+        novo_plano = Plano(
+            nome=data.get('nome'),
+            convenio_id=id,
+            codigo=data.get('codigo'),
+            descricao=data.get('descricao'),
+            tipo_acomodacao=data.get('tipo_acomodacao'),
+            cobertura_ambulatorial=data.get('cobertura_ambulatorial', True),
+            cobertura_hospitalar=data.get('cobertura_hospitalar', True),
+            cobertura_obstetrica=data.get('cobertura_obstetrica', False),
+            cobertura_odontologica=data.get('cobertura_odontologica', False),
+            cobertura_emergencia=data.get('cobertura_emergencia', True),
+            valor_mensalidade=data.get('valor_mensalidade'),
+            carencia_consultas=data.get('carencia_consultas', 0),
+            carencia_exames=data.get('carencia_exames', 0),
+            carencia_internacao=data.get('carencia_internacao', 0),
+            observacoes=data.get('observacoes'),
+            ativo=ativo
+        )
+        
+        db.session.add(novo_plano)
+        db.session.commit()
+        
+        return jsonify(novo_plano.to_dict()), 201
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': f'Erro ao criar plano: {str(e)}'}), 500
 
 @convenios_routes.route('/planos/convenios/<int:id>', methods=['GET'])
 def obter_planos_convenio(id):
@@ -190,56 +269,6 @@ def obter_planos_convenio(id):
     ---
     tags:
       - Convênios
-    parameters:
-      - name: id
-        in: path
-        type: integer
-        required: true
-        description: ID do convênio
-    responses:
-      200:
-        description: Lista de planos do convênio
-        schema:
-          type: array
-          items:
-            type: object
-            properties:
-              id:
-                type: integer
-                example: 1
-              nome:
-                type: string
-                example: "Plano Básico"
-              convenio_id:
-                type: integer
-                example: 1
-              descricao:
-                type: string
-                example: "Plano com cobertura básica"
-              created_at:
-                type: string
-                format: date-time
-                example: "2023-01-01T10:00:00"
-              updated_at:
-                type: string
-                format: date-time
-                example: "2023-01-01T10:00:00"
-      404:
-        description: Convênio não encontrado
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-              example: "Convênio não encontrado"
-      500:
-        description: Erro interno
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-              example: "Erro ao buscar planos do convênio"
     """
     try:
         convenio = Convenio.query.get(id)
@@ -252,110 +281,7 @@ def obter_planos_convenio(id):
         return jsonify(resultado), 200
         
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-@convenios_routes.route('/convenios/<int:id>/planos', methods=['POST'])
-def criar_plano(id):
-    """
-    Criar um novo plano para um convênio
-    ---
-    tags:
-      - Convênios
-    parameters:
-      - name: id
-        in: path
-        type: integer
-        required: true
-        description: ID do convênio
-      - name: body
-        in: body
-        required: true
-        schema:
-          type: object
-          properties:
-            nome:
-              type: string
-              example: "Plano Premium"
-              description: "Nome do plano"
-            descricao:
-              type: string
-              example: "Plano com cobertura completa"
-              description: "Descrição detalhada do plano (opcional)"
-          required:
-            - nome
-    responses:
-      201:
-        description: Plano criado com sucesso
-        schema:
-          type: object
-          properties:
-            id:
-              type: integer
-              example: 3
-            nome:
-              type: string
-              example: "Plano Premium"
-            convenio_id:
-              type: integer
-              example: 1
-            descricao:
-              type: string
-              example: "Plano com cobertura completa"
-            created_at:
-              type: string
-              format: date-time
-              example: "2023-01-15T14:30:00"
-      400:
-        description: Dados inválidos
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-              example: "O nome do plano é obrigatório"
-      404:
-        description: Convênio não encontrado
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-              example: "Convênio não encontrado"
-      500:
-        description: Erro interno
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-              example: "Erro ao criar plano"
-    """
-    try:
-        convenio = Convenio.query.get(id)
-        if not convenio:
-            return jsonify({'error': 'Convênio não encontrado'}), 404
-            
-        data = request.get_json()
-        
-        if not data.get('nome'):
-            return jsonify({'error': 'O nome do plano é obrigatório'}), 400
-        
-        novo_plano = Plano(
-            nome=data.get('nome'),
-            convenio_id=id,
-            descricao=data.get('descricao', '')
-        )
-        
-        db.session.add(novo_plano)
-        db.session.commit()
-        
-        return jsonify(novo_plano.to_dict()), 201
-        
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({'error': str(e)}), 500
-
-# PLANOS
+        return jsonify({'error': f'Erro ao buscar planos do convênio: {str(e)}'}), 500
 
 @convenios_routes.route('/planos', methods=['GET'])
 def listar_planos():
@@ -364,49 +290,13 @@ def listar_planos():
     ---
     tags:
       - Convênios
-    responses:
-      200:
-        description: Lista de planos
-        schema:
-          type: array
-          items:
-            type: object
-            properties:
-              id:
-                type: integer
-                example: 1
-              nome:
-                type: string
-                example: "Plano Básico"
-              convenio_id:
-                type: integer
-                example: 1
-              descricao:
-                type: string
-                example: "Plano com cobertura básica"
-              created_at:
-                type: string
-                format: date-time
-                example: "2023-01-01T10:00:00"
-              updated_at:
-                type: string
-                format: date-time
-                example: "2023-01-01T10:00:00"
-      500:
-        description: Erro interno
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-              example: "Erro ao listar planos"
     """
     try:
         planos = Plano.query.all()
         resultado = [plano.to_dict() for plano in planos]
         return jsonify(resultado), 200
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'error': f'Erro ao listar planos: {str(e)}'}), 500
 
 @convenios_routes.route('/planos/<int:id>', methods=['GET'])
 def obter_plano(id):
@@ -415,54 +305,6 @@ def obter_plano(id):
     ---
     tags:
       - Convênios
-    parameters:
-      - name: id
-        in: path
-        type: integer
-        required: true
-        description: ID do plano
-    responses:
-      200:
-        description: Detalhes do plano
-        schema:
-          type: object
-          properties:
-            id:
-              type: integer
-              example: 1
-            nome:
-              type: string
-              example: "Plano Básico"
-            convenio_id:
-              type: integer
-              example: 1
-            descricao:
-              type: string
-              example: "Plano com cobertura básica"
-            created_at:
-              type: string
-              format: date-time
-              example: "2023-01-01T10:00:00"
-            updated_at:
-              type: string
-              format: date-time
-              example: "2023-01-01T10:00:00"
-      404:
-        description: Plano não encontrado
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-              example: "Plano não encontrado"
-      500:
-        description: Erro interno
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-              example: "Erro ao buscar plano"
     """
     try:
         plano = Plano.query.get(id)
@@ -472,7 +314,7 @@ def obter_plano(id):
         return jsonify(plano.to_dict()), 200
         
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'error': f'Erro ao buscar plano: {str(e)}'}), 500
 
 @convenios_routes.route('/planos/<int:id>', methods=['PUT'])
 def atualizar_plano(id):
@@ -481,78 +323,6 @@ def atualizar_plano(id):
     ---
     tags:
       - Convênios
-    parameters:
-      - name: id
-        in: path
-        type: integer
-        required: true
-        description: ID do plano
-      - name: body
-        in: body
-        required: true
-        schema:
-          type: object
-          properties:
-            nome:
-              type: string
-              example: "Plano Básico Plus"
-              description: "Nome atualizado do plano"
-            descricao:
-              type: string
-              example: "Plano com cobertura básica e alguns adicionais"
-              description: "Descrição atualizada do plano (opcional)"
-            convenio_id:
-              type: integer
-              example: 2
-              description: "ID do convênio (opcional, para transferir o plano)"
-          required:
-            - nome
-    responses:
-      200:
-        description: Plano atualizado com sucesso
-        schema:
-          type: object
-          properties:
-            id:
-              type: integer
-              example: 1
-            nome:
-              type: string
-              example: "Plano Básico Plus"
-            convenio_id:
-              type: integer
-              example: 2
-            descricao:
-              type: string
-              example: "Plano com cobertura básica e alguns adicionais"
-            updated_at:
-              type: string
-              format: date-time
-              example: "2023-01-15T14:30:00"
-      400:
-        description: Dados inválidos
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-              example: "O nome do plano é obrigatório"
-      404:
-        description: Plano não encontrado
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-              example: "Plano não encontrado"
-      500:
-        description: Erro interno
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-              example: "Erro ao atualizar plano"
     """
     try:
         plano = Plano.query.get(id)
@@ -564,13 +334,37 @@ def atualizar_plano(id):
         if not data.get('nome'):
             return jsonify({'error': 'O nome do plano é obrigatório'}), 400
             
+        # Atualizar campos
         plano.nome = data.get('nome')
         
+        if 'codigo' in data:
+            plano.codigo = data.get('codigo')
         if 'descricao' in data:
             plano.descricao = data.get('descricao')
-            
-        if 'convenio_id' in data:
-            plano.convenio_id = data.get('convenio_id')
+        if 'tipo_acomodacao' in data:
+            plano.tipo_acomodacao = data.get('tipo_acomodacao')
+        if 'cobertura_ambulatorial' in data:
+            plano.cobertura_ambulatorial = data.get('cobertura_ambulatorial')
+        if 'cobertura_hospitalar' in data:
+            plano.cobertura_hospitalar = data.get('cobertura_hospitalar')
+        if 'cobertura_obstetrica' in data:
+            plano.cobertura_obstetrica = data.get('cobertura_obstetrica')
+        if 'cobertura_odontologica' in data:
+            plano.cobertura_odontologica = data.get('cobertura_odontologica')
+        if 'cobertura_emergencia' in data:
+            plano.cobertura_emergencia = data.get('cobertura_emergencia')
+        if 'valor_mensalidade' in data:
+            plano.valor_mensalidade = data.get('valor_mensalidade')
+        if 'carencia_consultas' in data:
+            plano.carencia_consultas = data.get('carencia_consultas')
+        if 'carencia_exames' in data:
+            plano.carencia_exames = data.get('carencia_exames')
+        if 'carencia_internacao' in data:
+            plano.carencia_internacao = data.get('carencia_internacao')
+        if 'observacoes' in data:
+            plano.observacoes = data.get('observacoes')
+        if 'ativo' in data:
+            plano.ativo = data.get('ativo')
         
         db.session.commit()
         
@@ -578,7 +372,7 @@ def atualizar_plano(id):
         
     except Exception as e:
         db.session.rollback()
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'error': f'Erro ao atualizar plano: {str(e)}'}), 500
 
 @convenios_routes.route('/planos/<int:id>/status', methods=['PATCH'])
 def alterar_status_plano(id):
@@ -587,67 +381,6 @@ def alterar_status_plano(id):
     ---
     tags:
       - Convênios
-    parameters:
-      - name: id
-        in: path
-        type: integer
-        required: true
-        description: ID do plano
-      - name: body
-        in: body
-        required: true
-        schema:
-          type: object
-          properties:
-            ativo:
-              type: boolean
-              example: false
-              description: "Status do plano (true = ativo, false = inativo)"
-          required:
-            - ativo
-    responses:
-      200:
-        description: Status do plano alterado com sucesso
-        schema:
-          type: object
-          properties:
-            id:
-              type: integer
-              example: 1
-            nome:
-              type: string
-              example: "Plano Básico"
-            ativo:
-              type: boolean
-              example: false
-            updated_at:
-              type: string
-              format: date-time
-              example: "2023-01-15T14:30:00"
-      400:
-        description: Dados inválidos
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-              example: "O campo 'ativo' é obrigatório"
-      404:
-        description: Plano não encontrado
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-              example: "Plano não encontrado"
-      500:
-        description: Erro interno
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-              example: "Erro ao alterar status do plano"
     """
     try:
         plano = Plano.query.get(id)
@@ -667,161 +400,7 @@ def alterar_status_plano(id):
         
     except Exception as e:
         db.session.rollback()
-        return jsonify({'error': str(e)}), 500
-
-# Adicionando novas rotas para completar CRUD de convênios
-
-@convenios_routes.route('/convenios/<int:id>', methods=['PUT'])
-def atualizar_convenio(id):
-    """
-    Atualizar um convênio existente
-    ---
-    tags:
-      - Convênios
-    parameters:
-      - name: id
-        in: path
-        type: integer
-        required: true
-        description: ID do convênio
-      - name: body
-        in: body
-        required: true
-        schema:
-          type: object
-          properties:
-            nome:
-              type: string
-              example: "Unimed Nacional"
-              description: "Nome atualizado do convênio"
-          required:
-            - nome
-    responses:
-      200:
-        description: Convênio atualizado com sucesso
-        schema:
-          type: object
-          properties:
-            id:
-              type: integer
-              example: 1
-            nome:
-              type: string
-              example: "Unimed Nacional"
-            updated_at:
-              type: string
-              format: date-time
-              example: "2023-01-15T14:30:00"
-      400:
-        description: Dados inválidos
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-              example: "O nome do convênio é obrigatório"
-      404:
-        description: Convênio não encontrado
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-              example: "Convênio não encontrado"
-      500:
-        description: Erro interno
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-              example: "Erro ao atualizar convênio"
-    """
-    try:
-        convenio = Convenio.query.get(id)
-        if not convenio:
-            return jsonify({'error': 'Convênio não encontrado'}), 404
-            
-        data = request.get_json()
-        
-        if not data.get('nome'):
-            return jsonify({'error': 'O nome do convênio é obrigatório'}), 400
-            
-        convenio.nome = data.get('nome')
-        
-        db.session.commit()
-        
-        return jsonify(convenio.to_dict()), 200
-        
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({'error': str(e)}), 500
-
-@convenios_routes.route('/convenios/<int:id>', methods=['DELETE'])
-def excluir_convenio(id):
-    """
-    Excluir um convênio
-    ---
-    tags:
-      - Convênios
-    parameters:
-      - name: id
-        in: path
-        type: integer
-        required: true
-        description: ID do convênio a ser excluído
-    responses:
-      200:
-        description: Convênio excluído com sucesso
-        schema:
-          type: object
-          properties:
-            message:
-              type: string
-              example: "Convênio excluído com sucesso"
-      404:
-        description: Convênio não encontrado
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-              example: "Convênio não encontrado"
-      409:
-        description: Conflito - Convênio possui planos associados
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-              example: "Não é possível excluir o convênio, pois existem planos associados"
-      500:
-        description: Erro interno
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-              example: "Erro ao excluir convênio"
-    """
-    try:
-        convenio = Convenio.query.get(id)
-        if not convenio:
-            return jsonify({'error': 'Convênio não encontrado'}), 404
-            
-        # Verificar se existem planos associados ao convênio
-        planos = Plano.query.filter_by(convenio_id=id).first()
-        if planos:
-            return jsonify({'error': 'Não é possível excluir o convênio, pois existem planos associados'}), 409
-            
-        db.session.delete(convenio)
-        db.session.commit()
-        
-        return jsonify({'message': 'Convênio excluído com sucesso'}), 200
-        
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'error': f'Erro ao alterar status do plano: {str(e)}'}), 500
 
 @convenios_routes.route('/planos/<int:id>', methods=['DELETE'])
 def excluir_plano(id):
@@ -830,45 +409,6 @@ def excluir_plano(id):
     ---
     tags:
       - Convênios
-    parameters:
-      - name: id
-        in: path
-        type: integer
-        required: true
-        description: ID do plano a ser excluído
-    responses:
-      200:
-        description: Plano excluído com sucesso
-        schema:
-          type: object
-          properties:
-            message:
-              type: string
-              example: "Plano excluído com sucesso"
-      404:
-        description: Plano não encontrado
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-              example: "Plano não encontrado"
-      409:
-        description: Conflito - Plano possui pacientes associados
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-              example: "Não é possível excluir o plano, pois existem pacientes associados"
-      500:
-        description: Erro interno
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-              example: "Erro ao excluir plano"
     """
     try:
         plano = Plano.query.get(id)
@@ -886,4 +426,4 @@ def excluir_plano(id):
         
     except Exception as e:
         db.session.rollback()
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'error': f'Erro ao excluir plano: {str(e)}'}), 500
