@@ -77,11 +77,10 @@ def create_setor():
         if existing_setor:
             return jsonify({'error': 'Setor já existe'}), 400
         
-        setor = Setor(
-            nome=data['nome'],
-            descricao=data.get('descricao'),
-            status=data.get('status', True)
-        )
+        setor = Setor()
+        setor.nome = data['nome']
+        setor.descricao = data.get('descricao')
+        setor.status = data.get('status', True)
         
         db.session.add(setor)
         db.session.commit()

@@ -1,13 +1,13 @@
-from flask import Flask, Blueprint, request, jsonify
+from flask import Flask, Blueprint, request, jsonify, session
 from models.user import User
 from db import db
 from flasgger import Swagger, swag_from
-import re
-import bleach
 from werkzeug.exceptions import BadRequest, Conflict, NotFound
 from utils import validate_cpf, sanitize_input
-import requests
 from datetime import datetime
+from functools import wraps
+import requests  # Added missing import
+import re  # Added missing import
 
 # Inicialização do Flask
 app = Flask(__name__)
@@ -21,8 +21,19 @@ app.config['SWAGGER'] = {
     'specs_route': '/docs/'  # Rota para acessar a documentação Swagger
 }
 swagger = Swagger(app)
-
 # Blueprint para as rotas de usuário
+user_routes = Blueprint('user_routes', __name__)
+
+def login_required(f):
+    """
+    Decorator to require login for protected routes
+    """
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_id' not in session:
+            return jsonify({'message': 'Login requerido'}), 401
+        return f(*args, **kwargs)
+    return decorated_function
 user_routes = Blueprint('user_routes', __name__)
 
 # Error handlers
@@ -44,7 +55,7 @@ def handle_internal_error(e):
 
 def camel_to_snake(data):
     """
-    Converte as chaves de um dicionário de camelCase para snake_case.
+    Converts dictionary keys from camelCase to snake_case.
     """
     if isinstance(data, dict):
         new_data = {}
@@ -143,53 +154,57 @@ def camel_to_snake(data):
 })
 def create_user():
     """
-    Cria um novo usuário e consulta o endereço via API ViaCEP.
+    Creates a new user and queries address via ViaCEP API.
     """
-    data = camel_to_snake(request.get_json())  # Converte camelCase para snake_case
+    request_data = request.get_json()
+    if not request_data:
+        return jsonify({'error': 'No data provided'}), 400
+    
+    data = camel_to_snake(request_data)  # Convert camelCase to snake_case
     try:
-        # Consulta o CEP na API ViaCEP
+        # Query CEP via ViaCEP API
         cep = data.get('cep')
         if not cep:
-            return jsonify({'error': 'CEP é obrigatório'}), 400
+            return jsonify({'error': 'CEP is required'}), 400
 
         response = requests.get(f'https://viacep.com.br/ws/{cep}/json/')
         response.raise_for_status()
-        endereco_via_cep = response.json()
+        address_via_cep = response.json()
 
-        if 'erro' in endereco_via_cep:
-            return jsonify({'error': 'CEP não encontrado'}), 404
+        if 'erro' in address_via_cep:
+            return jsonify({'error': 'CEP not found'}), 404
 
-        # Mesclar o endereço da API ViaCEP com os dados enviados pelo formulário
-        endereco_formulario = data.get('endereco', {})
-        endereco_final = {
-            # Dados do ViaCEP como referência
+        # Merge address from ViaCEP API with form data
+        form_address = data.get('endereco', {})
+        final_address = {
+            # ViaCEP data as reference
             'cep': cep,
-            'logradouro': endereco_via_cep.get('logradouro', ''),
-            'bairro': endereco_via_cep.get('bairro', ''),
-            'localidade': endereco_via_cep.get('localidade', ''),
-            'uf': endereco_via_cep.get('uf', ''),
-            'estado': endereco_via_cep.get('uf', ''),
+            'logradouro': address_via_cep.get('logradouro', ''),
+            'bairro': address_via_cep.get('bairro', ''),
+            'localidade': address_via_cep.get('localidade', ''),
+            'uf': address_via_cep.get('uf', ''),
+            'estado': address_via_cep.get('uf', ''),
             
-            # Sobrescrever com dados do formulário que têm prioridade
-            'numero': endereco_formulario.get('numero', ''),
-            'complemento': endereco_formulario.get('complemento', ''),
+            # Override with form data that has priority
+            'numero': form_address.get('numero', ''),
+            'complemento': form_address.get('complemento', ''),
         }
         
-        # Se houver mais campos no formulário, preservá-los
-        if endereco_formulario:
-            for key, value in endereco_formulario.items():
-                if key not in ['cep'] and key not in endereco_final:
-                    endereco_final[key] = value
+        # If there are more fields in the form, preserve them
+        if form_address:
+            for key, value in form_address.items():
+                if key not in ['cep'] and key not in final_address:
+                    final_address[key] = value
 
-        # Converte data_admissao para o formato correto (YYYY-MM-DD)
+        # Convert admission_date to correct format (YYYY-MM-DD)
         data_admissao = data.get('data_admissao')
         if data_admissao:
             try:
                 data_admissao = datetime.fromisoformat(data_admissao.replace("Z", "")).date()
             except ValueError:
-                return jsonify({'error': 'Formato de data_admissao inválido. Use o formato ISO 8601.'}), 400
+                return jsonify({'error': 'Invalid data_admissao format. Use ISO 8601 format.'}), 400
 
-        # Converte tipo_contratacao para o formato aceito pelo banco
+        # Convert contract_type to database accepted format
         tipo_contratacao = data.get('tipo_contratacao')
         if tipo_contratacao:
             if tipo_contratacao.lower() == 'contratada':
@@ -199,7 +214,7 @@ def create_user():
             elif tipo_contratacao.lower() == 'pessoa jurídica' :
                 tipo_contratacao = 'p'
 
-        # Cria o usuário
+        # Create user
         user = User(
             nome=data.get('nome'),
             email=data.get('email'),
@@ -209,14 +224,14 @@ def create_user():
             cep=cep,
             setor=data.get('setor'),
             funcao=data.get('funcao'),
-            endereco=endereco_final,  # Usando o endereço mesclado
+            endereco=final_address,  # Using merged address
             status=data.get('status'),
             telefone=data.get('telefone'),
             especialidade=data.get('especialidade'),
             registro_categoria=data.get('registro_categoria'),
-            data_admissao=data_admissao,  # Valor convertido
+            data_admissao=data_admissao,  # Converted value
             tipo_acesso=data.get('tipo_acesso'),
-            tipo_contratacao=tipo_contratacao,  # Valor convertido
+            tipo_contratacao=tipo_contratacao,  # Converted value
             created_at=data.get('created_at'),
             updated_at=data.get('updated_at')
         )
@@ -1021,6 +1036,82 @@ def get_estatisticas_usuarios():
         }), 200
     except Exception as e:
         return jsonify({'error': f'Erro ao obter estatísticas: {str(e)}'}), 500
+
+@user_routes.route('/api/usuarios/<int:user_id>/alterar-senha', methods=['PATCH'])
+@login_required
+def alterar_senha_usuario(user_id):
+    """
+    Altera a senha de um usuário específico
+    """
+    try:
+        from argon2 import PasswordHasher
+        from argon2.exceptions import VerifyMismatchError
+        
+        ph = PasswordHasher()
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({'message': 'Dados não fornecidos'}), 400
+            
+        nova_senha = data.get('nova_senha')
+        senha_atual = data.get('senha_atual')
+        
+        if not nova_senha:
+            return jsonify({'message': 'Nova senha é obrigatória'}), 400
+            
+        # Validar força da senha
+        if len(nova_senha) < 8:
+            return jsonify({'message': 'A senha deve ter pelo menos 8 caracteres'}), 422
+            
+        # Verificar se contém os critérios necessários
+        import re
+        if not re.search(r'[a-z]', nova_senha):
+            return jsonify({'message': 'A senha deve conter pelo menos uma letra minúscula'}), 422
+        if not re.search(r'[A-Z]', nova_senha):
+            return jsonify({'message': 'A senha deve conter pelo menos uma letra maiúscula'}), 422
+        if not re.search(r'\d', nova_senha):
+            return jsonify({'message': 'A senha deve conter pelo menos um número'}), 422
+        if not re.search(r'[@$!%*?&]', nova_senha):
+            return jsonify({'message': 'A senha deve conter pelo menos um caractere especial'}), 422
+        
+        # Buscar o usuário
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({'message': 'Usuário não encontrado'}), 404
+            
+        # Verificar permissões
+        current_user_id = session.get('user_id')
+        current_user = User.query.get(current_user_id)
+        
+        # Se não é o próprio usuário, verificar se é admin
+        if current_user_id != user_id:
+            if not current_user or current_user.tipo_acesso != 'admin':
+                return jsonify({'message': 'Permissão negada'}), 403
+        else:
+            # Se é o próprio usuário, verificar senha atual
+            if not senha_atual:
+                return jsonify({'message': 'Senha atual é obrigatória'}), 400
+                
+            try:
+                ph.verify(user.password_hash, senha_atual)
+            except VerifyMismatchError:
+                return jsonify({'message': 'Senha atual incorreta'}), 400
+        
+        # Criptografar a nova senha
+        nova_senha_hash = ph.hash(nova_senha)
+        
+        # Atualizar a senha
+        user.password_hash = nova_senha_hash
+        db.session.commit()
+        
+        # Log da alteração
+        app.logger.info(f'Senha alterada para usuário {user_id} por usuário {current_user_id}')
+        
+        return jsonify({'message': 'Senha alterada com sucesso'}), 200
+        
+    except Exception as e:
+        app.logger.error(f'Erro ao alterar senha: {str(e)}')
+        return jsonify({'message': 'Erro interno do servidor'}), 500
 
 # Registrar o Blueprint no aplicativo
 app.register_blueprint(user_routes)

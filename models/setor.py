@@ -1,5 +1,6 @@
 from db import db
 from datetime import datetime
+import datetime as dt
 
 class Setor(db.Model):
     __tablename__ = 'setores'
@@ -8,7 +9,7 @@ class Setor(db.Model):
     nome = db.Column(db.String(100), nullable=False)
     descricao = db.Column(db.Text, nullable=True)
     status = db.Column(db.Boolean, default=True, nullable=False)
-    data_criacao = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    data_criacao = db.Column(db.DateTime, default=lambda: datetime.now(dt.timezone.utc), nullable=False)
 
     # Relacionamento com funções
     funcoes = db.relationship("Funcao", backref="setor", lazy=True, cascade="all, delete-orphan")
@@ -23,7 +24,7 @@ class Setor(db.Model):
             'descricao': self.descricao,
             'status': self.status,
             'data_criacao': self.data_criacao.isoformat() if self.data_criacao else None,
-            'funcoes': [funcao.to_dict() for funcao in self.funcoes] if self.funcoes else []
+            'funcoes': [funcao.to_dict() for funcao in (self.funcoes or [])] # type: ignore
         }
 
     @staticmethod

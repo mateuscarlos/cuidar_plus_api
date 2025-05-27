@@ -31,14 +31,13 @@ def create_funcao():
         if existing_funcao:
             return jsonify({'error': 'Função já existe neste setor'}), 400
         
-        funcao = Funcao(
-            setor_id=data['setor_id'],
-            nome=data['nome'],
-            descricao=data.get('descricao'),
-            nivel_acesso=data.get('nivel_acesso', 1),
-            reg_categoria=data.get('reg_categoria'),
-            status=data.get('status', True)
-        )
+        funcao = Funcao()
+        funcao.setor_id = data['setor_id']
+        funcao.nome = data['nome']
+        funcao.descricao = data.get('descricao')
+        funcao.nivel_acesso = data.get('nivel_acesso', 1)
+        funcao.reg_categoria = data.get('reg_categoria')
+        funcao.status = data.get('status', True)
         
         db.session.add(funcao)
         db.session.commit()

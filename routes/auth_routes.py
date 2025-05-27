@@ -73,77 +73,85 @@ def register():
 @auth_bp.route('/login', methods=['POST'])
 def login():
     """
-    Rota para autenticar um usuário.
-    ---
-    tags:
-      - Autenticação
-    parameters:
-      - name: body
-        in: body
-        required: true
-        schema:
-          type: object
-          properties:
-            email:
-              type: string
-              example: admin@cuidarplus.com
-            senha:
-              type: string
-              example: CuidarPlus@2025
-    responses:
-      200:
-        description: Login bem-sucedido
-        schema:
-          type: object
-          properties:
-            token:
-              type: string
-              example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-      401:
-        description: Credenciais inválidas
+    Endpoint para login de usuário
     """
     try:
+        from argon2 import PasswordHasher
+        from argon2.exceptions import VerifyMismatchError
+        
+        ph = PasswordHasher()
         data = request.get_json()
-
-        # Buscar usuário pelo email
-        user = User.query.filter_by(email=data.get('email')).first()
+        
+        if not data:
+            return jsonify({'message': 'Dados não fornecidos'}), 400
+        
+        email = data.get('email')
+        password = data.get('password')
+        
+        if not email or not password:
+            return jsonify({'message': 'Email e senha são obrigatórios'}), 400
+        
+        # Buscar usuário por email
+        user = User.query.filter_by(email=email).first()
+        
         if not user:
             return jsonify({'message': 'Email ou senha inválidos'}), 401
 
         # Verificar a senha usando Argon2
         try:
-            ph.verify(user.password_hash, data.get('password'))
+            ph.verify(user.password_hash, password)
         except VerifyMismatchError:
             return jsonify({'message': 'Email ou senha inválidos'}), 401
 
-        # Rehash da senha, se necessário
+        # Verificar se o usuário está ativo
+        if user.status != 'ativo':
+            return jsonify({'message': 'Usuário inativo. Contate o administrador'}), 401
+
+        # Rehash da senha se necessário (para manter a segurança atualizada)
         if ph.check_needs_rehash(user.password_hash):
-            user.password_hash = ph.hash(data.get('password'))
+            user.password_hash = ph.hash(password)
             db.session.commit()
 
         # Gerar token JWT
+        from datetime import datetime, timedelta
+        import jwt
+        
         expiration = datetime.utcnow() + timedelta(hours=24)
         payload = {
             'user_id': user.id,
-            'exp': expiration
+            'email': user.email,
+            'tipo_acesso': user.tipo_acesso,
+            'exp': expiration,
+            'iat': datetime.utcnow()
         }
+        
         token = jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256')
+
+        # Salvar informações da sessão
+        session['user_id'] = user.id
+        session['user_email'] = user.email
+        session['logged_in'] = True
+
+        # Log do login
+        app.logger.info(f'Login realizado com sucesso para usuário {user.email} (ID: {user.id})')
 
         return jsonify({
             'message': 'Login realizado com sucesso',
+            'token': token,
             'user': {
                 'id': user.id,
                 'nome': user.nome,
                 'email': user.email,
                 'setor': user.setor,
                 'funcao': user.funcao,
+                'tipo_acesso': user.tipo_acesso,
                 'status': user.status
-            },
-            'token': token
+            }
         }), 200
-
+        
     except Exception as e:
-        return jsonify({'message': f'Erro ao realizar login: {str(e)}'}), 500
+        app.logger.error(f'Erro no login: {str(e)}')
+        return jsonify({'message': 'Erro interno do servidor'}), 500
 
 @auth_bp.route('/api/protected-route', methods=['GET'])
 def protected_route():

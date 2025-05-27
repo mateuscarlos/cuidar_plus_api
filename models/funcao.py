@@ -7,6 +7,9 @@ class Funcao(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     setor_id = db.Column(db.Integer, db.ForeignKey('setores.id'), nullable=False)
     nome = db.Column(db.String(255), nullable=False)
+    
+    # Relationship
+    setor = db.relationship('Setor', backref='funcoes')
     descricao = db.Column(db.Text, nullable=True)
     nivel_acesso = db.Column(db.Integer, nullable=False, default=1)  # 1=Básico, 2=Intermediário, 3=Avançado
     status = db.Column(db.Boolean, default=True, nullable=False)
