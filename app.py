@@ -8,23 +8,12 @@ from routes.acompanhamentos_routes import acompanhamentos_routes
 from routes.auth_routes import auth_bp
 from routes.planos_routes import planos_routes
 from routes.cep_routes import cep_routes
-""" from routes.routes_setor import bp as setor_bp """
-from routes.routes_setor import setores_funcoes_bp
-from routes.routes_setor import bp as setores_bp
-from routes.setores import setores_bp
-from routes.funcoes import funcoes_bp
+from routes.routes_setor import setor_bp
+from routes.routes_funcoes import funcao_bp
 from flasgger import Swagger
 from config import Config
 
 from flask_migrate import Migrate
-
-# Fix imports for routes
-try:
-    from routes.user_routes import user_routes
-    from routes.routes_setor import bp as setor_bp
-    # Import other routes as needed
-except ImportError as e:
-    print(f"Error importing routes: {e}")
 
 # Inicialização da aplicação
 app = Flask(__name__, template_folder='../cuidar-plus/cuidar-plus', static_folder='../cuidar-plus/cuidar-plus')
@@ -158,12 +147,8 @@ app.register_blueprint(convenios_routes)
 app.register_blueprint(acompanhamentos_routes)
 app.register_blueprint(planos_routes)
 app.register_blueprint(cep_routes)
-""" app.register_blueprint(setor_bp)
-app.register_blueprint(setores_funcoes_bp) """
-app.register_blueprint(setores_bp)
-app.register_blueprint(setores_funcoes_bp)
-app.register_blueprint(setores_bp, url_prefix='/api')
-app.register_blueprint(funcoes_bp, url_prefix='/api')
+app.register_blueprint(setor_bp)
+app.register_blueprint(funcao_bp)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=True)

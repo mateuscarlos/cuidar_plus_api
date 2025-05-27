@@ -831,6 +831,197 @@ def busca_avancada_usuarios():
     except Exception as e:
         return jsonify({'error': f"Erro ao buscar usuários: {str(e)}"}), 500
 
+@user_routes.route('/usuarios', methods=['GET'])
+@swag_from({
+    'tags': ['Usuários'],
+    'parameters': [
+        {
+            'name': 'nome',
+            'in': 'query',
+            'type': 'string',
+            'required': False,
+            'description': 'Filtrar por nome'
+        },
+        {
+            'name': 'email',
+            'in': 'query',
+            'type': 'string',
+            'required': False,
+            'description': 'Filtrar por email'
+        },
+        {
+            'name': 'status',
+            'in': 'query',
+            'type': 'string',
+            'required': False,
+            'description': 'Filtrar por status'
+        },
+        {
+            'name': 'setor',
+            'in': 'query',
+            'type': 'string',
+            'required': False,
+            'description': 'Filtrar por setor'
+        },
+        {
+            'name': 'tipo_acesso',
+            'in': 'query',
+            'type': 'string',
+            'required': False,
+            'description': 'Filtrar por tipo de acesso'
+        }
+    ],
+    'responses': {
+        '200': {
+            'description': 'Lista de usuários',
+            'schema': {
+                'type': 'array',
+                'items': {
+                    'type': 'object',
+                    'properties': {
+                        'id': {'type': 'integer'},
+                        'nome': {'type': 'string'},
+                        'email': {'type': 'string'},
+                        'status': {'type': 'string'}
+                    }
+                }
+            }
+        }
+    }
+})
+def get_usuarios():
+    """
+    Lista usuários com filtros opcionais - endpoint compatível com o frontend.
+    """
+    try:
+        query = User.query
+        
+        # Aplicar filtros se fornecidos
+        nome = request.args.get('nome')
+        if nome:
+            query = query.filter(User.nome.ilike(f'%{nome}%'))
+        
+        email = request.args.get('email')
+        if email:
+            query = query.filter(User.email.ilike(f'%{email}%'))
+        
+        status = request.args.get('status')
+        if status:
+            query = query.filter(User.status == status)
+        
+        setor = request.args.get('setor')
+        if setor:
+            try:
+                setor_id = int(setor)
+                query = query.filter(User.setor_id == setor_id)
+            except ValueError:
+                pass
+        
+        tipo_acesso = request.args.get('tipo_acesso')
+        if tipo_acesso:
+            query = query.filter(User.tipo_acesso == tipo_acesso)
+        
+        usuarios = query.all()
+        
+        # Remover senhas dos resultados
+        resultado = []
+        for user in usuarios:
+            user_dict = user.to_dict()
+            user_dict.pop('password_hash', None)
+            resultado.append(user_dict)
+        
+        return jsonify(resultado), 200
+    except Exception as e:
+        return jsonify({'error': f'Erro ao listar usuários: {str(e)}'}), 500
+
+@user_routes.route('/usuarios/<int:id>/status', methods=['PATCH'])
+@swag_from({
+    'tags': ['Usuários'],
+    'parameters': [
+        {
+            'name': 'id',
+            'in': 'path',
+            'type': 'integer',
+            'required': True,
+            'description': 'ID do usuário'
+        },
+        {
+            'name': 'body',
+            'in': 'body',
+            'required': True,
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'status': {'type': 'string', 'example': 'Ativo'}
+                },
+                'required': ['status']
+            }
+        }
+    ],
+    'responses': {
+        '200': {
+            'description': 'Status atualizado com sucesso'
+        },
+        '404': {
+            'description': 'Usuário não encontrado'
+        }
+    }
+})
+def alterar_status_usuario(id):
+    """
+    Altera o status de um usuário.
+    """
+    try:
+        user = User.query.get(id)
+        if not user:
+            raise NotFound('Usuário não encontrado')
+        
+        data = request.get_json()
+        user.status = data.get('status')
+        
+        db.session.commit()
+        return jsonify(user.to_dict()), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': f'Erro ao alterar status: {str(e)}'}), 500
+
+@user_routes.route('/usuarios/estatisticas', methods=['GET'])
+@swag_from({
+    'tags': ['Usuários'],
+    'responses': {
+        '200': {
+            'description': 'Estatísticas dos usuários',
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'total': {'type': 'integer'},
+                    'ativos': {'type': 'integer'},
+                    'inativos': {'type': 'integer'},
+                    'administradores': {'type': 'integer'}
+                }
+            }
+        }
+    }
+})
+def get_estatisticas_usuarios():
+    """
+    Retorna estatísticas dos usuários.
+    """
+    try:
+        total = User.query.count()
+        ativos = User.query.filter(User.status == 'Ativo').count()
+        inativos = User.query.filter(User.status == 'Inativo').count()
+        administradores = User.query.filter(User.tipo_acesso == 'Administrador').count()
+        
+        return jsonify({
+            'total': total,
+            'ativos': ativos,
+            'inativos': inativos,
+            'administradores': administradores
+        }), 200
+    except Exception as e:
+        return jsonify({'error': f'Erro ao obter estatísticas: {str(e)}'}), 500
+
 # Registrar o Blueprint no aplicativo
 app.register_blueprint(user_routes)
 
